@@ -14,6 +14,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -139,9 +140,17 @@ type K8sClient struct {
 	ClientSet *kubernetes.Clientset
 }
 
+func buildConfigFromFlags(contextName, kubeconfigPath string) (*rest.Config, error) {
+	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		&clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeconfigPath},
+		&clientcmd.ConfigOverrides{
+			CurrentContext: contextName,
+		}).ClientConfig()
+}
+
 // NewK8sClient return a k8s client
-func NewK8sClient(kubeconfig string) (K8sClient, error) {
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+func NewK8sClient(contextName, kubeconfig string) (K8sClient, error) {
+	config, err := buildConfigFromFlags(contextName, kubeconfig)
 	if err != nil {
 		return K8sClient{}, err
 	}
@@ -191,12 +200,12 @@ func (k8s *K8sClient) DeleteIngress(nameSpace string, name string) error {
 
 // DeleteEnvironment deletes an environment
 func (k8s *K8sClient) DeleteEnvironment(nameSpace string, name string) error {
-	/*err := k8s.DeleteDeployment(nameSpace, name)
+	err := k8s.DeleteDeployment(nameSpace, name)
 	if err != nil {
 		return err
-	}*/
+	}
 
-	err := k8s.DeleteService(nameSpace, name)
+	err = k8s.DeleteService(nameSpace, name)
 	if err != nil {
 		return err
 	}
@@ -210,7 +219,6 @@ func (k8s *K8sClient) DeleteEnvironment(nameSpace string, name string) error {
 }
 
 func main() {
-	// TODO figured how to select the cluster and implement filtering by cluster
 	var prefix = flag.String("prefix", "", "prefix string to filter environments to check")
 	var expiration = flag.Int("expirarion", 120, "how many hous to consider and environment stale")
 	var dryRun = flag.Bool("dryRun", false, "only show logs but don'r perform deletess")
@@ -218,6 +226,7 @@ func main() {
 	var cfEndpoint = flag.String("cfEndpoint", "https://g.codefresh.io", "codefresh api endpoint")
 	var kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	var k8sNamespace = flag.String("k8sNamespace", "", "the k8s namespace to operate on")
+	var k8sContextName = flag.String("k8sContextName", "", "the k8s context name to operate on")
 	flag.Parse()
 
 	cfClient := NewCFCLient(*cfEndpoint, *cfToken)
@@ -226,7 +235,7 @@ func main() {
 		log.Fatalf("error listing environments: %s", err)
 	}
 
-	k8sClient, err := NewK8sClient(*kubeconfig)
+	k8sClient, err := NewK8sClient(*k8sContextName, *kubeconfig)
 	if err != nil {
 		log.Fatalf("error creating k8s client: %s", err)
 	}
