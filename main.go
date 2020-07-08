@@ -2,16 +2,17 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
-	"strings"
 	"time"
 
+	"github.com/gobwas/glob"
+	cli "github.com/urfave/cli/v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -218,51 +219,101 @@ func (k8s *K8sClient) DeleteEnvironment(nameSpace string, name string) error {
 	return nil
 }
 
-func main() {
-	var prefix = flag.String("prefix", "", "prefix string to filter environments to check")
-	var expiration = flag.Int("expirarion", 120, "how many hous to consider and environment stale")
-	var dryRun = flag.Bool("dryRun", false, "only show logs but don'r perform deletess")
-	var cfToken = flag.String("cfToken", "", "codefresh api token")
-	var cfEndpoint = flag.String("cfEndpoint", "https://g.codefresh.io", "codefresh api endpoint")
-	var kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	var k8sNamespace = flag.String("k8sNamespace", "", "the k8s namespace to operate on")
-	var k8sContextName = flag.String("k8sContextName", "", "the k8s context name to operate on")
-	flag.Parse()
-
-	cfClient := NewCFCLient(*cfEndpoint, *cfToken)
+func run(c *cli.Context) error {
+	cfClient := NewCFCLient(c.String("cfEndpoint"), c.String("cfToken"))
 	environments, err := cfClient.EnvironmentsList()
 	if err != nil {
 		log.Fatalf("error listing environments: %s", err)
 	}
 
-	k8sClient, err := NewK8sClient(*k8sContextName, *kubeconfig)
+	k8sClient, err := NewK8sClient(c.String("k8sContextName"), c.String("k8sKubeconfig"))
 	if err != nil {
 		log.Fatalf("error creating k8s client: %s", err)
 	}
 
+	g := glob.MustCompile(c.String("name"))
 	for _, environment := range environments {
-		expired := time.Since(environment.UpdatedAt) >= time.Duration(*expiration)*time.Hour
-		match := strings.HasPrefix(environment.Name, *prefix)
-		log.Printf("Name: %s Duration: %s, Expired: %t, Matches: %t",
-			environment.Name, time.Since(environment.UpdatedAt), expired, match)
-		if !expired || !match {
-			continue
-		}
-
-		if !*dryRun {
-			if err := cfClient.DeleteEnvironment(environment.Name); err != nil {
-				log.Printf("error deleting environment: %s", err)
-				continue
+		matches := g.Match(environment.Name)
+		expired := time.Since(environment.UpdatedAt) >= time.Duration(c.Int("expiration"))*time.Hour
+		log.Printf("Name: %s Duration: %s, Expired: %t, Matches: %t, Forced: %t",
+			environment.Name, time.Since(environment.UpdatedAt), expired, matches, c.Bool("force"))
+		if matches && (expired || c.Bool("force")) {
+			if !c.Bool("dryRun") {
+				if err := cfClient.DeleteEnvironment(environment.Name); err != nil {
+					log.Printf("error deleting environment: %s", err)
+					continue
+				}
 			}
-		}
-		log.Printf("Environment deleted: %s", environment.Name)
-		if !*dryRun {
-			if err := k8sClient.DeleteDeployment(*k8sNamespace, environment.Name); err != nil {
-				log.Printf("error deleting k8s deployment: %s", err)
-				continue
+			log.Printf("Environment deleted: %s", environment.Name)
+			if !c.Bool("dryRun") {
+				if err := k8sClient.DeleteDeployment(c.String("k8sNamespace"), environment.Name); err != nil {
+					log.Printf("error deleting k8s deployment: %s", err)
+					continue
+				}
 			}
-		}
 
-		log.Printf("K8s deployment deleted: %s", environment.Name)
+			log.Printf("K8s deployment deleted: %s", environment.Name)
+		}
+	}
+	return nil
+}
+
+func main() {
+	app := cli.NewApp()
+	app.Flags = []cli.Flag{
+		&cli.StringFlag{
+			Name:     "name",
+			Usage:    "environment name to filter, accepts glob expressions",
+			Required: true,
+		},
+		&cli.BoolFlag{
+			Name:  "force",
+			Usage: "force will ignore expiration check",
+			Value: false,
+		},
+		&cli.IntFlag{
+			Name:  "expiration",
+			Usage: "how many hous to consider an environment stale",
+			Value: 120,
+		},
+		&cli.BoolFlag{
+			Name:  "dryRun",
+			Usage: "only show logs but don'r perform deletess",
+			Value: false,
+		},
+		&cli.StringFlag{
+			Name:     "cfToken",
+			Usage:    "codefresh api token",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:  "cfEndpoint",
+			Usage: "codefresh api endpoint",
+			Value: "https://g.codefresh.io",
+		},
+		&cli.StringFlag{
+			Name:     "k8sKubeconfig",
+			Usage:    "absolute path to the kubeconfig file",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "k8sNamespace",
+			Usage:    "the k8s namespace to operate on",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "k8sContextName",
+			Usage:    "the k8s context name to operate on",
+			Required: true,
+		},
+	}
+
+	app.Action = func(c *cli.Context) error {
+		return run(c)
+	}
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
