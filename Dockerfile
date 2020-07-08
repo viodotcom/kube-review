@@ -6,5 +6,5 @@ WORKDIR /
 
 COPY . .
 
-RUN go build -o ./cf-stop-stale-envs .
-RUN chmod +x cf-stop-stale-envs
+RUN go build -o ./cf-stop-k8s-env .
+RUN chmod +x cf-stop-k8s-env

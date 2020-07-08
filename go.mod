@@ -1,4 +1,4 @@
-module github.com/FindHotel/cf-stop-review-env
+module github.com/FindHotel/cf-stop-k8s-env
 
 go 1.14
 
