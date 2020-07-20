@@ -285,7 +285,7 @@ func main() {
 		&cli.StringFlag{
 			Name:     "cfToken",
 			Usage:    "codefresh api token",
-			Required: false,
+			Required: true,
 		},
 		&cli.StringFlag{
 			Name:  "cfEndpoint",
