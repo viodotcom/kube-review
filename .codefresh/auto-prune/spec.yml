@@ -1,0 +1,23 @@
+version: '1.0'
+kind: pipeline
+metadata:
+  name: cf-review-env/auto-prune
+  project: cf-review-env
+  deprecate: {}
+  labels:
+    tags: []
+spec:
+  triggers: []
+  steps: {}
+  stages: []
+  variables: []
+  contexts: []
+  terminationPolicy: []
+  externalResources: []
+  specTemplate:
+    location: git
+    repo: FindHotel/cf-review-env
+    path: ./.codefresh/auto-prune/pipeline.yml
+    revision: ch19575
+    context: github
+

@@ -1,0 +1,28 @@
+version: "1.0"
+stages:
+  - "clone"
+  - "build"
+  - "run"
+
+steps:
+  clone:
+    title: "Cloning repository"
+    type: "git-clone"
+    repo: "FindHotel/cf-review-env"
+    revision: "${{CF_BRANCH}}"
+    git: "github"
+    stage: "clone"
+
+  build:
+    title: "Building Docker image"
+    type: "build"
+    image_name: "cf-review-env"
+    working_directory: "${{clone}}"
+    tag: latest
+    tags:
+      - "${{CF_SHORT_REVISION}}"
+      - "${{CF_BRANCH_TAG_NORMALIZED}}"
+      - latest
+    dockerfile: "Dockerfile"
+    stage: "build"
+    registry: cf-review-env
