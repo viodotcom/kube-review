@@ -1,8 +1,8 @@
 version: '1.0'
 kind: pipeline
 metadata:
-  name: cf-review-env/build
-  project: cf-review-env
+  name: cf-review-env-{{(ds "data").STAGE}}/build
+  project: cf-review-env-{{(ds "data").STAGE}}
 spec:
   triggers:
     - name: FindHotel/cf-review-env

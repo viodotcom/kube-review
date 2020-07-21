@@ -1,8 +1,8 @@
 version: '1.0'
 kind: pipeline
 metadata:
-  name: cf-review-env/auto-prune
-  project: cf-review-env
+  name: cf-review-env-{{(ds "data").STAGE}}/auto-prune
+  project: cf-review-env-{{(ds "data").STAGE}}
   deprecate: {}
   labels:
     tags: []
