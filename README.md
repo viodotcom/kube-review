@@ -11,7 +11,7 @@ You will need `brew` installed and a CodeFresh API Token.
 
 To instal requied depencies run:
 
-   CFTOKEN=[YOUR-TOKEN-HERE] make setup
+    CFTOKEN=[YOUR-TOKEN-HERE] make setup
 
 ## Create and Update
 
