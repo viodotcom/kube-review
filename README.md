@@ -15,8 +15,8 @@ To instal requied depencies run:
 
 ## Create and Update
 
-In order to create or update the pipelines you need a project already crated in CodeFresh.
-We recommend using the `cf-review-env-[STAGE]` as name of the project.
+In order to create or update the pipelines you need a project already created in CodeFresh.
+We recommend using `cf-review-env-[STAGE]` as name of the project.
 
 To create the pipelines run:
 
