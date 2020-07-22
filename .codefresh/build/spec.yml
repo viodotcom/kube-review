@@ -15,7 +15,7 @@ spec:
       branchRegex: /.*/gi
       branchRegexInput: regex
       provider: github
-      disabled: false
+      disabled: {{if eq (ds "data").STAGE "main"}}false{{else}}true{{end}}
       options:
         noCache: false
         noCfCache: false

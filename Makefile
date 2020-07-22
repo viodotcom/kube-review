@@ -1,5 +1,5 @@
 PIPELINE?=build
-STAGE?=stg
+STAGE?=lab
 
 setup:
 	brew tap codefresh-io/cli

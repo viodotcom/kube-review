@@ -20,8 +20,8 @@ We recommend using `cf-review-env-[STAGE]` as name of the project.
 
 To create the pipelines run:
 
-    STAGE=stg make create
+    STAGE=lab make create
 
 After that, you can update the pipelines by running:
 
-    STAGE=stg make update
+    STAGE=lab make update
