@@ -34,5 +34,5 @@ spec:
     location: git
     repo: FindHotel/cf-review-env
     path: ./.codefresh/build/pipeline.yml
-    revision: ch19575
+    revision: master
     context: github
