@@ -164,8 +164,9 @@ func NewK8sClient(contextName, kubeconfig string) (K8sClient, error) {
 }
 
 // DeleteDeployment deletes a deployment
-func (k8s *K8sClient) DeleteDeployment(nameSpace string, name string) error {
-	deploymentsClient := k8s.ClientSet.AppsV1().Deployments(nameSpace)
+func (k8s *K8sClient) DeleteDeployment(name string) error {
+	// The name of the deployment and the namespace are the same
+	deploymentsClient := k8s.ClientSet.AppsV1().Deployments(name)
 	deletePolicy := metav1.DeletePropagationForeground
 	if err := deploymentsClient.Delete(name, &metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
@@ -176,8 +177,8 @@ func (k8s *K8sClient) DeleteDeployment(nameSpace string, name string) error {
 }
 
 // DeleteService deletes a service
-func (k8s *K8sClient) DeleteService(nameSpace string, name string) error {
-	servicesClient := k8s.ClientSet.CoreV1().Services(nameSpace)
+func (k8s *K8sClient) DeleteService(name string) error {
+	servicesClient := k8s.ClientSet.CoreV1().Services(name)
 	deletePolicy := metav1.DeletePropagationForeground
 	if err := servicesClient.Delete(name, &metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
@@ -188,8 +189,8 @@ func (k8s *K8sClient) DeleteService(nameSpace string, name string) error {
 }
 
 // DeleteIngress deletes an ingress
-func (k8s *K8sClient) DeleteIngress(nameSpace string, name string) error {
-	ingressesClient := k8s.ClientSet.ExtensionsV1beta1().Ingresses(nameSpace)
+func (k8s *K8sClient) DeleteIngress(name string) error {
+	ingressesClient := k8s.ClientSet.ExtensionsV1beta1().Ingresses(name)
 	deletePolicy := metav1.DeletePropagationForeground
 	if err := ingressesClient.Delete(name, &metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
@@ -200,18 +201,18 @@ func (k8s *K8sClient) DeleteIngress(nameSpace string, name string) error {
 }
 
 // DeleteEnvironment deletes an environment
-func (k8s *K8sClient) DeleteEnvironment(nameSpace string, name string) error {
-	err := k8s.DeleteDeployment(nameSpace, name)
+func (k8s *K8sClient) DeleteEnvironment(name string) error {
+	err := k8s.DeleteDeployment(name)
 	if err != nil {
 		return err
 	}
 
-	err = k8s.DeleteService(nameSpace, name)
+	err = k8s.DeleteService(name)
 	if err != nil {
 		return err
 	}
 
-	err = k8s.DeleteIngress(nameSpace, name)
+	err = k8s.DeleteIngress(name)
 	if err != nil {
 		return err
 	}
@@ -246,7 +247,7 @@ func run(c *cli.Context) error {
 			}
 			log.Printf("Environment deleted: %s", environment.Name)
 			if !c.Bool("dryRun") {
-				if err := k8sClient.DeleteDeployment(c.String("k8sNamespace"), environment.Name); err != nil {
+				if err := k8sClient.DeleteDeployment(environment.Name); err != nil {
 					log.Printf("error deleting k8s deployment: %s", err)
 					continue
 				}
@@ -294,11 +295,6 @@ func main() {
 		&cli.StringFlag{
 			Name:     "k8sKubeconfig",
 			Usage:    "absolute path to the kubeconfig file",
-			Required: true,
-		},
-		&cli.StringFlag{
-			Name:     "k8sNamespace",
-			Usage:    "the k8s namespace to operate on",
 			Required: true,
 		},
 		&cli.StringFlag{

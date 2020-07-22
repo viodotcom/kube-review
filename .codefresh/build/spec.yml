@@ -1,0 +1,38 @@
+version: '1.0'
+kind: pipeline
+metadata:
+  name: cf-review-env/build
+  project: cf-review-env
+spec:
+  triggers:
+    - name: FindHotel/cf-review-env
+      type: git
+      repo: FindHotel/cf-review-env
+      events:
+        - push.heads
+      pullRequestAllowForkEvents: false
+      commentRegex: /.*/gi
+      branchRegex: /.*/gi
+      branchRegexInput: regex
+      provider: github
+      disabled: false
+      options:
+        noCache: false
+        noCfCache: false
+        resetVolume: false
+      verified: true
+      context: github
+      contexts: []
+      variables: []
+  steps: {}
+  stages: []
+  variables: []
+  contexts: []
+  terminationPolicy: []
+  externalResources: []
+  specTemplate:
+    location: git
+    repo: FindHotel/cf-review-env
+    path: ./.codefresh/build/pipeline.yml
+    revision: ch19575
+    context: github

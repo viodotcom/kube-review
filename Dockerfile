@@ -4,7 +4,7 @@ RUN apk add --no-cache git
 
 WORKDIR /
 
-COPY . .
+COPY prune/* ./
 
-RUN go build -o ./cf-stop-k8s-env .
-RUN chmod +x cf-stop-k8s-env
+RUN go build -o ./prune .
+RUN chmod +x prune
