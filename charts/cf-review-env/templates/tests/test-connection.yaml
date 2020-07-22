@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "cf-review-env.fullname" . }}-test-connection"
+  labels:
+    {{- include "cf-review-env.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "cf-review-env.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

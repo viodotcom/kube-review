@@ -1,10 +1,22 @@
-FROM golang:1.14-alpine
+FROM golang:1.14-alpine as base
 
 RUN apk add --no-cache git
-
 WORKDIR /
 
 COPY prune/* ./
-
 RUN go build -o ./prune .
 RUN chmod +x prune
+
+FROM codefresh/cfstep-helm:3.0.3
+RUN apk add --no-cache libstdc++
+RUN curl -L "https://github.com/codefresh-io/cli/releases/download/v0.71.3/codefresh-v0.71.3-alpine-x64.tar.gz" -o codefresh.tar.gz \
+    && tar -zxvf codefresh.tar.gz \
+    && mv ./codefresh /usr/local/bin/codefresh
+RUN chmod +x /usr/local/bin/codefresh
+
+WORKDIR /
+COPY deploy/* ./
+RUN chmod +x deploy
+
+# We need to do this because cfstep-helm has an entrypoint
+ENTRYPOINT []

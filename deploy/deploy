@@ -1,0 +1,35 @@
+#!/bin/sh
+export NAMESPACE=re-$NAME
+kubectl config use-context $KUBE_CONTEXT
+kubectl create namespace $NAMESPACE --dry-run -o yaml | kubectl apply -f -
+kubectl create secret generic $NAMESPACE --from-env-file=/codefresh/volume/secrets.env --dry-run -o yaml --save-config=true --namespace $NAMESPACE | kubectl apply -f -
+codefresh generate image-pull-secret --cluster $KUBE_CONTEXT --namespace $NAMESPACE --registry $APP_REGISTRY_NAME
+
+# We need to use env here because of the CUSTOM vars
+# they have special charectes that export can't handle
+env \
+ACTION=install \
+CHART_REPO_URL=cm://h.cfcr.io/findhotel/default \
+CHART_REF=cf-review-env \
+KUBE_CONTEXT=$KUBE_CONTEXT \
+RELEASE_NAME=$NAME \
+HELM_VERSION=3.0.3 \
+CUSTOM_image_tag=$APP_IMAGE_TAG \
+CUSTOM_image_repository=$APP_IMAGE_URL \
+CUSTOM_imagePullSecrets=$(kubectl get secret --namespace $NAMESPACE --field-selector='type=kubernetes.io/dockercfg' -o=jsonpath='{.items[0].metadata.name}') \
+CUSTOM_envFrom_secretRef_name=$NAMESPACE \
+CUSTOM_"ingress_hosts[0]_host=$NAMESPACE.$APP_DOMAIN" \
+CUSTOM_"ingress_hosts[0]_paths[0]=/" \
+CUSTOM_"ingress_tls[0]_secretName=$NAMESPACE-tls" \
+CUSTOM_"ingress_tls[0]_hosts[0]=$NAMESPACE.$APP_DOMAIN" \
+CUSTOMFILE_0=$VALUES_FILE \
+SKIP_CF_STABLE_HELM_REPO=true \
+WAIT=true \
+/opt/bin/release_chart
+
+env ACTION=auth \
+SKIP_CF_STABLE_HELM_REPO=true \
+HELM_VERSION=3.0.3 \
+KUBE_CONTEXT=$KUBE_CONTEXT \
+/opt/bin/release_chart
+helm test $NAME --namespace $NAMESPACE
