@@ -1,8 +1,8 @@
 version: '1.0'
 kind: pipeline
 metadata:
-  name: cf-review-env/build
-  project: cf-review-env
+  name: cf-review-env-{{(ds "data").STAGE}}/build
+  project: cf-review-env-{{(ds "data").STAGE}}
 spec:
   triggers:
     - name: FindHotel/cf-review-env
@@ -34,5 +34,5 @@ spec:
     location: git
     repo: FindHotel/cf-review-env
     path: ./.codefresh/build/pipeline.yml
-    revision: ch19575
+    revision: master
     context: github
