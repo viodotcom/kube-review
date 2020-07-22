@@ -16,7 +16,7 @@ steps:
   build:
     title: "Building Docker image"
     type: "build"
-    image_name: "cf-review-env-{{(ds "data").STAGE}}"
+    image_name: "cf-review-env-${{STAGE}}"
     working_directory: "${{clone}}"
     tag: latest
     tags:
@@ -25,4 +25,4 @@ steps:
       - latest
     dockerfile: "Dockerfile"
     stage: "build"
-    registry: cf-review-env-{{(ds "data").STAGE}}
+    registry: cf-review-env-${{STAGE}}
