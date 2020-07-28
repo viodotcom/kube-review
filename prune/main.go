@@ -163,60 +163,16 @@ func NewK8sClient(contextName, kubeconfig string) (K8sClient, error) {
 	return K8sClient{clientset}, nil
 }
 
-// DeleteDeployment deletes a deployment
-func (k8s *K8sClient) DeleteDeployment(name string) error {
+// DeleteNamespace deletes a namespace
+func (k8s *K8sClient) DeleteNamespace(name string) error {
 	// The name of the deployment and the namespace are the same
-	deploymentsClient := k8s.ClientSet.AppsV1().Deployments(name)
+	namespacesClient := k8s.ClientSet.CoreV1().Namespaces()
 	deletePolicy := metav1.DeletePropagationForeground
-	if err := deploymentsClient.Delete(name, &metav1.DeleteOptions{
+	if err := namespacesClient.Delete(name, &metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	}); err != nil {
 		return err
 	}
-	return nil
-}
-
-// DeleteService deletes a service
-func (k8s *K8sClient) DeleteService(name string) error {
-	servicesClient := k8s.ClientSet.CoreV1().Services(name)
-	deletePolicy := metav1.DeletePropagationForeground
-	if err := servicesClient.Delete(name, &metav1.DeleteOptions{
-		PropagationPolicy: &deletePolicy,
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// DeleteIngress deletes an ingress
-func (k8s *K8sClient) DeleteIngress(name string) error {
-	ingressesClient := k8s.ClientSet.ExtensionsV1beta1().Ingresses(name)
-	deletePolicy := metav1.DeletePropagationForeground
-	if err := ingressesClient.Delete(name, &metav1.DeleteOptions{
-		PropagationPolicy: &deletePolicy,
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// DeleteEnvironment deletes an environment
-func (k8s *K8sClient) DeleteEnvironment(name string) error {
-	err := k8s.DeleteDeployment(name)
-	if err != nil {
-		return err
-	}
-
-	err = k8s.DeleteService(name)
-	if err != nil {
-		return err
-	}
-
-	err = k8s.DeleteIngress(name)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -247,13 +203,13 @@ func run(c *cli.Context) error {
 			}
 			log.Printf("Environment deleted: %s", environment.Name)
 			if !c.Bool("dryRun") {
-				if err := k8sClient.DeleteDeployment(environment.Name); err != nil {
-					log.Printf("error deleting k8s deployment: %s", err)
+				if err := k8sClient.DeleteNamespace(environment.Name); err != nil {
+					log.Printf("error deleting k8s namespace: %s", err)
 					continue
 				}
 			}
 
-			log.Printf("K8s deployment deleted: %s", environment.Name)
+			log.Printf("K8s namespace deleted: %s", environment.Name)
 		}
 	}
 	return nil
