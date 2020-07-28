@@ -25,11 +25,21 @@ spec:
       contexts: []
       variables: []
   steps: {}
+  runtimeEnvironment:
+    name: k8s-fh-ci-{{if eq (ds "data").STAGE "main"}}prd{{else}}stg{{end}}/codefresh
+    cpu: 2000m
+    memory: 4096Mi
+    dindStorage: nullGi
+  terminationPolicy:
+    - event: onCreate
+      type: branch
+      ignoreTrigger: true
   stages: []
   variables: []
   contexts: []
-  terminationPolicy: []
   externalResources: []
+  concurrency: 1
+  triggerConcurrency: 1
   specTemplate:
     location: git
     repo: FindHotel/cf-review-env

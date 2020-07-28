@@ -16,7 +16,9 @@ RUN chmod +x /usr/local/bin/codefresh
 
 WORKDIR /
 COPY deploy/* ./
+COPY --from=base /prune ./
 RUN chmod +x deploy
+RUN chmod +x prune
 
 # We need to do this because cfstep-helm has an entrypoint
 ENTRYPOINT []
