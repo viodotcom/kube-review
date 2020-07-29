@@ -28,6 +28,7 @@ spec:
     spec:
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets }}
+        - name: {{ .Values.imagePullSecretsSideCar }}
       serviceAccountName: {{ include "cf-review-env.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -62,6 +63,26 @@ spec:
             timeoutSeconds: {{ .Values.readinessProbe.httpGet.timeoutSeconds}}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+        {{- if .Values.sideCar.enabled }}
+        - name: {{ .Chart.Name }}-sideCar
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repositorySideCar }}:{{ .Values.image.tagSideCar | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: {{ .Values.deploymentSideCar.ports.name }}
+              containerPort: {{ .Values.deploymentSideCar.ports.containerPort }}
+              protocol: {{ .Values.deploymentSideCar.ports.protocol }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.livenessProbeSideCar.httpGet.path}}
+              port: {{ .Values.serviceSideCar.port}}
+              scheme: {{ .Values.livenessProbeSideCar.httpGet.scheme}}
+            initialDelaySeconds: {{ .Values.livenessProbeSideCar.httpGet.initialDelaySeconds}}
+            timeoutSeconds: {{ .Values.livenessProbeSideCar.httpGet.timeoutSeconds}}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

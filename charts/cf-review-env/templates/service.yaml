@@ -11,5 +11,11 @@ spec:
       protocol: {{ .Values.service.protocol }}
       port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
+    {{- if .Values.sideCar.enabled }}
+    - name: {{ .Values.serviceSideCar.name }}
+      protocol: {{ .Values.serviceSideCar.protocol }}
+      port: {{ .Values.serviceSideCar.port }}
+      targetPort: {{ .Values.serviceSideCar.targetPort }}
+    {{- end}}
   selector:
     {{- include "cf-review-env.selectorLabels" . | nindent 4 }}
