@@ -14,7 +14,7 @@ ACTION=install \
 CHART_REPO_URL=cm://h.cfcr.io/findhotel/default \
 CHART_REF=cf-review-env \
 KUBE_CONTEXT=$KUBE_CONTEXT \
-RELEASE_NAME=$NAME \
+RELEASE_NAME=$NAMESPACE \
 HELM_VERSION=3.0.3 \
 CUSTOM_image_tag=$APP_IMAGE_TAG \
 CUSTOM_image_repository=$APP_IMAGE_URL \
@@ -34,4 +34,4 @@ SKIP_CF_STABLE_HELM_REPO=true \
 HELM_VERSION=3.0.3 \
 KUBE_CONTEXT=$KUBE_CONTEXT \
 /opt/bin/release_chart
-helm test $NAME --namespace $NAMESPACE
+helm test $NAMESPACE --namespace $NAMESPACE
