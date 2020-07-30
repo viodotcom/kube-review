@@ -47,4 +47,4 @@ SKIP_CF_STABLE_HELM_REPO=true \
 HELM_VERSION=$helm_version \
 KUBE_CONTEXT=$KUBE_CONTEXT \
 /opt/bin/release_chart
-cf_export $NAMESPACE
+cf_export NAMESPACE=re-$SHORT_NAME-$HASH
