@@ -1,4 +1,8 @@
 #!/bin/sh
+chart_version=0.2.0
+helm_version=3.0.3
+chart_ref=cf-review-env
+
 SHORT_NAME=$(echo -n $NAME | cut -c1-20)
 HASH=$(echo $NAME | rhash -p "%c" -)
 export NAMESPACE=re-$SHORT_NAME-$HASH
@@ -11,11 +15,12 @@ codefresh generate image-pull-secret --cluster $KUBE_CONTEXT --namespace $NAMESP
 # they have special charectes that export can't handle
 env \
 ACTION=install \
-CHART_REPO_URL=cm://h.cfcr.io/findhotel/default \
-CHART_REF=cf-review-env \
+CHART_REPO_URL=$HELM_REPO_URL \
+CHART_REF=$chart_ref \
 KUBE_CONTEXT=$KUBE_CONTEXT \
 RELEASE_NAME=$NAMESPACE \
-HELM_VERSION=3.0.3 \
+CHART_VERSION=$chart_version \
+HELM_VERSION=$helm_version \
 CUSTOM_image_tag=$APP_IMAGE_TAG \
 CUSTOM_image_repository=$APP_IMAGE_URL \
 CUSTOM_imagePullSecrets=$(kubectl get secret --namespace $NAMESPACE --field-selector='type=kubernetes.io/dockercfg' -o=jsonpath='{.items[0].metadata.name}') \
@@ -31,7 +36,8 @@ WAIT=true \
 
 env ACTION=auth \
 SKIP_CF_STABLE_HELM_REPO=true \
-HELM_VERSION=3.0.3 \
+HELM_VERSION=$helm_version \
+CHART_VERSION=$chart_version \
 KUBE_CONTEXT=$KUBE_CONTEXT \
 /opt/bin/release_chart
 helm test $NAMESPACE --namespace $NAMESPACE

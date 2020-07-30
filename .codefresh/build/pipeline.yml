@@ -39,3 +39,5 @@ steps:
     dockerfile: Dockerfile
     stage: build
     registry: ${{IMAGE_REGISTRY_NAME}}
+    build_arguments:
+      - DEFAULT_HELM_REPO_URL=${{K8S_CHART_REPOSITORY}}
