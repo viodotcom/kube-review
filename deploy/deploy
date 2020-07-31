@@ -16,7 +16,7 @@ SKIP_CF_STABLE_HELM_REPO=true \
 HELM_VERSION=$helm_version \
 KUBE_CONTEXT=$KUBE_CONTEXT \
 /opt/bin/release_chart
-cf_export $NAMESPACE
+cf_export re-$SHORT_NAME-$HASH
 
 # We need to use env here because of the CUSTOM vars
 # they have special charectes that export can't handle
