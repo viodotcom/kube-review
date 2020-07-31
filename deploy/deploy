@@ -11,13 +11,6 @@ kubectl create namespace $NAMESPACE --dry-run -o yaml | kubectl apply -f -
 kubectl create secret generic $NAMESPACE --from-env-file=/codefresh/volume/secrets.env --dry-run -o yaml --save-config=true --namespace $NAMESPACE | kubectl apply -f -
 codefresh generate image-pull-secret --cluster $KUBE_CONTEXT --namespace $NAMESPACE --registry $APP_REGISTRY_NAME
 
-env ACTION=auth \
-SKIP_CF_STABLE_HELM_REPO=true \
-HELM_VERSION=$helm_version \
-KUBE_CONTEXT=$KUBE_CONTEXT \
-/opt/bin/release_chart
-cf_export NAMESPACE=re-$SHORT_NAME-$HASH
-
 # We need to use env here because of the CUSTOM vars
 # they have special charectes that export can't handle
 env \
