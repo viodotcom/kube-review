@@ -23,6 +23,6 @@ spec:
     location: git
     repo: FindHotel/cf-review-env
     path: ./.codefresh/auto-prune/pipeline.yml
-    revision: master
+    revision: ch20441
     context: github
 
