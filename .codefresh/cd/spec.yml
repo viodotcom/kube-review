@@ -1,7 +1,7 @@
 version: '1.0'
 kind: pipeline
 metadata:
-  name: cf-review-env-{{(ds "data").STAGE}}/build
+  name: cf-review-env-{{(ds "data").STAGE}}/cd
   project: cf-review-env-{{(ds "data").STAGE}}
 spec:
   triggers:
@@ -12,10 +12,10 @@ spec:
         - push.heads
       pullRequestAllowForkEvents: false
       commentRegex: /.*/gi
-      branchRegex: /.*/gi
+      branchRegex: /master/gi
       branchRegexInput: regex
       provider: github
-      disabled: false
+      disabled: {{if eq (ds "data").STAGE "main"}}false{{else}}true{{end}}
       options:
         noCache: false
         noCfCache: false
@@ -43,6 +43,6 @@ spec:
   specTemplate:
     location: git
     repo: FindHotel/cf-review-env
-    path: ./.codefresh/build/pipeline.yml
+    path: ./.codefresh/cd/pipeline.yml
     revision: master
     context: github
