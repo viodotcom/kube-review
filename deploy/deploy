@@ -6,7 +6,6 @@ chart_ref=cf-review-env
 SHORT_NAME=$(echo -n $NAME | cut -c1-20)
 HASH=$(echo $NAME | rhash -p "%c" -)
 export NAMESPACE=re-$SHORT_NAME-$HASH
-cf_export NAMESPACE=re-$SHORT_NAME-$HASH
 kubectl config use-context $KUBE_CONTEXT
 kubectl create namespace $NAMESPACE --dry-run -o yaml | kubectl apply -f -
 kubectl create secret generic $NAMESPACE --from-env-file=/codefresh/volume/secrets.env --dry-run -o yaml --save-config=true --namespace $NAMESPACE | kubectl apply -f -
