@@ -3,7 +3,7 @@ chart_version=0.2.0
 helm_version=3.0.3
 chart_ref=cf-review-env
 
-SHORT_NAME=$(echo -n $NAME | cut -c1-20)
+SHORT_NAME=$(echo -n $NAME | cut -c1-15)
 HASH=$(echo $NAME | rhash -p "%c" -)
 export NAMESPACE=re-$SHORT_NAME-$HASH
 kubectl config use-context $KUBE_CONTEXT
