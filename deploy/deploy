@@ -6,8 +6,23 @@ chart_ref=cf-review-env
 SHORT_NAME=$(echo -n $NAME | cut -c1-15)
 HASH=$(echo $NAME | rhash -p "%c" -)
 export NAMESPACE=re-$SHORT_NAME-$HASH
+export UPDATED_AT=$(date --utc +%s)
 kubectl config use-context $KUBE_CONTEXT
-kubectl create namespace $NAMESPACE --dry-run -o yaml | kubectl apply -f -
+
+kubectl version
+cat <<EOF | envsubst | kubectl apply -f -
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/instance: $NAMESPACE
+    app.kubernetes.io/name: cf-review-env
+    app.kubernetes.io/pull_request_number: "$CF_PULL_REQUEST_NUMBER"
+    app.kubernetes.io/repository_name: "$CF_REPO_NAME"
+    app.kubernetes.io/repository_owner: "$CF_REPO_OWNER"
+    app.kubernetes.io/updated_at: "$UPDATED_AT"
+  name: $NAMESPACE
+EOF
 kubectl create secret generic $NAMESPACE --from-env-file=/codefresh/volume/secrets.env --dry-run -o yaml --save-config=true --namespace $NAMESPACE | kubectl apply -f -
 codefresh generate image-pull-secret --cluster $KUBE_CONTEXT --namespace $NAMESPACE --registry $APP_REGISTRY_NAME
 

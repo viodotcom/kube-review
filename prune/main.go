@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -9,6 +8,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strconv"
 	"time"
 
 	"github.com/gobwas/glob"
@@ -54,56 +54,6 @@ func NewCFCLient(apiEndpoint string, apiToken string) *CFClient {
 	}
 }
 
-// EnvironmentsList lists all environments using environments-v2 endpoint
-func (cf *CFClient) EnvironmentsList() ([]CFEnvironment, error) {
-	endpoint, err := url.Parse(cf.APIEndpoint)
-	if err != nil {
-		return nil, err
-	}
-
-	endpoint.Path = path.Join(endpoint.Path, "api/environments-v2")
-	req, err := http.NewRequest("GET", endpoint.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Authorization", cf.APIToken)
-	resp, err := cf.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("Got status code %d with body: %s", resp.Status, string(body))
-	}
-
-	cfResponse := CFResponse{}
-	if err := json.Unmarshal(body, &cfResponse); err != nil {
-		return nil, err
-	}
-
-	environments := make([]CFEnvironment, 0)
-	for _, environment := range cfResponse.Doc {
-		t, err := time.Parse("2006-01-02T15:04:05.000Z", environment.Metadata.UpdatedAt)
-		if err != nil {
-			return nil, err
-		}
-
-		environments = append(environments, CFEnvironment{
-			ID:        environment.Metadata.ID,
-			Name:      environment.Metadata.Name,
-			UpdatedAt: t,
-		})
-	}
-	return environments, nil
-}
-
 // DeleteEnvironment deletes an environment using environments-v2 endpoint
 func (cf *CFClient) DeleteEnvironment(name string) error {
 	endpoint, err := url.Parse(cf.APIEndpoint)
@@ -141,6 +91,15 @@ type K8sClient struct {
 	ClientSet *kubernetes.Clientset
 }
 
+// K8sNamespace is a kubernete namespace
+type K8sNamespace struct {
+	Name              string
+	UpdatedAt         *time.Time
+	PullRequestNumber string
+	RepositoryName    string
+	RepositoryOwner   string
+}
+
 func buildConfigFromFlags(contextName, kubeconfigPath string) (*rest.Config, error) {
 	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		&clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeconfigPath},
@@ -176,40 +135,87 @@ func (k8s *K8sClient) DeleteNamespace(name string) error {
 	return nil
 }
 
-func run(c *cli.Context) error {
-	cfClient := NewCFCLient(c.String("cfEndpoint"), c.String("cfToken"))
-	environments, err := cfClient.EnvironmentsList()
+// NamespaceList deletes a namespace
+func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
+	namespacesClient := k8s.ClientSet.CoreV1().Namespaces()
+	namespaceList, err := namespacesClient.List(metav1.ListOptions{
+		LabelSelector: "app.kubernetes.io/name=cf-review-env",
+	})
 	if err != nil {
-		log.Fatalf("error listing environments: %s", err)
+		return nil, err
 	}
 
+	nk8sNamespacesList := make([]K8sNamespace, 0)
+	for _, namespace := range namespaceList.Items {
+		var updatedAt time.Time
+		updatedAtTimestamp := namespace.Labels["app.kubernetes.io/updated_at"]
+		if updatedAtTimestamp != "" {
+			updatedAtTimestamp, err := strconv.ParseInt(updatedAtTimestamp, 10, 64)
+			if err != nil {
+				log.Printf("Got bad data at updated_at label for namespace: %s", namespace.Name)
+				continue
+			}
+
+			updatedAt = time.Unix(updatedAtTimestamp, 0)
+		}
+
+		nk8sNamespacesList = append(nk8sNamespacesList, K8sNamespace{
+			UpdatedAt:         &updatedAt,
+			Name:              namespace.Labels["app.kubernetes.io/instance"],
+			PullRequestNumber: namespace.Labels["app.kubernetes.io/pull_request_number"],
+			RepositoryName:    namespace.Labels["app.kubernetes.io/repository_name"],
+			RepositoryOwner:   namespace.Labels["app.kubernetes.io/repository_owner"],
+		})
+	}
+	return nk8sNamespacesList, nil
+}
+
+// run will list all namespaces that belong to cf-review-env
+// if the name of the namespace matches and it's expired, both
+// cf review environment and the namespace will be deleted.
+func run(c *cli.Context) error {
+	cfClient := NewCFCLient(c.String("cfEndpoint"), c.String("cfToken"))
 	k8sClient, err := NewK8sClient(c.String("k8sContextName"), c.String("k8sKubeconfig"))
 	if err != nil {
 		log.Fatalf("error creating k8s client: %s", err)
 	}
 
+	namespaces, err := k8sClient.NamespaceList()
+	if err != nil {
+		log.Fatalf("error listing namespaces: %s", err)
+	}
+
 	g := glob.MustCompile(c.String("name"))
-	for _, environment := range environments {
-		matches := g.Match(environment.Name)
-		expired := time.Since(environment.UpdatedAt) >= time.Duration(c.Int("expiration"))*time.Hour
-		log.Printf("Name: %s Duration: %s, Expired: %t, Matches: %t, Forced: %t",
-			environment.Name, time.Since(environment.UpdatedAt), expired, matches, c.Bool("force"))
-		if matches && (expired || c.Bool("force")) {
+	for _, namespace := range namespaces {
+		matches := g.Match(namespace.Name)
+		if !matches {
+			continue
+		}
+
+		if namespace.UpdatedAt == nil {
+			log.Printf("Namespace %s has no updated_at label", namespace.Name)
+			continue
+		}
+
+		expired := time.Since(*namespace.UpdatedAt) >= time.Duration(c.Int("expiration"))*time.Hour
+		log.Printf("Name: %s Duration: %s, Expired: %t",
+			namespace.Name, time.Since(*namespace.UpdatedAt), expired)
+		if expired || c.Bool("force") {
 			if !c.Bool("dryRun") {
-				if err := cfClient.DeleteEnvironment(environment.Name); err != nil {
+				if err := cfClient.DeleteEnvironment(namespace.Name); err != nil {
 					log.Printf("error deleting environment: %s", err)
 					continue
 				}
 			}
-			log.Printf("Environment deleted: %s", environment.Name)
+			log.Printf("Environment deleted: %s", namespace.Name)
 			if !c.Bool("dryRun") {
-				if err := k8sClient.DeleteNamespace(environment.Name); err != nil {
+				if err := k8sClient.DeleteNamespace(namespace.Name); err != nil {
 					log.Printf("error deleting k8s namespace: %s", err)
 					continue
 				}
 			}
 
-			log.Printf("K8s namespace deleted: %s", environment.Name)
+			log.Printf("K8s namespace deleted: %s", namespace.Name)
 		}
 	}
 	return nil
@@ -221,12 +227,8 @@ func main() {
 		&cli.StringFlag{
 			Name:     "name",
 			Usage:    "environment name to filter, accepts glob expressions",
-			Required: true,
-		},
-		&cli.BoolFlag{
-			Name:  "force",
-			Usage: "force will ignore expiration check",
-			Value: false,
+			Required: false,
+			Value:    "*",
 		},
 		&cli.IntFlag{
 			Name:  "expiration",

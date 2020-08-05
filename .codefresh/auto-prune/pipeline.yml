@@ -8,6 +8,6 @@ steps:
     type: freestyle
     stage: run
     # This has to be the full image uri otherwise it doesn't work
-    image: ${{IMAGE_REGISTRY_URL}}/${{IMAGE_NAME}}:latest
+    image: ${{IMAGE_REGISTRY_URL}}/${{IMAGE_NAME}}:${{IMAGE_TAG}}
     commands:
       - "/prune --cfToken=$CF_TOKEN --k8sKubeconfig=$CF_KUBECONFIG_PATH --k8sContextName=$K8S_CONTEXT_NAME --name=re-*"
