@@ -12,11 +12,6 @@ spec:
   stages: []
   variables: []
   contexts: []
-  runtimeEnvironment:
-    name: k8s-fh-ci-{{if eq (ds "data").STAGE "main"}}prd{{else}}stg{{end}}/codefresh
-    cpu: 1000m
-    memory: 2048Mi
-    dindStorage: nullGi
   terminationPolicy: []
   externalResources: []
   specTemplate:

@@ -19,6 +19,64 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+// GHClient is a client for the github API
+type GHClient struct {
+	APIEndpoint string
+	UserName    string
+	APIToken    string
+	httpClient  *http.Client
+}
+
+// NewGHClient creates a new GHClient
+func NewGHClient(apiEndpoint, userName, apiToken string) *GHClient {
+	httpClient := http.Client{}
+	return &GHClient{
+		APIEndpoint: apiEndpoint,
+		UserName:    userName,
+		APIToken:    apiToken,
+		httpClient:  &httpClient,
+	}
+}
+
+// IsPRMerged returns true if a PR is merged false otherwise
+func (gh *GHClient) IsPRMerged(owner, repo, number string) (bool, error) {
+	endpoint, err := url.Parse(gh.APIEndpoint)
+	if err != nil {
+		return false, err
+	}
+
+	// GET /repos/:owner/:repo/pulls/:pull_number/merge
+	method := fmt.Sprintf("repos/%s/%s/pulls/%s/merge", owner, repo, number)
+	endpoint.Path = path.Join(endpoint.Path, method)
+	req, err := http.NewRequest("GET", endpoint.String(), nil)
+	if err != nil {
+		return false, err
+	}
+
+	req.SetBasicAuth(gh.UserName, gh.APIToken)
+	resp, err := gh.httpClient.Do(req)
+	if err != nil {
+		return false, err
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, err
+	}
+
+	switch resp.StatusCode {
+	case 204:
+		return true, nil
+	case 404:
+		return false, nil
+	default:
+		return false, fmt.Errorf("Got status code %d with body: %s", resp.Status, body)
+	}
+
+	return false, nil
+}
+
 // CFEnvironment holds information about a codefresh environment
 type CFEnvironment struct {
 	Name      string
@@ -44,8 +102,8 @@ type CFClient struct {
 	httpClient  *http.Client
 }
 
-// NewCFCLient creates a new CFClient
-func NewCFCLient(apiEndpoint string, apiToken string) *CFClient {
+// NewCFClient creates a new CFClient
+func NewCFClient(apiEndpoint string, apiToken string) *CFClient {
 	httpClient := http.Client{}
 	return &CFClient{
 		APIEndpoint: apiEndpoint,
@@ -174,7 +232,8 @@ func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 // if the name of the namespace matches and it's expired, both
 // cf review environment and the namespace will be deleted.
 func run(c *cli.Context) error {
-	cfClient := NewCFCLient(c.String("cfEndpoint"), c.String("cfToken"))
+	ghClient := NewGHClient(c.String("ghEndpoint"), c.String("ghUserName"), c.String("ghToken"))
+	cfClient := NewCFClient(c.String("cfEndpoint"), c.String("cfToken"))
 	k8sClient, err := NewK8sClient(c.String("k8sContextName"), c.String("k8sKubeconfig"))
 	if err != nil {
 		log.Fatalf("error creating k8s client: %s", err)
@@ -197,10 +256,21 @@ func run(c *cli.Context) error {
 			continue
 		}
 
+		merged := false
+		if namespace.PullRequestNumber != "" {
+			status, err := ghClient.IsPRMerged(namespace.RepositoryOwner, namespace.RepositoryName,
+				namespace.PullRequestNumber)
+			if err != nil {
+				log.Printf("error checking PR status: %s", err)
+			} else {
+				merged = status
+			}
+		}
+
 		expired := time.Since(*namespace.UpdatedAt) >= time.Duration(c.Int("expiration"))*time.Hour
-		log.Printf("Name: %s Duration: %s, Expired: %t",
-			namespace.Name, time.Since(*namespace.UpdatedAt), expired)
-		if expired || c.Bool("force") {
+		log.Printf("Name: %s Duration: %s, Expired: %t, Merged: %t",
+			namespace.Name, time.Since(*namespace.UpdatedAt), expired, merged)
+		if expired || merged {
 			if !c.Bool("dryRun") {
 				if err := cfClient.DeleteEnvironment(namespace.Name); err != nil {
 					log.Printf("error deleting environment: %s", err)
@@ -258,6 +328,21 @@ func main() {
 		&cli.StringFlag{
 			Name:     "k8sContextName",
 			Usage:    "the k8s context name to operate on",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:  "ghEndpoint",
+			Usage: "github api endpoint",
+			Value: "https://api.github.com",
+		},
+		&cli.StringFlag{
+			Name:     "ghToken",
+			Usage:    "github api token",
+			Required: true,
+		},
+		&cli.StringFlag{
+			Name:     "ghUserName",
+			Usage:    "github username to use for auth",
 			Required: true,
 		},
 	}
