@@ -57,3 +57,4 @@ KUBE_CONTEXT=$KUBE_CONTEXT \
 /opt/bin/release_chart
 helm test $NAMESPACE --namespace $NAMESPACE
 cf_export NAMESPACE=re-$SHORT_NAME-$HASH
+cf_export HELM_TEST_STATUS=$(kubectl --namespace $NAMESPACE get pods --selector="app.kubernetes.io/managed-by=Helm" -o jsonpath='{.items[?(@.status.phase!="Succeeded")].status.phase}')
