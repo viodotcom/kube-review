@@ -56,4 +56,11 @@ CHART_VERSION=$chart_version \
 KUBE_CONTEXT=$KUBE_CONTEXT \
 /opt/bin/release_chart
 helm test $NAMESPACE --namespace $NAMESPACE
+
+helm_test_status=$(kubectl get pods --selector="app.kubernetes.io/managed-by=Helm" -o jsonpath='{.items[?(@.status.phase!="Succeeded")].status.phase}' --cluster $KUBE_CONTEXT --namespace $NAMESPACE)
+if [[ "$helm_test_status" == "Failed" ]]; then
+  echo "ERROR: The branch has not passed because the Helm Test failed, please check your application pod.";
+  exit 1;
+fi
+
 cf_export NAMESPACE=re-$SHORT_NAME-$HASH
