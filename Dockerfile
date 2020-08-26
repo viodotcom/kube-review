@@ -12,10 +12,13 @@ ARG DEFAULT_HELM_REPO_URL
 ENV HELM_REPO_URL $DEFAULT_HELM_REPO_URL
 
 RUN apk update && apk add --no-cache rhash gettext libstdc++
-RUN curl -L "https://github.com/codefresh-io/cli/releases/download/v0.71.3/codefresh-v0.71.3-alpine-x64.tar.gz" -o codefresh.tar.gz \
+RUN curl -L "https://github.com/codefresh-io/cli/releases/download/v0.72.1/codefresh-v0.72.1-alpine-x64.tar.gz" -o codefresh.tar.gz \
     && tar -zxvf codefresh.tar.gz \
     && mv ./codefresh /usr/local/bin/codefresh
 RUN chmod +x /usr/local/bin/codefresh
+
+RUN curl -LO --silent "https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kubectl"
+RUN mv kubectl /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
 
 WORKDIR /
 COPY deploy/* ./
