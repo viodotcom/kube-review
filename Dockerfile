@@ -17,7 +17,7 @@ RUN curl -L "https://github.com/codefresh-io/cli/releases/download/v0.72.1/codef
     && mv ./codefresh /usr/local/bin/codefresh
 RUN chmod +x /usr/local/bin/codefresh
 
-RUN curl -L "https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kubectl"
+RUN curl -LO --silent "https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kubectl"
 RUN mv kubectl /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
 
 WORKDIR /
