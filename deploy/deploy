@@ -1,5 +1,5 @@
 #!/bin/sh
-chart_version=0.2.0
+chart_version=0.2.1
 helm_version=3.0.3
 chart_ref=cf-review-env
 
