@@ -2,15 +2,13 @@
 chart_version=0.2.0
 helm_version=3.0.3
 chart_ref=cf-review-env
-kubectl_version=v1.18.6
 
 SHORT_NAME=$(echo -n $NAME | cut -c1-15)
 HASH=$(echo $NAME | rhash -p "%c" -)
 export NAMESPACE=re-$SHORT_NAME-$HASH
 export UPDATED_AT=$(date --utc +%s)
 
-curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/${kubectl_version}/bin/linux/amd64/kubectl
-chmod u+x kubectl && mv kubectl /usr/local/bin && kubectl version
+kubectl version
 
 kubectl config use-context $KUBE_CONTEXT
 
