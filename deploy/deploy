@@ -64,6 +64,7 @@ if [[ "$helm_test_status" == "Failed" ]]; then
   echo "ERROR: The branch has not passed because the Helm Test failed, please check your application pod.";
   exit 1;
 else
+  echo "INFO: Removed the completed Test Pod";
   kubectl delete pod --selector="app.kubernetes.io/managed-by=Helm" --namespace $NAMESPACE
 fi
 
