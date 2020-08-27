@@ -14,12 +14,12 @@ This is an example of `how to install`.
 helm install CHART_NAME cf-review-env \
 --install \
 --reset-values \
---repo cm://h.cfcr.io/findhotel/default/ \
---version 0.2.0 \
+--repo REPO_NAME \
+--version CHART_VERSION \
 --namespace NAMESPACE_NAME \
 --values values.yaml \
 --set envFrom.secretRef.name=SECRET_NAME \
---set image.repository=265409992602.dkr.ecr.eu-west-1.amazonaws.com/daedalus-server-main \
+--set image.repository=IMAGE_REPOSITORY_NAME \
 --set image.tag=IMAGE_TAG \
 --set imagePullSecrets=IMAGE_PULL_SECRETS_NAME \
 --set "ingress.hosts[0].host=HOST_NAME" \
@@ -38,12 +38,12 @@ This is an example of `how to upgrade`.
 helm upgrade CHART_NAME cf-review-env \
 --install \
 --reset-values \
---repo cm://h.cfcr.io/findhotel/default/ \
+--repo REPO_NAME \
 --version 0.2.0 \
 --namespace NAMESPACE_NAME \
 --values values.yaml \
 --set envFrom.secretRef.name=SECRET_NAME \
---set image.repository=265409992602.dkr.ecr.eu-west-1.amazonaws.com/daedalus-server-main \
+--set image.repository=IMAGE_REPOSITORY_NAME \
 --set image.tag=IMAGE_TAG \
 --set imagePullSecrets=IMAGE_PULL_SECRETS_NAME \
 --set "ingress.hosts[0].host=HOST_NAME" \
