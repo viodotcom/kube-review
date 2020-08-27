@@ -64,6 +64,9 @@ if [[ "$helm_test_status" == "Failed" ]]; then
   echo "ERROR: The branch has not passed because the Helm Test failed, please check your application pod.";
   exit 1;
 else
+  # It is necessary to remove the test pod from the helm test bacause HPA metrics may fail when we have a pod with completed status.
+  # Issue: https://github.com/kubernetes/kubernetes/issues/79365
+  # Issues: https://github.com/kubernetes/kubernetes/issues?page=1&q=is%3Aissue+is%3Aopen+HPA
   echo "INFO: Removed the completed Test Pod";
   kubectl delete pod --selector="app.kubernetes.io/managed-by=Helm" --namespace $NAMESPACE
 fi
