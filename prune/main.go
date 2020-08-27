@@ -273,8 +273,7 @@ func run(c *cli.Context) error {
 		if expired || merged {
 			if !c.Bool("dryRun") {
 				if err := cfClient.DeleteEnvironment(namespace.Name); err != nil {
-					log.Printf("error deleting environment: %s", err)
-					continue
+					log.Printf("warn could not delete environment: %s", err)
 				}
 			}
 			log.Printf("Environment deleted: %s", namespace.Name)
