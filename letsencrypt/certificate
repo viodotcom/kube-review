@@ -10,8 +10,8 @@ certbot certonly \
 --dns-route53-propagation-seconds 30 \
 --email $EMAIL \
 --server $SERVER \
---non-interactive
---agree-tos
+--non-interactive \
+--agree-tos \
 -d $DOMAIN
 
 echo "Copying of the Certificate to S3"
