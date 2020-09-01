@@ -32,8 +32,10 @@ RUN apk add --no-cache certbot py-pip \
     && pip3 --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host=files.pythonhosted.org install certbot-dns-route53 awscli cryptography
 
 WORKDIR /
+COPY letsencrypt/* ./
 COPY deploy/* ./
 COPY --from=base /prune ./
+RUN chmod +x certificate
 RUN chmod +x deploy
 RUN chmod +x prune
 
