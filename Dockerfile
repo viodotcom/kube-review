@@ -26,7 +26,8 @@ RUN curl -LO --silent "https://storage.googleapis.com/kubernetes-release/release
 RUN mv kubectl /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
 
 # Certbot
-RUN apk add --no-cache certbot aws-cli py-pip \
+RUN apk update \
+    && apk add --no-cache certbot aws-cli py-pip \
     && pip install certbot-dns-route53
 
 WORKDIR /
