@@ -1,5 +1,7 @@
 FROM golang:1.14-alpine as base
 
+LABEL maintainer="EEQ Team"
+
 RUN apk add --no-cache git
 WORKDIR /
 
