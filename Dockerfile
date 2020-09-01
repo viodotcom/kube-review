@@ -27,7 +27,7 @@ RUN mv kubectl /usr/local/bin/kubectl && chmod +x /usr/local/bin/kubectl
 
 # Certbot
 FROM alpine:latest
-RUN apk add --no-cache certbot py-pip curl \
+RUN apk add --no-cache certbot py-pip curl gettext \
     && pip install --upgrade pip \
     && pip3 --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host=files.pythonhosted.org install certbot-dns-route53 awscli cryptography
 RUN curl -LO --silent "https://storage.googleapis.com/kubernetes-release/release/v1.18.6/bin/linux/amd64/kubectl"
