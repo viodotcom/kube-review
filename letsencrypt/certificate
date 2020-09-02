@@ -21,8 +21,8 @@ AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION \
 aws s3 sync /etc/letsencrypt/ s3://$BUCKET_S3/$DATE/
 
 echo "INFO - Exporting the CSR and KEY file..."
-export CSR=$(cat /etc/letsencrypt/live/fih.io/fullchain.pem | base64 | tr -d \\n)
-export KEY=$(cat /etc/letsencrypt/live/fih.io/privkey.pem | base64 | tr -d \\n)
+export CRT=$(cat /etc/letsencrypt/live/$DOMAIN/fullchain.pem | base64 | tr -d \\n)
+export KEY=$(cat /etc/letsencrypt/live/$DOMAIN/privkey.pem | base64 | tr -d \\n)
 
 echo "INFO - Updating the Certificate on the Kubernetes Cluster..."
 kubectl config use-context $KUBE_CONTEXT
@@ -33,7 +33,7 @@ metadata:
   name: $SECRET_NAME
   namespace: $NAMESPACE
 data:
-  tls.crt: $CSR
+  tls.crt: $CRT
   tls.key: $KEY
 type: kubernetes.io/tls
 EOF
