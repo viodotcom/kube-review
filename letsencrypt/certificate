@@ -3,8 +3,8 @@
 DATE=$(date -u +'%Y-%m-%dT%H:%M')
 
 echo "INFO - Generating the Certificate..."
-AWS_ACCESS_KEY_ID=$LETSENCRYPT_AWS_ACCESS_KEY_ID \
-AWS_SECRET_ACCESS_KEY=$LETSENCRYPT_AWS_SECRET_ACCESS_KEY \
+AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
 certbot certonly \
 --dns-route53 \
 --dns-route53-propagation-seconds 30 \
