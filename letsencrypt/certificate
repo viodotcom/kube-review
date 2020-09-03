@@ -3,8 +3,6 @@
 DATE=$(date -u +'%Y-%m-%dT%H:%M')
 
 echo "INFO - Generating the Certificate..."
-AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
 certbot certonly \
 --dns-route53 \
 --dns-route53-propagation-seconds 30 \
@@ -15,14 +13,11 @@ certbot certonly \
 -d $DOMAIN
 
 echo "INFO - Copying of the Certificate to S3..."
-AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION \
 aws s3 sync /etc/letsencrypt/ s3://$BUCKET_S3/$DATE/
 
-echo "INFO - Exporting the CSR and KEY file..."
-export CRT=$(cat /etc/letsencrypt/live/"${DOMAIN:2}"/fullchain.pem | base64 | tr -d \\n)
-export KEY=$(cat /etc/letsencrypt/live/"${DOMAIN:2}"/privkey.pem | base64 | tr -d \\n)
+echo "INFO - Getting the CSR and KEY file..."
+CRT=$(cat /etc/letsencrypt/live/"${DOMAIN:2}"/fullchain.pem | base64 | tr -d \\n)
+KEY=$(cat /etc/letsencrypt/live/"${DOMAIN:2}"/privkey.pem | base64 | tr -d \\n)
 
 echo "INFO - Updating the Certificate on the Kubernetes Cluster..."
 kubectl config use-context $KUBE_CONTEXT
