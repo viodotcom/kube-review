@@ -8,8 +8,12 @@ metadata:
     "helm.sh/hook": test-success
 spec:
   containers:
-    - name: wget
+  {{- range $index, $host := .Values.ingress.hosts }}
+    {{- range .paths }}
+    - name: wget{{ $index }}
       image: busybox
       command: ['wget']
-      args: ['{{ include "cf-review-env.fullname" . }}:{{ .Values.service.port }}']
+      args: ['http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ . }}']
+    {{- end }}
+  {{- end }}
   restartPolicy: Never
