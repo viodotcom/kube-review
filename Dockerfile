@@ -2,8 +2,8 @@ FROM golang:1.14-alpine as base
 
 LABEL maintainer="EEQ Team"
 
-RUN apk --quiet update && \
-    apk add --no-cache --quiet git
+RUN apk --quiet update \
+    && apk add --no-cache --quiet git
 WORKDIR /
 
 # Prune
