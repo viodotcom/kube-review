@@ -76,4 +76,7 @@ else
   echo "Connection test is disabled.";
 fi
 
+# It is necessary to export these variables because we are using it on the pipelines
 cf_export NAMESPACE=re-$SHORT_NAME-$HASH
+cf_export URL=https://$NAMESPACE.$APP_DOMAIN
+cf_export K8S_CONTEXT_NAME=$KUBE_CONTEXT
