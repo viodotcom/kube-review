@@ -8,8 +8,6 @@ HASH=$(echo $NAME | rhash -p "%c" -)
 export NAMESPACE=re-$SHORT_NAME-$HASH
 export UPDATED_AT=$(date --utc +%s)
 
-kubectl version
-
 kubectl config use-context $KUBE_CONTEXT
 
 cat <<EOF | envsubst | kubectl apply -f -
@@ -25,8 +23,13 @@ metadata:
     app.kubernetes.io/updated_at: "$UPDATED_AT"
   name: $NAMESPACE
 EOF
-kubectl create secret generic $NAMESPACE --from-env-file=/codefresh/volume/secrets.env --dry-run=client -o yaml --save-config=true --namespace $NAMESPACE | kubectl apply -f -
+
+if [[ ! -f "/codefresh/volume/secrets.env" ]]; then
+  touch /codefresh/volume/secrets.env
+else
+  kubectl create secret generic $NAMESPACE --from-env-file=/codefresh/volume/secrets.env --dry-run=client -o yaml --save-config=true --namespace $NAMESPACE | kubectl apply -f -
 codefresh generate image-pull-secret --cluster $KUBE_CONTEXT --namespace $NAMESPACE --registry $APP_REGISTRY_NAME
+fi
 
 # We need to use env here because of the CUSTOM vars
 # they have special charectes that export can't handle
@@ -69,7 +72,7 @@ then
     # It is necessary to remove the test pod from the helm test bacause HPA metrics may fail when we have a pod with completed status.
     # Issue: https://github.com/kubernetes/kubernetes/issues/79365
     # Issues: https://github.com/kubernetes/kubernetes/issues?page=1&q=is%3Aissue+is%3Aopen+HPA
-    echo "INFO: Removed the completed Test Pod";
+    echo "INFO: Removed the completed Test Pod.";
     kubectl delete pod --selector="app.kubernetes.io/managed-by=Helm" --namespace $NAMESPACE
   fi
 else
