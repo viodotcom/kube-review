@@ -26,10 +26,10 @@ EOF
 
 if [[ ! -f "/codefresh/volume/secrets.env" ]]; then
   touch /codefresh/volume/secrets.env
-else
-  kubectl create secret generic $NAMESPACE --from-env-file=/codefresh/volume/secrets.env --dry-run=client -o yaml --save-config=true --namespace $NAMESPACE | kubectl apply -f -
-codefresh generate image-pull-secret --cluster $KUBE_CONTEXT --namespace $NAMESPACE --registry $APP_REGISTRY_NAME
 fi
+
+kubectl create secret generic $NAMESPACE --from-env-file=/codefresh/volume/secrets.env --dry-run=client -o yaml --save-config=true --namespace $NAMESPACE | kubectl apply -f -
+codefresh generate image-pull-secret --cluster $KUBE_CONTEXT --namespace $NAMESPACE --registry $APP_REGISTRY_NAME
 
 # We need to use env here because of the CUSTOM vars
 # they have special charectes that export can't handle
