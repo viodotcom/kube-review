@@ -1,16 +1,24 @@
 #!/bin/sh
+# exit if any command fails
+set -e
+
 chart_version=${CHART_VERSION:-0.2.2}
 helm_version=3.0.3
 chart_ref=cf-review-env
+short_name=$(echo -n $NAME | cut -c1-15)
+hash=$(echo "$NAME" | rhash -p "%c" -)
+namespace=re-$short_name-$hash
 
-SHORT_NAME=$(echo -n $NAME | cut -c1-15)
-HASH=$(echo $NAME | rhash -p "%c" -)
-export NAMESPACE=re-$SHORT_NAME-$HASH
-export UPDATED_AT=$(date --utc +%s)
+config_context() {
+  kubectl config use-context "$KUBE_CONTEXT"
+}
 
-kubectl config use-context $KUBE_CONTEXT
-
-cat <<EOF | envsubst | kubectl apply -f -
+namespace_apply() {
+  # Variables need to be export in order to be replaced by envsubst
+  updated_at=$(date --utc +%s)
+  export UPDATED_AT=$updated_at
+  export NAMESPACE=$namespace
+  cat <<EOF | envsubst | kubectl apply -f -
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -23,63 +31,82 @@ metadata:
     app.kubernetes.io/updated_at: "$UPDATED_AT"
   name: $NAMESPACE
 EOF
+}
 
-if [[ ! -f "/codefresh/volume/secrets.env" ]]; then
-  touch /codefresh/volume/secrets.env
-fi
+apply_secret() {
+  # If the user doesn't have secrets we need to generate an empty file
+  # to make our chart happy, without this the deployment breaks
+  if [ ! -f "/codefresh/volume/secrets.env" ]; then
+    touch /codefresh/volume/secrets.env
+  fi
 
-kubectl create secret generic $NAMESPACE --from-env-file=/codefresh/volume/secrets.env --dry-run=client -o yaml --save-config=true --namespace $NAMESPACE | kubectl apply -f -
-codefresh generate image-pull-secret --cluster $KUBE_CONTEXT --namespace $NAMESPACE --registry $APP_REGISTRY_NAME
+  kubectl create secret generic "$namespace" --from-env-file=/codefresh/volume/secrets.env \
+    --dry-run=client -o yaml --save-config=true --namespace "$namespace" | kubectl apply -f -
+}
 
-# We need to use env here because of the CUSTOM vars
-# they have special charectes that export can't handle
-env \
-ACTION=install \
-CHART_REPO_URL=$HELM_REPO_URL \
-CHART_REF=$chart_ref \
-KUBE_CONTEXT=$KUBE_CONTEXT \
-RELEASE_NAME=$NAMESPACE \
-CHART_VERSION=$chart_version \
-HELM_VERSION=$helm_version \
-CUSTOM_image_tag=$APP_IMAGE_TAG \
-CUSTOM_image_repository=$APP_IMAGE_URL \
-CUSTOM_imagePullSecrets=$(kubectl get secret --namespace $NAMESPACE --field-selector='type=kubernetes.io/dockercfg' -o=jsonpath='{.items[0].metadata.name}') \
-CUSTOM_envFrom_secretRef_name=$NAMESPACE \
-CUSTOM_"ingress_hosts[0]_host=$NAMESPACE.$APP_DOMAIN" \
-CUSTOM_"ingress_hosts[0]_paths[0]=/" \
-CUSTOM_"ingress_tls[0]_hosts[0]=$NAMESPACE.$APP_DOMAIN" \
-CUSTOMFILE_0=$VALUES_FILE \
-SKIP_CF_STABLE_HELM_REPO=true \
-WAIT=true \
-/opt/bin/release_chart
+generate_pull_secret() {
+  codefresh generate image-pull-secret --cluster "$KUBE_CONTEXT" --namespace "$namespace" \
+    --registry "$APP_REGISTRY_NAME"
+}
 
-TEST_CONNECTION=${TEST_CONNECTION:-true}
-if [[ "$TEST_CONNECTION" = true ]];
-then
-  env ACTION=auth \
-  SKIP_CF_STABLE_HELM_REPO=true \
+install_chart() {
+  # We need to use env here because of the CUSTOM vars
+  # they have special charectes that export can't handle
+  env \
+  ACTION=install \
+  CHART_REPO_URL="$HELM_REPO_URL" \
+  CHART_REF=$chart_ref \
+  KUBE_CONTEXT="$KUBE_CONTEXT" \
+  RELEASE_NAME="$namespace" \
+  CHART_VERSION="$chart_version" \
   HELM_VERSION=$helm_version \
-  CHART_VERSION=$chart_version \
-  KUBE_CONTEXT=$KUBE_CONTEXT \
+  CUSTOM_image_tag="$APP_IMAGE_TAG" \
+  CUSTOM_image_repository="$APP_IMAGE_URL" \
+  CUSTOM_imagePullSecrets="$(kubectl get secret --namespace $namespace --field-selector='type=kubernetes.io/dockercfg' -o=jsonpath='{.items[0].metadata.name}')" \
+  CUSTOM_envFrom_secretRef_name="$namespace" \
+  CUSTOM_"ingress_hosts[0]_host=$namespace.$APP_DOMAIN" \
+  CUSTOM_"ingress_hosts[0]_paths[0]=/" \
+  CUSTOM_"ingress_tls[0]_hosts[0]=$namespace.$APP_DOMAIN" \
+  CUSTOMFILE_0="$VALUES_FILE" \
+  SKIP_CF_STABLE_HELM_REPO=true \
+  WAIT=true \
   /opt/bin/release_chart
-  helm test $NAMESPACE --namespace $NAMESPACE
+}
 
-  helm_test_status=$(kubectl get pods --selector="app.kubernetes.io/managed-by=Helm" -o jsonpath='{.items[?(@.status.phase!="Succeeded")].status.phase}' --cluster $KUBE_CONTEXT --namespace $NAMESPACE)
-  if [[ "$helm_test_status" == "Failed" ]]; then
-    echo "ERROR: The branch has not passed because the Helm Test failed, please check your application pod.";
-    exit 1;
-  else
-    # It is necessary to remove the test pod from the helm test bacause HPA metrics may fail when we have a pod with completed status.
+test_chart() {
+  TEST_CONNECTION=${TEST_CONNECTION:-true}
+  if [ "$TEST_CONNECTION" = true ];
+  then
+    env ACTION=auth \
+    SKIP_CF_STABLE_HELM_REPO=true \
+    HELM_VERSION=$helm_version \
+    CHART_VERSION="$chart_version" \
+    KUBE_CONTEXT="$KUBE_CONTEXT" \
+    /opt/bin/release_chart
+    helm test "$namespace" --namespace "$namespace"
+
+    # It is necessary to remove the test pod from the helm test bacause HPA metrics may
+    # fail when we have a pod with completed status.
     # Issue: https://github.com/kubernetes/kubernetes/issues/79365
     # Issues: https://github.com/kubernetes/kubernetes/issues?page=1&q=is%3Aissue+is%3Aopen+HPA
     echo "INFO: Removed the completed Test Pod.";
-    kubectl delete pod --selector="app.kubernetes.io/managed-by=Helm" --namespace $NAMESPACE
+    kubectl delete pod --selector="app.kubernetes.io/managed-by=Helm" --namespace "$namespace"
+  else
+    echo "Connection test is disabled.";
   fi
-else
-  echo "Connection test is disabled.";
-fi
+}
 
-# It is necessary to export these variables because we are using it on the pipelines
-cf_export NAMESPACE=re-$SHORT_NAME-$HASH
-cf_export URL=https://$NAMESPACE.$APP_DOMAIN
-cf_export K8S_CONTEXT_NAME=$KUBE_CONTEXT
+export_variables() {
+  # It is necessary to export these variables because we are using it on the pipelines
+  cf_export NAMESPACE="$namespace"
+  cf_export URL="https://$namespace.$APP_DOMAIN"
+  cf_export K8S_CONTEXT_NAME="$KUBE_CONTEXT"
+}
+
+config_context
+namespace_apply
+apply_secret
+generate_pull_secret
+install_chart
+test_chart
+export_variables
