@@ -30,6 +30,7 @@ spec:
         - name: {{ .Values.imagePullSecrets }}
       serviceAccountName: {{ include "cf-review-env.serviceAccountName" . }}
       securityContext:
+        privileged: {{- toYaml .Values.podSecurityContext.privileged | default false }}
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
