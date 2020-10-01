@@ -62,7 +62,9 @@ spec:
             timeoutSeconds: {{ .Values.readinessProbe.httpGet.timeoutSeconds}}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- if .Values.dind-daemon.enabled -}}
+      {{- if .Values.docker.dind.enabled -}}
+          # https://hub.docker.com/_/docker
+          # https://www.docker.com/blog/docker-can-now-run-within-docker/
           env:
             - name: DOCKER_HOST
               value: tcp://localhost:2375
