@@ -62,6 +62,7 @@ spec:
             timeoutSeconds: {{ .Values.readinessProbe.httpGet.timeoutSeconds }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.dockerDind.enabled }}
           env:
             - name: DOCKER_HOST
               value: tcp://localhost:2375
@@ -72,8 +73,8 @@ spec:
               value: ""
           resources:
             requests:
-              cpu: {{ .Values.dockerDind.cpu }}
-              memory: {{ .Values.dockerDind.memory }}
+              cpu: {{ .Values.dockerDind.cpu | default "20m" }}
+              memory: {{ .Values.dockerDind.memory | default "512Mi" }}
           securityContext:
             privileged: true
           volumeMounts:
@@ -82,10 +83,11 @@ spec:
       volumes:
         - name: docker-graph-store
           emptyDir: {}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{ end }}
       {{- with .Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
