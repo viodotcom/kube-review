@@ -62,7 +62,7 @@ spec:
             timeoutSeconds: {{ .Values.readinessProbe.httpGet.timeoutSeconds }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- if .Values.dockerDind.enabled }}
+      {{- if $.Values.dockerDind.enabled }}
           env:
             - name: DOCKER_HOST
               value: tcp://localhost:2375

@@ -1,12 +1,10 @@
-Template Helm Chart
-===================
+# Template Helm Chart
 
 This is a `template helm chart` created to be used in the CI pipeline for all projects.
 
 Ref.: https://helm.sh/docs/helm/helm_create/
 
-How to Install
---------------
+## How to Install
 
 This is an example of `how to install`.
 
@@ -29,8 +27,7 @@ helm install CHART_NAME cf-review-env \
 --wait
 ```
 
-How to Upgrade
---------------
+## How to Upgrade
 
 This is an example of `how to upgrade`.
 
@@ -53,9 +50,18 @@ helm upgrade CHART_NAME cf-review-env \
 --wait
 ```
 
-How to Delete
--------------
+## How to Delete
 
 This is an example of `how to delete`.
 
 `helm delete CHART_NAME --namespace NAMESPACE_NAME`
+
+## How to debut the templates files
+
+Ref.: https://helm.sh/docs/chart_template_guide/debugging/
+
+When will be necessary to add new changes on the templates file it's possible to do a debug and then to check if the new change is correct or not, basically you need to run this command:
+
+`helm template test cf-review-env -f values.yaml --debug`
+
+**Note:** It's necessary to use a true `values.yaml` file.
