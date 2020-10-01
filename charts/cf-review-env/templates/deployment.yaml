@@ -62,7 +62,7 @@ spec:
             timeoutSeconds: {{ .Values.readinessProbe.httpGet.timeoutSeconds}}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- if .Values.docker.dind.enabled -}}
+      {{- if .Values.dockerDind.enabled }}
           # https://hub.docker.com/_/docker
           # https://www.docker.com/blog/docker-can-now-run-within-docker/
           env:
@@ -75,8 +75,8 @@ spec:
               value: ""
           resources:
             requests:
-              cpu: {{ .Values.docker.dind.cpu}}
-              memory: {{ .Values.docker.dind.memory}}
+              cpu: {{ .Values.dockerDind.cpu}}
+              memory: {{ .Values.dockerDind.memory}}
           securityContext:
             privileged: true
           volumeMounts:
