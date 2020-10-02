@@ -48,14 +48,14 @@ spec:
               protocol: {{ .Values.deployment.ports.protocol | default "TCP" }}
           livenessProbe:
             httpGet:
-              path: {{ .Values.livenessProbe.httpGet.path | default "/" }}
+              path: {{ .Values.livenessProbe.httpGet.path }}
               port: {{ .Values.service.port }}
               scheme: {{ .Values.livenessProbe.httpGet.scheme | default "HTTP" }}
             initialDelaySeconds: {{ .Values.livenessProbe.httpGet.initialDelaySeconds | default "15" }}
             timeoutSeconds: {{ .Values.livenessProbe.httpGet.timeoutSeconds | default "15" }}
           readinessProbe:
             httpGet:
-              path: {{ .Values.readinessProbe.httpGet.path | default "/" }}
+              path: {{ .Values.readinessProbe.httpGet.path }}
               port: {{ .Values.service.port }}
               scheme: {{ .Values.readinessProbe.httpGet.scheme | default "HTTP" }}
             initialDelaySeconds: {{ .Values.readinessProbe.httpGet.initialDelaySeconds | default "15" }}
