@@ -79,15 +79,16 @@ spec:
         - name: init-dind-daemon
           image: busybox
           command: ['sh', '-c', "until nslookup dind-daemon; do echo waiting for dind-daemon; sleep 5; done"]
+      volumes:
+        - name: docker-graph-store
+          emptyDir: {}
+      {{- end }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets }}
       serviceAccountName: {{ include "cf-review-env.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      volumes:
-        - name: docker-graph-store
-          emptyDir: {}
-      {{- end }}
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
