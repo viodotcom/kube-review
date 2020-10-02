@@ -66,6 +66,11 @@ spec:
           env:
             - name: DOCKER_HOST
               value: tcp://localhost:2375
+        initContainers:
+          # It's necessary to wait for the container dind-daemon to start #
+        - name: dind-init
+          image: busybox
+          command: ['sh', '-c', 'until nslookup dind-daemon; do echo waiting for dind-daemon; sleep 5; done;']
         - name: dind-daemon
           image: docker:stable-dind
           env:
