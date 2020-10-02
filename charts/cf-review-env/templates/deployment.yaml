@@ -31,6 +31,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command: ['sh', '-c', "until nslookup dind-daemon.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for dind-daemon; sleep 2; done"]
           imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
           {{- if .Values.envFrom.secretRef.name }}
           envFrom:
@@ -75,10 +76,6 @@ spec:
           volumeMounts:
             - name: docker-graph-store
               mountPath: /var/lib/docker
-      initContainers:
-        - name: init-dind-daemon
-          image: busybox
-          command: ['sh', '-c', "until nslookup dind-daemon; do echo waiting for dind-daemon; sleep 5; done"]
       volumes:
         - name: docker-graph-store
           emptyDir: {}
