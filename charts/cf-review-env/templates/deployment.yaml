@@ -6,14 +6,14 @@ metadata:
     {{- include "cf-review-env.labels" . | nindent 4 }}
 spec:
 {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.replicaCount | default "1" }}
 {{- end }}
   strategy:
 {{- if .Values.strategy }}
 {{ toYaml .Values.strategy | indent 4 }}
 {{- end }}
-  progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds }}
-  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds | default "600" }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit | default "10" }}
   selector:
     matchLabels:
       {{- include "cf-review-env.selectorLabels" . | nindent 6 }}
@@ -36,7 +36,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
           {{- if .Values.envFrom.secretRef.name }}
           envFrom:
             - secretRef:
@@ -45,21 +45,21 @@ spec:
           ports:
             - name: {{ .Values.deployment.ports.name }}
               containerPort: {{ .Values.deployment.ports.containerPort }}
-              protocol: {{ .Values.deployment.ports.protocol }}
+              protocol: {{ .Values.deployment.ports.protocol | default "TCP" }}
           livenessProbe:
             httpGet:
-              path: {{ .Values.livenessProbe.httpGet.path }}
+              path: {{ .Values.livenessProbe.httpGet.path | default "/" }}
               port: {{ .Values.service.port }}
-              scheme: {{ .Values.livenessProbe.httpGet.scheme }}
-            initialDelaySeconds: {{ .Values.livenessProbe.httpGet.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.livenessProbe.httpGet.timeoutSeconds }}
+              scheme: {{ .Values.livenessProbe.httpGet.scheme | default "HTTP" }}
+            initialDelaySeconds: {{ .Values.livenessProbe.httpGet.initialDelaySeconds | default "15" }}
+            timeoutSeconds: {{ .Values.livenessProbe.httpGet.timeoutSeconds | default "15" }}
           readinessProbe:
             httpGet:
-              path: {{ .Values.readinessProbe.httpGet.path }}
+              path: {{ .Values.readinessProbe.httpGet.path | default "/" }}
               port: {{ .Values.service.port }}
-              scheme: {{ .Values.readinessProbe.httpGet.scheme }}
-            initialDelaySeconds: {{ .Values.readinessProbe.httpGet.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.readinessProbe.httpGet.timeoutSeconds }}
+              scheme: {{ .Values.readinessProbe.httpGet.scheme | default "HTTP" }}
+            initialDelaySeconds: {{ .Values.readinessProbe.httpGet.initialDelaySeconds | default "15" }}
+            timeoutSeconds: {{ .Values.readinessProbe.httpGet.timeoutSeconds | default "15" }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if .Values.dockerDind }}
@@ -96,6 +96,6 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      restartPolicy: {{ .Values.restartPolicy }}
-      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
-      dnsPolicy: {{ .Values.dnsPolicy }}
+      restartPolicy: {{ .Values.restartPolicy | default "Always" }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds | default "40" }}
+      dnsPolicy: {{ .Values.dnsPolicy | default "ClusterFirst" }}
