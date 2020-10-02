@@ -26,11 +26,6 @@ spec:
       labels:
         {{- include "cf-review-env.selectorLabels" . | nindent 8 }}
     spec:
-      imagePullSecrets:
-        - name: {{ .Values.imagePullSecrets }}
-      serviceAccountName: {{ include "cf-review-env.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -66,11 +61,6 @@ spec:
           env:
             - name: DOCKER_HOST
               value: tcp://localhost:2375
-        initContainers:
-          # It's necessary to wait for the container dind-daemon to start #
-        - name: dind-init
-          image: busybox
-          command: ['sh', '-c', 'until nslookup dind-daemon; do echo waiting for dind-daemon; sleep 5; done;']
         - name: dind-daemon
           image: docker:stable-dind
           env:
@@ -78,13 +68,22 @@ spec:
               value: ""
           resources:
             requests:
-              cpu: {{ .Values.dockerDind.cpu | default "20m" }}
+              cpu: {{ .Values.dockerDind.cpu | default "100m" }}
               memory: {{ .Values.dockerDind.memory | default "512Mi" }}
           securityContext:
             privileged: true
           volumeMounts:
             - name: docker-graph-store
               mountPath: /var/lib/docker
+      initContainers:
+        - name: init-dind-daemon
+          image: busybox
+          command: ['sh', '-c', "until nslookup dind-daemon; do echo waiting for dind-daemon; sleep 5; done"]
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecrets }}
+      serviceAccountName: {{ include "cf-review-env.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
         - name: docker-graph-store
           emptyDir: {}
