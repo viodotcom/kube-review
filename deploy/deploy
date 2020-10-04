@@ -51,9 +51,9 @@ generate_pull_secret() {
 }
 
 install_chart() {
-  if [ "$VALUES_FILE" != ""]; then
+  if [ "$VALUES_FILE" != "" ]; then
     echo "Using values file from user: $VALUES_FILE"
-    CUSTOMFILE_0="$VALUES_FILE"
+    export CUSTOMFILE_0="$VALUES_FILE"
   fi
 
   # We need to use env here because of the CUSTOM vars
