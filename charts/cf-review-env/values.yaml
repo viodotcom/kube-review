@@ -33,11 +33,10 @@ readinessProbe:
   httpGet:
     path: "/"
 envFrom:
-  secretRef:
-    name: "change_me_if_necessary"
+  enabled: true
 dockerDind:
-  enabled: true
+  enabled: false
 customHelmTest:
-  enabled: true
+  enabled: false
   args: "/ping/1"
 # Example: https://URL/ping/1

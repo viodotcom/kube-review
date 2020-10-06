@@ -32,7 +32,7 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
-          {{- if .Values.envFrom.secretRef.name }}
+          {{- if eq .Values.envFrom.enabled true }}
           envFrom:
             - secretRef:
                 name: {{ .Values.envFrom.secretRef.name }}
@@ -63,7 +63,7 @@ spec:
             failureThreshold: {{ .Values.readinessProbe.failureThreshold | default "10" }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- if .Values.dockerDind.enabled }}
+      {{- if eq .Values.dockerDind.enabled true }}
           env:
             - name: DOCKER_HOST
               value: tcp://localhost:2375
