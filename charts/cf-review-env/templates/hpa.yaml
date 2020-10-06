@@ -13,20 +13,16 @@ spec:
   minReplicas: {{ .Values.autoscaling.minReplicas | default "1" }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas | default "2" }}
   metrics:
-  {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
           averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage | default "90" }}
-  {{- end }}
-  {{- if .Values.autoscaling.targetMemoryUtilizationPercentage }}
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
           averageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage | default "90" }}
-  {{- end }}
 {{- end }}
