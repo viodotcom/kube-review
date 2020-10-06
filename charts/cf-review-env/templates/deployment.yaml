@@ -63,7 +63,7 @@ spec:
             failureThreshold: {{ .Values.readinessProbe.failureThreshold | default "10" }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- if .Values.dockerDind }}
+      {{- if .Values.dockerDind.enabled }}
           env:
             - name: DOCKER_HOST
               value: tcp://localhost:2375

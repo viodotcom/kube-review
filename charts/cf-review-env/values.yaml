@@ -35,9 +35,9 @@ readinessProbe:
 envFrom:
   secretRef:
     name: "change_me_if_necessary"
-#dockerDind:
-#  enabled: true
-#customHelmTest:
-#  enabled: true
-#  args: "/ping/1"
+dockerDind:
+  enabled: true
+customHelmTest:
+  enabled: true
+  args: "/ping/1"
 # Example: https://URL/ping/1

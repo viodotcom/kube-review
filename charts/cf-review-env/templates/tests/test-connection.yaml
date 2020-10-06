@@ -13,7 +13,7 @@ spec:
     - name: wget{{ $index }}
       image: busybox
       command: ['wget']
-      {{- if .Values.customHelmTest }}
+      {{- if $.Values.customHelmTest.enabled }}
       args: ['http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ $.Values.customHelmTest.args }}']
       {{- else }}
       args: ['http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ . }}']
