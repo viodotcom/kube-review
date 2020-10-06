@@ -14,7 +14,7 @@ spec:
       image: busybox
       command: ['wget']
       {{- if .Values.customHelmTest }}
-      args: ['http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .Values.customHelmTest.args }}']
+      args: ['http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ $.Values.customHelmTest.args }}']
       {{- else }}
       args: ['http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ . }}']
       {{- end }}

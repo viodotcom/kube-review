@@ -37,7 +37,7 @@ envFrom:
     name: "change_me_if_necessary"
 #dockerDind:
 #  enabled: true
-#helmTest:
+#customHelmTest:
 #  enabled: true
 #  args: "/ping/1"
 # Example: https://URL/ping/1
