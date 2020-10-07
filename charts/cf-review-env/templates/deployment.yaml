@@ -79,10 +79,10 @@ spec:
           securityContext:
             privileged: true
           volumeMounts:
-            - name: docker-graph-store
+            - name: docker-store
               mountPath: /var/lib/docker
       volumes:
-        - name: docker-graph-store
+        - name: docker-store
           emptyDir: {}
       {{- end }}
       imagePullSecrets:
