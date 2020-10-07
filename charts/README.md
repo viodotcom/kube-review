@@ -56,7 +56,7 @@ This is an example of `how to delete`.
 
 `helm delete CHART_NAME --namespace NAMESPACE_NAME`
 
-## How to debut the templates files
+## How to debug the templates files
 
 Ref.: https://helm.sh/docs/chart_template_guide/debugging/
 

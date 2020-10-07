@@ -36,7 +36,7 @@ envFrom:
   enabled: true
 dockerDind:
   enabled: false
-customHelmTest:
+customHelmTestURL:
   enabled: false
   args: "/ping/1"
 # Example: https://URL/ping/1

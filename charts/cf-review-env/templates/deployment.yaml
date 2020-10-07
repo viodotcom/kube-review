@@ -31,7 +31,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
           {{- if eq .Values.envFrom.enabled true }}
           envFrom:
             - secretRef:
@@ -46,21 +46,21 @@ spec:
               path: {{ .Values.livenessProbe.httpGet.path }}
               port: {{ .Values.deployment.ports.containerPort }}
               scheme: {{ .Values.livenessProbe.httpGet.scheme | default "HTTP" }}
-            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default "15" }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default "10" }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default "15" }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds | default "30" }}
             successThreshold: {{ .Values.livenessProbe.successThreshold | default "1" }}
-            failureThreshold: {{ .Values.livenessProbe.failureThreshold | default "10" }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold | default "2" }}
           readinessProbe:
             httpGet:
               path: {{ .Values.readinessProbe.httpGet.path }}
               port: {{ .Values.deployment.ports.containerPort }}
               scheme: {{ .Values.readinessProbe.httpGet.scheme | default "HTTP" }}
-            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default "15" }}
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default "10" }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default "15" }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds | default "30" }}
             successThreshold: {{ .Values.readinessProbe.successThreshold | default "1" }}
-            failureThreshold: {{ .Values.readinessProbe.failureThreshold | default "10" }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold | default "2" }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if eq .Values.dockerDind.enabled true }}
