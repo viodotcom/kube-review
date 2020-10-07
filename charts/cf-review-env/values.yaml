@@ -47,12 +47,12 @@ livenessProbe:
     scheme: "HTTP"
     initialDelaySeconds: 10
     timeoutSeconds: 15
-readinessProbe:
+startupProbe:
   httpGet:
     path: "/"
     scheme: "HTTP"
-    initialDelaySeconds: 15
-    timeoutSeconds: 15
+    periodSeconds: 30
+    failureThreshold: 100
 envFrom:
   secretRef:
     name: "change_me_if_necessary"

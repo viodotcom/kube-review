@@ -60,6 +60,13 @@ spec:
               scheme: {{ .Values.readinessProbe.httpGet.scheme}}
             initialDelaySeconds: {{ .Values.readinessProbe.httpGet.initialDelaySeconds}}
             timeoutSeconds: {{ .Values.readinessProbe.httpGet.timeoutSeconds}}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.startupProbe.httpGet.path}}
+              port: {{ .Values.service.port}}
+              scheme: {{ .Values.startupProbe.httpGet.scheme}}
+            failureThreshold: {{ .Values.startupProbe.httpGet.failureThreshold}}
+            periodSecond: {{ .Values.startupProbe.httpGet.periodSeconds}}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
