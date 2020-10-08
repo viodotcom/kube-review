@@ -13,7 +13,11 @@ spec:
     - name: wget{{ $index }}
       image: busybox
       command: ['wget']
+      {{- if eq $.Values.customHelmTestURL.enabled true }}
+      args: ['http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ $.Values.customHelmTestURL.args }}']
+      {{- else }}
       args: ['http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ . }}']
+      {{- end }}
     {{- end }}
   {{- end }}
   restartPolicy: Never

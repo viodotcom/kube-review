@@ -10,23 +10,19 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "cf-review-env.fullname" . }}
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  minReplicas: {{ .Values.autoscaling.minReplicas | default "1" }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas | default "2" }}
   metrics:
-  {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
-  {{- end }}
-  {{- if .Values.autoscaling.targetMemoryUtilizationPercentage }}
+          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage | default "90" }}
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
-          averageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
-  {{- end }}
+          averageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage | default "90" }}
 {{- end }}

@@ -1,23 +1,12 @@
-replicaCount: 1
-image:
-  pullPolicy: Always
 serviceAccount:
   create: true
 deployment:
   ports:
     name: web
     containerPort: 5000
-    protocol: TCP
-restartPolicy: Always
-terminationGracePeriodSeconds: 40
-dnsPolicy: ClusterFirst
-progressDeadlineSeconds: 600
-revisionHistoryLimit: 10
 service:
-  type: ClusterIP
-  port: 5000
   name: web
-  protocol: TCP
+  port: 5000
   targetPort: 5000
 ingress:
   enabled: true
@@ -32,10 +21,6 @@ resources:
     memory: 600Mi
 autoscaling:
   enabled: true
-  minReplicas: 1
-  maxReplicas: 2
-  targetCPUUtilizationPercentage: 90
-  targetMemoryUtilizationPercentage: 90
 strategy:
   type: RollingUpdate
   rollingUpdate:
@@ -44,15 +29,14 @@ strategy:
 livenessProbe:
   httpGet:
     path: "/"
-    scheme: "HTTP"
-    initialDelaySeconds: 10
-    timeoutSeconds: 15
 readinessProbe:
   httpGet:
     path: "/"
-    scheme: "HTTP"
-    initialDelaySeconds: 15
-    timeoutSeconds: 15
 envFrom:
-  secretRef:
-    name: "change_me_if_necessary"
+  enabled: true
+dockerDind:
+  enabled: false
+customHelmTestURL:
+  enabled: false
+  args: "/ping/1"
+# Example: https://URL/ping/1

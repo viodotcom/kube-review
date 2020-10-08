@@ -5,10 +5,10 @@ metadata:
   labels:
     {{- include "cf-review-env.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.service.type | default "ClusterIP" }}
   ports:
     - name: {{ .Values.service.name }}
-      protocol: {{ .Values.service.protocol }}
+      protocol: {{ .Values.service.protocol | default "TCP" }}
       port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
   selector:
