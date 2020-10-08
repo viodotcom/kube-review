@@ -51,7 +51,7 @@ startupProbe:
   httpGet:
     path: "/"
     scheme: "HTTP"
-    periodSeconds: 30
+    periodSeconds: 5
     failureThreshold: 100
 envFrom:
   secretRef:
