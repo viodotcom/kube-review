@@ -6,14 +6,14 @@ metadata:
     {{- include "cf-review-env.labels" . | nindent 4 }}
 spec:
 {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.replicaCount | default "1" }}
 {{- end }}
   strategy:
 {{- if .Values.strategy }}
 {{ toYaml .Values.strategy | indent 4 }}
 {{- end }}
-  progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds }}
-  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds | default "600" }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit | default "10" }}
   selector:
     matchLabels:
       {{- include "cf-review-env.selectorLabels" . | nindent 6 }}
@@ -26,18 +26,13 @@ spec:
       labels:
         {{- include "cf-review-env.selectorLabels" . | nindent 8 }}
     spec:
-      imagePullSecrets:
-        - name: {{ .Values.imagePullSecrets }}
-      serviceAccountName: {{ include "cf-review-env.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if .Values.envFrom.secretRef.name }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
+          {{- if eq .Values.envFrom.enabled true }}
           envFrom:
             - secretRef:
                 name: {{ .Values.envFrom.secretRef.name }}
@@ -45,30 +40,62 @@ spec:
           ports:
             - name: {{ .Values.deployment.ports.name }}
               containerPort: {{ .Values.deployment.ports.containerPort }}
-              protocol: {{ .Values.deployment.ports.protocol }}
+              protocol: {{ .Values.deployment.ports.protocol | default "TCP" }}
           livenessProbe:
             httpGet:
-              path: {{ .Values.livenessProbe.httpGet.path}}
-              port: {{ .Values.service.port}}
-              scheme: {{ .Values.livenessProbe.httpGet.scheme}}
-            initialDelaySeconds: {{ .Values.livenessProbe.httpGet.initialDelaySeconds}}
-            timeoutSeconds: {{ .Values.livenessProbe.httpGet.timeoutSeconds}}
+              path: {{ .Values.livenessProbe.httpGet.path }}
+              port: {{ .Values.deployment.ports.containerPort }}
+              scheme: {{ .Values.livenessProbe.httpGet.scheme | default "HTTP" }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default "15" }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds | default "30" }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold | default "1" }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold | default "2" }}
           readinessProbe:
             httpGet:
-              path: {{ .Values.readinessProbe.httpGet.path}}
-              port: {{ .Values.service.port}}
-              scheme: {{ .Values.readinessProbe.httpGet.scheme}}
-            initialDelaySeconds: {{ .Values.readinessProbe.httpGet.initialDelaySeconds}}
-            timeoutSeconds: {{ .Values.readinessProbe.httpGet.timeoutSeconds}}
+              path: {{ .Values.readinessProbe.httpGet.path }}
+              port: {{ .Values.deployment.ports.containerPort }}
+              scheme: {{ .Values.readinessProbe.httpGet.scheme | default "HTTP" }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default "15" }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds | default "30" }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold | default "1" }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold | default "2" }}
           startupProbe:
             httpGet:
-              path: {{ .Values.startupProbe.httpGet.path}}
-              port: {{ .Values.service.port}}
-              scheme: {{ .Values.startupProbe.httpGet.scheme}}
-            failureThreshold: {{ .Values.startupProbe.httpGet.failureThreshold}}
-            periodSecond: {{ .Values.startupProbe.httpGet.periodSeconds}}
+              path: {{ .Values.startupProbe.httpGet.path }}
+              port: {{ .Values.deployment.ports.containerPort }}
+              scheme: {{ .Values.startupProbe.httpGet.scheme | default "HTTP" }}
+            periodSeconds: {{ .Values.startupProbe.periodSeconds | default "5" }}
+            failureThreshold: {{ .Values.startupProbe.failureThreshold | default "100" }}
+            
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      {{- if eq .Values.dockerDind.enabled true }}
+          env:
+            - name: DOCKER_HOST
+              value: tcp://localhost:2375
+        - name: dind-daemon
+          image: docker:stable-dind
+          env:
+            - name: DOCKER_TLS_CERTDIR
+              value: ""
+          resources:
+            requests:
+              cpu: {{ .Values.dockerDind.cpu | default "100m" }}
+              memory: {{ .Values.dockerDind.memory | default "512Mi" }}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: docker-store
+              mountPath: /var/lib/docker
+      volumes:
+        - name: docker-store
+          emptyDir: {}
+      {{- end }}
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecrets }}
+      serviceAccountName: {{ include "cf-review-env.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -81,6 +108,6 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      restartPolicy: {{ .Values.restartPolicy }}
-      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
-      dnsPolicy: {{ .Values.dnsPolicy }}
+      restartPolicy: {{ .Values.restartPolicy | default "Always" }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds | default "40" }}
+      dnsPolicy: {{ .Values.dnsPolicy | default "ClusterFirst" }}
