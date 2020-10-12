@@ -32,7 +32,7 @@ livenessProbe:
 readinessProbe:
   httpGet:
     path: "/"
-StartupProbe:
+startupProbe:
   httpGet:
     path: "/"
 envFrom:
