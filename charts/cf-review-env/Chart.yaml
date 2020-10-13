@@ -10,4 +10,4 @@ maintainers:
 type: application
 sources:
 - https://github.com/FindHotel/cf-review-env
-version: 0.2.4
+version: 0.2.5
