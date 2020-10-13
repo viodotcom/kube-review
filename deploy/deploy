@@ -2,7 +2,7 @@
 # exit if any command fails
 set -e
 
-chart_version=${CHART_VERSION:-0.2.3}
+chart_version=${CHART_VERSION:-0.2.4}
 helm_version=3.0.3
 chart_ref=cf-review-env
 short_name=$(echo -n $NAME | cut -c1-15)
@@ -10,6 +10,11 @@ hash=$(echo "$NAME" | rhash -p "%c" -)
 namespace=re-$short_name-$hash
 
 config_context() {
+  # kubectl locks the config for each execution. To workaround
+  # and allow multiple concurrent kubectl executions we copy the config
+  kubeconfig_dir=/codefresh/volume/sensitive/.kube-$namespace/
+  cp -R /codefresh/volume/sensitive/.kube "${kubeconfig_dir}"
+  export KUBECONFIG=${kubeconfig_dir}/config
   kubectl config use-context "$KUBE_CONTEXT"
 }
 
