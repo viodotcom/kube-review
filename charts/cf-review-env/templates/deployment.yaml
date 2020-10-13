@@ -46,7 +46,6 @@ spec:
               path: {{ .Values.livenessProbe.httpGet.path }}
               port: {{ .Values.deployment.ports.containerPort }}
               scheme: {{ .Values.livenessProbe.httpGet.scheme | default "HTTP" }}
-            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default "10" }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default "15" }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds | default "30" }}
             successThreshold: {{ .Values.livenessProbe.successThreshold | default "1" }}
@@ -56,11 +55,17 @@ spec:
               path: {{ .Values.readinessProbe.httpGet.path }}
               port: {{ .Values.deployment.ports.containerPort }}
               scheme: {{ .Values.readinessProbe.httpGet.scheme | default "HTTP" }}
-            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default "10" }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default "15" }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds | default "30" }}
             successThreshold: {{ .Values.readinessProbe.successThreshold | default "1" }}
             failureThreshold: {{ .Values.readinessProbe.failureThreshold | default "2" }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.startupProbe.httpGet.path }}
+              port: {{ .Values.deployment.ports.containerPort }}
+              scheme: {{ .Values.startupProbe.httpGet.scheme | default "HTTP" }}
+            periodSeconds: {{ .Values.startupProbe.periodSeconds | default "5" }}
+            failureThreshold: {{ .Values.startupProbe.failureThreshold | default "100" }}   
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if eq .Values.dockerDind.enabled true }}

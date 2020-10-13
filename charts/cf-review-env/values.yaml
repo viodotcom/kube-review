@@ -32,6 +32,9 @@ livenessProbe:
 readinessProbe:
   httpGet:
     path: "/"
+startupProbe:
+  httpGet:
+    path: "/"
 envFrom:
   enabled: true
 dockerDind:
