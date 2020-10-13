@@ -26,15 +26,6 @@ strategy:
   rollingUpdate:
     maxSurge: 1
     maxUnavailable: 0
-livenessProbe:
-  httpGet:
-    path: "/"
-readinessProbe:
-  httpGet:
-    path: "/"
-startupProbe:
-  httpGet:
-    path: "/"
 envFrom:
   enabled: true
 dockerDind:
