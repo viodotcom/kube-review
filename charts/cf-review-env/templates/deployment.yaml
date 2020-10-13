@@ -61,7 +61,7 @@ spec:
             failureThreshold: {{ .Values.readinessProbe.failureThreshold | default "2" }}
           startupProbe:
             httpGet:
-              path: {{ .Values.startupProbe.httpGet.path| "/" }}
+              path: {{ .Values.startupProbe.httpGet.path| default "/" }}
               port: {{ .Values.deployment.ports.containerPort }}
               scheme: {{ .Values.startupProbe.httpGet.scheme | default "HTTP" }}
             periodSeconds: {{ .Values.startupProbe.periodSeconds | default "5" }}
