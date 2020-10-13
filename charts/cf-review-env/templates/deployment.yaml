@@ -65,7 +65,7 @@ spec:
               port: {{ .Values.deployment.ports.containerPort }}
               scheme: {{ .Values.startupProbe.httpGet.scheme | default "HTTP" }}
             periodSeconds: {{ .Values.startupProbe.periodSeconds | default "5" }}
-            failureThreshold: {{ .Values.startupProbe.failureThreshold | default "100" }}   
+            failureThreshold: {{ .Values.startupProbe.failureThreshold | default "60" }}   
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if eq .Values.dockerDind.enabled true }}
