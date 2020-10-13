@@ -2,7 +2,7 @@
 
 ## Use startupProbe on the deployments
 
-We need to use the `startupProbe` in our helm chart, but this new feature will be available only on `EKS version 1.18`, so now we have it added in our [deployment.yaml](https://github.com/FindHotel/cf-review-env/blob/master/charts/cf-review-env/templates/deployment.yaml#L62) file but we can't use it.
+We need to use the `startupProbe` in our deployments, but this new feature will be available only on `EKS version 1.18`, so now we have it added in our [deployment.yaml](https://github.com/FindHotel/cf-review-env/blob/master/charts/cf-review-env/templates/deployment.yaml#L62) file but we can't use it.
 **Note:** According to AWS the `EKS 1.18 version` will be available on `October, 2020`.
 
 
