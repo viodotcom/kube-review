@@ -47,27 +47,26 @@ spec:
               port: {{ .Values.deployment.ports.containerPort }}
               scheme: {{ .Values.livenessProbe.httpGet.scheme | default "HTTP" }}
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default "10" }}
-            periodSeconds: {{ .Values.livenessProbe.periodSeconds | default "15" }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds | default "5" }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default "5" }}
             successThreshold: {{ .Values.livenessProbe.successThreshold | default "1" }}
-            failureThreshold: {{ .Values.livenessProbe.failureThreshold | default "5" }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold | default "30" }}
           readinessProbe:
             httpGet:
               path: {{ .Values.readinessProbe.httpGet.path | default "/" }}
               port: {{ .Values.deployment.ports.containerPort }}
               scheme: {{ .Values.readinessProbe.httpGet.scheme | default "HTTP" }}
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default "10" }}
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds | default "15" }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds | default "5" }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default "5" }}
             successThreshold: {{ .Values.readinessProbe.successThreshold | default "1" }}
-            failureThreshold: {{ .Values.readinessProbe.failureThreshold | default "5" }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold | default "30" }}
           startupProbe:
             httpGet:
               path: {{ .Values.startupProbe.httpGet.path | default "/" }}
               port: {{ .Values.deployment.ports.containerPort }}
               scheme: {{ .Values.startupProbe.httpGet.scheme | default "HTTP" }}
-            initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds | default "10" }}
-            periodSeconds: {{ .Values.startupProbe.periodSeconds | default "15" }}
+            periodSeconds: {{ .Values.startupProbe.periodSeconds | default "5" }}
             timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds | default "5" }}
             successThreshold: {{ .Values.startupProbe.successThreshold | default "1" }}
             failureThreshold: {{ .Values.startupProbe.failureThreshold | default "10" }}
