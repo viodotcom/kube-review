@@ -6,7 +6,7 @@ This is a `template helm chart` created to be used in the CI pipeline for all pr
 
 If you have questions, we have more docs for example:
 
-- [Values File Template](./docs/values-file-template.yaml)
+- [Values Template](./docs/values-template.yaml)
 - [Kubernetes Probes](./docs/kubernetes-probes.md)
 
 and others [here](./docs)
