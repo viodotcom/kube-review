@@ -69,7 +69,7 @@ spec:
             periodSeconds: {{ .Values.startupProbe.periodSeconds | default "5" }}
             timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds | default "5" }}
             successThreshold: {{ .Values.startupProbe.successThreshold | default "1" }}
-            failureThreshold: {{ .Values.startupProbe.failureThreshold | default "10" }}
+            failureThreshold: {{ .Values.startupProbe.failureThreshold | default "30" }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if eq .Values.dockerDind.enabled true }}
