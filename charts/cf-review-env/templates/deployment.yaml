@@ -49,7 +49,7 @@ spec:
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default "10" }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds | default "15" }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds | default "5" }}
-            successThreshold: {{ .Values.livenessProbe.successThreshold | default "2" }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold | default "1" }}
             failureThreshold: {{ .Values.livenessProbe.failureThreshold | default "5" }}
           readinessProbe:
             httpGet:
@@ -59,7 +59,7 @@ spec:
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default "10" }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds | default "15" }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds | default "5" }}
-            successThreshold: {{ .Values.readinessProbe.successThreshold | default "2" }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold | default "1" }}
             failureThreshold: {{ .Values.readinessProbe.failureThreshold | default "5" }}
           startupProbe:
             httpGet:
@@ -69,7 +69,7 @@ spec:
             initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds | default "10" }}
             periodSeconds: {{ .Values.startupProbe.periodSeconds | default "15" }}
             timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds | default "5" }}
-            successThreshold: {{ .Values.startupProbe.successThreshold | default "2" }}
+            successThreshold: {{ .Values.startupProbe.successThreshold | default "1" }}
             failureThreshold: {{ .Values.startupProbe.failureThreshold | default "10" }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
