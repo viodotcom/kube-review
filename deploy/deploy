@@ -2,7 +2,7 @@
 # exit if any command fails
 set -e
 
-chart_version=${CHART_VERSION:-0.2.5}
+chart_version=${CHART_VERSION:-0.2.6}
 helm_version=3.0.3
 chart_ref=cf-review-env
 short_name=$(echo -n $NAME | cut -c1-15)
