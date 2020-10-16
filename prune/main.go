@@ -60,7 +60,6 @@ func (gh *GHClient) IsBranchMerged(owner, repo, branch string) (bool, error) {
 		return false, err
 	}
 
-	log.Printf(branch)
 	// GET /repos/{owner}/{repo}/branches/{branch}
 	method := fmt.Sprintf("repos/%s/%s/branches/%s", owner, repo, branch)
 	endpoint.Path = path.Join(endpoint.Path, method)
@@ -83,9 +82,9 @@ func (gh *GHClient) IsBranchMerged(owner, repo, branch string) (bool, error) {
 
 	switch resp.StatusCode {
 	case 200:
-		return true, nil
-	case 404:
 		return false, nil
+	case 404:
+		return true, nil
 	default:
 		return false, fmt.Errorf("Got status code %d with body: %s", resp.Status, body)
 	}
@@ -122,9 +121,9 @@ func (gh *GHClient) IsPRMerged(owner, repo, number string) (bool, error) {
 
 	switch resp.StatusCode {
 	case 204:
-		return true, nil
-	case 404:
 		return false, nil
+	case 404:
+		return true, nil
 	default:
 		return false, fmt.Errorf("Got status code %d with body: %s", resp.Status, body)
 	}
