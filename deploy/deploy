@@ -31,7 +31,7 @@ metadata:
     app.kubernetes.io/instance: $NAMESPACE
     app.kubernetes.io/name: cf-review-env
     app.kubernetes.io/pull_request_number: "$CF_PULL_REQUEST_NUMBER"
-    app.kubernetes.io/branch_name: "$CF_BRANCH_TAG_NORMALIZED_LOWER_CASE"
+    app.kubernetes.io/branch_name: "$CF_BRANCH"
     app.kubernetes.io/repository_name: "$CF_REPO_NAME"
     app.kubernetes.io/repository_owner: "$CF_REPO_OWNER"
     app.kubernetes.io/updated_at: "$UPDATED_AT"
