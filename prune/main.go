@@ -38,6 +38,60 @@ func NewGHClient(apiEndpoint, userName, apiToken string) *GHClient {
 	}
 }
 
+// IsMerged returns true if a PR is open false otherwise
+// if PR number is not present use the branch name, in that case
+// checks if branch exists
+func (gh *GHClient) IsMerged(owner, repo, number, branch string) (bool, error) {
+	if number != "" {
+		return gh.IsPRMerged(owner, repo, number)
+	}
+
+	if branch != "" {
+		return gh.IsBranchMerged(owner, repo, branch)
+	}
+
+	return false, fmt.Errorf("Both PR number and branch name annotations are missing")
+}
+
+// IsBranchMerged returns true if the branch is merged false otherwise
+func (gh *GHClient) IsBranchMerged(owner, repo, branch string) (bool, error) {
+	endpoint, err := url.Parse(gh.APIEndpoint)
+	if err != nil {
+		return false, err
+	}
+
+	// GET /repos/{owner}/{repo}/branches/{branch}
+	method := fmt.Sprintf("repos/%s/%s/branches/%s", owner, repo, branch)
+	endpoint.Path = path.Join(endpoint.Path, method)
+	req, err := http.NewRequest("GET", endpoint.String(), nil)
+	if err != nil {
+		return false, err
+	}
+
+	req.SetBasicAuth(gh.UserName, gh.APIToken)
+	resp, err := gh.httpClient.Do(req)
+	if err != nil {
+		return false, err
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return false, err
+	}
+
+	switch resp.StatusCode {
+	case 200:
+		return false, nil
+	case 404:
+		return true, nil
+	default:
+		return false, fmt.Errorf("Got status code %d with body: %s", resp.Status, body)
+	}
+
+	return false, nil
+}
+
 // IsPRMerged returns true if a PR is merged false otherwise
 func (gh *GHClient) IsPRMerged(owner, repo, number string) (bool, error) {
 	endpoint, err := url.Parse(gh.APIEndpoint)
@@ -67,9 +121,9 @@ func (gh *GHClient) IsPRMerged(owner, repo, number string) (bool, error) {
 
 	switch resp.StatusCode {
 	case 204:
-		return true, nil
-	case 404:
 		return false, nil
+	case 404:
+		return true, nil
 	default:
 		return false, fmt.Errorf("Got status code %d with body: %s", resp.Status, body)
 	}
@@ -154,6 +208,7 @@ type K8sNamespace struct {
 	Name              string
 	UpdatedAt         *time.Time
 	PullRequestNumber string
+	BranchName        string
 	RepositoryName    string
 	RepositoryOwner   string
 }
@@ -220,6 +275,7 @@ func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 		nk8sNamespacesList = append(nk8sNamespacesList, K8sNamespace{
 			UpdatedAt:         &updatedAt,
 			Name:              namespace.Labels["app.kubernetes.io/instance"],
+			BranchName:        namespace.Labels["app.kubernetes.io/branch_name"],
 			PullRequestNumber: namespace.Labels["app.kubernetes.io/pull_request_number"],
 			RepositoryName:    namespace.Labels["app.kubernetes.io/repository_name"],
 			RepositoryOwner:   namespace.Labels["app.kubernetes.io/repository_owner"],
@@ -257,14 +313,12 @@ func run(c *cli.Context) error {
 		}
 
 		merged := false
-		if namespace.PullRequestNumber != "" {
-			status, err := ghClient.IsPRMerged(namespace.RepositoryOwner, namespace.RepositoryName,
-				namespace.PullRequestNumber)
-			if err != nil {
-				log.Printf("error checking PR status: %s", err)
-			} else {
-				merged = status
-			}
+		merged, err := ghClient.IsMerged(namespace.RepositoryOwner, namespace.RepositoryName,
+			namespace.PullRequestNumber, namespace.BranchName)
+		if err != nil {
+			log.Printf("error checking env status: %s", err)
+		} else {
+			merged = merged
 		}
 
 		expired := time.Since(*namespace.UpdatedAt) >= time.Duration(c.Int("expiration"))*time.Hour
