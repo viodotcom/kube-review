@@ -22,6 +22,7 @@ spec:
     {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     {{- end }}
       labels:
         {{- include "cf-review-env.selectorLabels" . | nindent 8 }}
