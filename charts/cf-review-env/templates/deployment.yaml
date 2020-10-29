@@ -19,7 +19,7 @@ spec:
       {{- include "cf-review-env.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-    {{- with .Values.podAnnotations }}
+    {{- if eq .Values.podAnnotations.enabled true }}
       annotations:
         {{- toYaml . | nindent 8 }}
         rollme: {{ randAlphaNum 5 | quote }}
