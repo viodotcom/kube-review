@@ -22,7 +22,7 @@ spec:
     {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        rollme: {{ randAlphaNum 5 | quote }}
     {{- end }}
       labels:
         {{- include "cf-review-env.selectorLabels" . | nindent 8 }}
@@ -34,9 +34,10 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
           {{- if eq .Values.envFrom.enabled true }}
-          envFrom:
-            - secretRef:
-                name: {{ .Values.envFrom.secretRef.name }}
+          volumes:
+            - name: {{ include "cf-review-env.fullname" . }}
+              configMap:
+                name: {{ include "cf-review-env.fullname" . }}
           {{- end }}
           ports:
             - name: {{ .Values.deployment.ports.name }}
