@@ -19,11 +19,9 @@ spec:
       {{- include "cf-review-env.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-    {{- if eq .Values.podAnnotations.enabled true }}
       annotations:
-        {{- toYaml . | nindent 8 }}
+        # Force all new release to recreate the pods #
         rollme: {{ randAlphaNum 5 | quote }}
-    {{- end }}
       labels:
         {{- include "cf-review-env.selectorLabels" . | nindent 8 }}
     spec:
