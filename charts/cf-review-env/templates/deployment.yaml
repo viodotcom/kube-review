@@ -34,10 +34,9 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "Always" }}
           {{- if eq .Values.envFrom.enabled true }}
-          volumes:
-            - name: {{ include "cf-review-env.fullname" . }}
-              configMap:
-                name: {{ include "cf-review-env.fullname" . }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.envFrom.secretRef.name }}
           {{- end }}
           ports:
             - name: {{ .Values.deployment.ports.name }}
