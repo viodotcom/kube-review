@@ -28,8 +28,9 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    app.kubernetes.io/instance: $NAMESPACE
     app.kubernetes.io/name: cf-review-env
+  annotations:
+    app.kubernetes.io/instance: $NAMESPACE
     app.kubernetes.io/pull_request_number: "$CF_PULL_REQUEST_NUMBER"
     app.kubernetes.io/branch_name: "$CF_BRANCH"
     app.kubernetes.io/repository_name: "$CF_REPO_NAME"

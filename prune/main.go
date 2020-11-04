@@ -206,6 +206,7 @@ type K8sClient struct {
 // K8sNamespace is a kubernete namespace
 type K8sNamespace struct {
 	Name              string
+	Instance          string
 	UpdatedAt         *time.Time
 	PullRequestNumber string
 	BranchName        string
@@ -260,12 +261,19 @@ func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 
 	nk8sNamespacesList := make([]K8sNamespace, 0)
 	for _, namespace := range namespaceList.Items {
+		// Backward compatibility layer. This can be removed once all
+		// envs using labels for storing data are purged.
+		data := namespace.Annotations
+		if _, ok := data["app.kubernetes.io/instance"]; !ok {
+			data = namespace.Labels
+		}
+
 		var updatedAt time.Time
-		updatedAtTimestamp := namespace.Labels["app.kubernetes.io/updated_at"]
+		updatedAtTimestamp := data["app.kubernetes.io/updated_at"]
 		if updatedAtTimestamp != "" {
 			updatedAtTimestamp, err := strconv.ParseInt(updatedAtTimestamp, 10, 64)
 			if err != nil {
-				log.Printf("Got bad data at updated_at label for namespace: %s", namespace.Name)
+				log.Printf("Got bad data at updated_at annotation for namespace: %s", namespace.Name)
 				continue
 			}
 
@@ -274,11 +282,12 @@ func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 
 		nk8sNamespacesList = append(nk8sNamespacesList, K8sNamespace{
 			UpdatedAt:         &updatedAt,
-			Name:              namespace.Labels["app.kubernetes.io/instance"],
-			BranchName:        namespace.Labels["app.kubernetes.io/branch_name"],
-			PullRequestNumber: namespace.Labels["app.kubernetes.io/pull_request_number"],
-			RepositoryName:    namespace.Labels["app.kubernetes.io/repository_name"],
-			RepositoryOwner:   namespace.Labels["app.kubernetes.io/repository_owner"],
+			Name:              namespace.Name,
+			Instance:          data["app.kubernetes.io/instance"],
+			BranchName:        data["app.kubernetes.io/branch_name"],
+			PullRequestNumber: data["app.kubernetes.io/pull_request_number"],
+			RepositoryName:    data["app.kubernetes.io/repository_name"],
+			RepositoryOwner:   data["app.kubernetes.io/repository_owner"],
 		})
 	}
 	return nk8sNamespacesList, nil
@@ -316,7 +325,8 @@ func run(c *cli.Context) error {
 		merged, err := ghClient.IsMerged(namespace.RepositoryOwner, namespace.RepositoryName,
 			namespace.PullRequestNumber, namespace.BranchName)
 		if err != nil {
-			log.Printf("error checking env status: %s", err)
+			log.Printf("error checking env: %s error: %s", namespace.Name, err)
+			continue
 		} else {
 			merged = merged
 		}
