@@ -206,6 +206,7 @@ type K8sClient struct {
 // K8sNamespace is a kubernete namespace
 type K8sNamespace struct {
 	Name              string
+	Instance          string
 	UpdatedAt         *time.Time
 	PullRequestNumber string
 	BranchName        string
@@ -263,7 +264,7 @@ func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 		// Backward compatibility layer. This can be removed once all
 		// envs using labels for storing data are purged.
 		data := namespace.Annotations
-		if _, ok := data["instance"]; !ok {
+		if _, ok := data["app.kubernetes.io/instance"]; !ok {
 			data = namespace.Labels
 		}
 
@@ -281,7 +282,8 @@ func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 
 		nk8sNamespacesList = append(nk8sNamespacesList, K8sNamespace{
 			UpdatedAt:         &updatedAt,
-			Name:              data["app.kubernetes.io/instance"],
+			Name:              namespace.Name,
+			Instance:          data["app.kubernetes.io/instance"],
 			BranchName:        data["app.kubernetes.io/branch_name"],
 			PullRequestNumber: data["app.kubernetes.io/pull_request_number"],
 			RepositoryName:    data["app.kubernetes.io/repository_name"],
@@ -323,7 +325,8 @@ func run(c *cli.Context) error {
 		merged, err := ghClient.IsMerged(namespace.RepositoryOwner, namespace.RepositoryName,
 			namespace.PullRequestNumber, namespace.BranchName)
 		if err != nil {
-			log.Printf("error checking env status: %s", err)
+			log.Printf("error checking env: %s error: %s", namespace.Name, err)
+			continue
 		} else {
 			merged = merged
 		}
