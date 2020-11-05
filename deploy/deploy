@@ -11,8 +11,8 @@ chart_ref=cf-review-env
 # way the prefix is informed in a different variable.
 # This code can be removed once all piplines start using prefix.
 name=${NAME}
-if [ "$PREFIX" != "" ]; then
-  name="$PREFIX-$NAME"
+if [ "$APP_PREFIX" != "" ]; then
+  name="$APP_PREFIX-${APP_NAME_OVERRIDE:-$APP_NAME}"
 fi
 short_name=$(echo -n $name | cut -c1-15)
 hash=$(echo "$name" | rhash -p "%c" -)
