@@ -17,7 +17,7 @@ fi
 short_name=$(echo -n $name | cut -c1-15)
 hash=$(echo "$name" | rhash -p "%c" -)
 namespace=re-$short_name-$hash
-is_ephemeral=$IS_EPHEMERAL
+is_ephemeral=${IS_EPHEMERAL:-true}
 
 config_context() {
   # kubectl locks the config for each execution. To workaround
