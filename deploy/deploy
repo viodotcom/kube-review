@@ -9,7 +9,7 @@ chart_ref=cf-review-env
 # This code is necessary to ensure backwards compatibility
 # The old name parameter included the prefix. In the new
 # way the prefix is informed in a different variable.
-# This code can be removed once all piplines start using prefix.
+# This code can be removed once all pipelines start using prefix.
 name=${NAME}
 if [ "$APP_PREFIX" != "" ]; then
   name="$APP_PREFIX-${APP_NAME_OVERRIDE:-$APP_NAME}"
@@ -17,7 +17,7 @@ fi
 short_name=$(echo -n $name | cut -c1-15)
 hash=$(echo "$name" | rhash -p "%c" -)
 namespace=re-$short_name-$hash
-is_ephemeral=${IS_EPHEMERAL:-true}
+is_ephemeral=${APP_IS_EPHEMERAL:-true}
 
 config_context() {
   # kubectl locks the config for each execution. To workaround
