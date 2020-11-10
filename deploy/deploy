@@ -23,6 +23,9 @@ short_name=$(echo -n $name | cut -c1-15)
 hash=$(echo "$name" | rhash -p "%c" -)
 namespace=re-$short_name-$hash
 is_ephemeral=${APP_IS_EPHEMERAL:-true}
+host="$namespace.$APP_DOMAIN"
+url="https://$host"
+kube_context=$KUBE_CONTEXT
 
 config_context() {
   # kubectl locks the config for each execution. To workaround
@@ -30,7 +33,7 @@ config_context() {
   kubeconfig_dir=/codefresh/volume/sensitive/.kube-$namespace/
   cp -R /codefresh/volume/sensitive/.kube "${kubeconfig_dir}"
   export KUBECONFIG=${kubeconfig_dir}/config
-  kubectl config use-context "$KUBE_CONTEXT"
+  kubectl config use-context "$kube_context"
 }
 
 namespace_apply() {
@@ -70,7 +73,7 @@ apply_secret() {
 }
 
 generate_pull_secret() {
-  codefresh generate image-pull-secret --cluster "$KUBE_CONTEXT" --namespace "$namespace" \
+  codefresh generate image-pull-secret --cluster "$kube_context" --namespace "$namespace" \
     --registry "$APP_REGISTRY_NAME"
 }
 
@@ -86,7 +89,7 @@ install_chart() {
   ACTION=install \
   CHART_REPO_URL="$HELM_REPO_URL" \
   CHART_REF=$chart_ref \
-  KUBE_CONTEXT="$KUBE_CONTEXT" \
+  KUBE_CONTEXT="$kube_context" \
   RELEASE_NAME="$namespace" \
   CHART_VERSION="$chart_version" \
   HELM_VERSION=$helm_version \
@@ -94,9 +97,9 @@ install_chart() {
   CUSTOM_image_repository="$APP_IMAGE_URL" \
   CUSTOM_imagePullSecrets="$(kubectl get secret --namespace $namespace --field-selector='type=kubernetes.io/dockercfg' -o=jsonpath='{.items[0].metadata.name}')" \
   CUSTOM_envFrom_secretRef_name="$namespace" \
-  CUSTOM_"ingress_hosts[0]_host=$namespace.$APP_DOMAIN" \
+  CUSTOM_"ingress_hosts[0]_host=$host" \
   CUSTOM_"ingress_hosts[0]_paths[0]=/" \
-  CUSTOM_"ingress_tls[0]_hosts[0]=$namespace.$APP_DOMAIN" \
+  CUSTOM_"ingress_tls[0]_hosts[0]=$host" \
   SKIP_CF_STABLE_HELM_REPO=true \
   WAIT=true \
   /opt/bin/release_chart
@@ -110,7 +113,7 @@ test_chart() {
     SKIP_CF_STABLE_HELM_REPO=true \
     HELM_VERSION=$helm_version \
     CHART_VERSION="$chart_version" \
-    KUBE_CONTEXT="$KUBE_CONTEXT" \
+    KUBE_CONTEXT="$kube_context" \
     /opt/bin/release_chart
     helm test "$namespace" --namespace "$namespace"
 
@@ -126,14 +129,15 @@ test_chart() {
 }
 
 export_variables() {
-  # It is necessary to export these variables because we are using it on the pipelines
-  url="https://$namespace.$APP_DOMAIN"
+  # Export normally here so they are available to the post hook
   export URL=$url
   export NAMESPACE=$namespace
+  export K8S_CONTEXT_NAME=$kube_context
 
-  cf_export NAMESPACE="$namespace"
+  # It is necessary to export these variables because we are using it on the pipelines
   cf_export URL="$url"
-  cf_export K8S_CONTEXT_NAME="$KUBE_CONTEXT"
+  cf_export NAMESPACE="$namespace"
+  cf_export K8S_CONTEXT_NAME="$kube_context"
 }
 
 config_context
