@@ -3,8 +3,8 @@
 set -e
 
 if [ "$PRE_HOOK" != "" ]; then
-  echo "Running pre hook command '%s': $PRE_HOOK"
-  sh -c "$PRE_HOOK"
+  echo "Running pre hook command: $PRE_HOOK"
+  eval "$PRE_HOOK"
 fi
 
 chart_version=${CHART_VERSION:-0.2.8}
@@ -141,6 +141,6 @@ test_chart
 export_variables
 
 if [ "$POST_HOOK" != "" ]; then
-  echo "Running post hook command '%s': $POST_HOOK"
-  sh -c "$POST_HOOK"
+  echo "Running post hook command: $POST_HOOK"
+  eval "$POST_HOOK"
 fi
