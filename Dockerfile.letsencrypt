@@ -1,0 +1,12 @@
+FROM alpine:3.12
+
+LABEL maintainer="EEQ Team"
+LABEL service="Letsencrypt"
+
+WORKDIR /
+RUN apk --no-cache --quiet update \
+    && apk add --no-cache --quiet py-pip certbot \
+    && pip3 install -U certbot-dns-route53 awscli
+
+COPY letsencrypt/* ./
+RUN chmod +x certificate

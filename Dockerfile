@@ -1,8 +1,9 @@
 FROM golang:1.14-alpine as base
 
 LABEL maintainer="EEQ Team"
+LABEL service="Codefresh Deploy"
 
-RUN apk --quiet update \
+RUN apk --no-cache --quiet update \
     && apk add --no-cache --quiet git
 WORKDIR /
 
@@ -18,16 +19,11 @@ ARG DEFAULT_HELM_REPO_URL
 ARG KUBE_CONTEXT
 ARG APP_DOMAIN
 
-ENV CODEFRESH_VERSION=v0.72.1
-ENV KUBECTL_VERSION=v1.18.6
+ENV CODEFRESH_VERSION=V0.73.18
+ENV KUBECTL_VERSION=v1.19.3
 ENV HELM_REPO_URL $DEFAULT_HELM_REPO_URL
 ENV KUBE_CONTEXT $KUBE_CONTEXT
 ENV APP_DOMAIN $APP_DOMAIN
-
-RUN cd /tmp \
-    && apk --quiet update \
-    && apk add --no-cache --quiet rhash gettext libstdc++ certbot g++ gcc libffi-dev openssl-dev python3-dev \
-    && pip3 --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host=files.pythonhosted.org install -U cryptography certbot-dns-route53 awscli
 
 # Codefresh #
 RUN curl -L https://github.com/codefresh-io/cli/releases/download/${CODEFRESH_VERSION}/codefresh-${CODEFRESH_VERSION}-alpine-x64.tar.gz -o codefresh.tar.gz \
@@ -38,16 +34,11 @@ RUN curl -L https://github.com/codefresh-io/cli/releases/download/${CODEFRESH_VE
 # Kubectl #
 RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
     && mv kubectl /usr/local/bin/kubectl \
-    && chmod +x /usr/local/bin/kubectl \
-    && rm -rf /tmp/* \
-    && rm -rf /var/cache/apk/* \
-    && rm -rf /var/tmp/*
+    && chmod +x /usr/local/bin/kubectl
 
 WORKDIR /
-COPY letsencrypt/* ./
 COPY deploy/* ./
 COPY --from=base /prune ./
-RUN chmod +x certificate
 RUN chmod +x deploy
 RUN chmod +x prune
 
