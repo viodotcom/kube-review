@@ -2,6 +2,11 @@
 # exit if any command fails
 set -e
 
+if [ "$PRE_HOOK" != "" ]; then
+  echo "Running pre hook command '%s': $PRE_HOOK"
+  exec "$PRE_HOOK"
+fi
+
 chart_version=${CHART_VERSION:-0.2.8}
 helm_version=3.0.3
 chart_ref=cf-review-env
@@ -134,3 +139,8 @@ generate_pull_secret
 install_chart
 test_chart
 export_variables
+
+if [ "$POST_HOOK" != "" ]; then
+  echo "Running post hook command '%s': $POST_HOOK"
+  exec "$POST_HOOK"
+fi
