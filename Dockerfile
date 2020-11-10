@@ -12,7 +12,7 @@ COPY prune/* ./
 RUN go build -o ./prune .
 RUN chmod +x prune
 
-# Helm and Codefresh
+# Helm #
 FROM codefresh/cfstep-helm:3.0.3
 
 ARG DEFAULT_HELM_REPO_URL
@@ -25,7 +25,7 @@ ENV HELM_REPO_URL $DEFAULT_HELM_REPO_URL
 ENV KUBE_CONTEXT $KUBE_CONTEXT
 ENV APP_DOMAIN $APP_DOMAIN
 
-# Default #
+# Default packages #
 RUN apk --no-cache --quiet update \
     && apk add --no-cache --quiet rhash gettext libstdc++
 
