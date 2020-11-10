@@ -9,7 +9,7 @@ WORKDIR /
 
 # Certbot #
 RUN apk --no-cache --quiet update \
-    && apk add --no-cache --quiet py-pip certbot \
+    && apk add --no-cache --quiet py-pip certbot curl \
     && pip3 install -U certbot-dns-route53 awscli
 
 # Kubectl #
