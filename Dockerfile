@@ -19,21 +19,20 @@ ARG DEFAULT_HELM_REPO_URL
 ARG KUBE_CONTEXT
 ARG APP_DOMAIN
 
-ENV CODEFRESH_VERSION=V0.73.18
+ENV CODEFRESH_VERSION=v0.73.18
 ENV KUBECTL_VERSION=v1.19.3
 ENV HELM_REPO_URL $DEFAULT_HELM_REPO_URL
 ENV KUBE_CONTEXT $KUBE_CONTEXT
 ENV APP_DOMAIN $APP_DOMAIN
 
 # Codefresh #
-RUN curl -L https://github.com/codefresh-io/cli/releases/download/${CODEFRESH_VERSION}/codefresh-${CODEFRESH_VERSION}-alpine-x64.tar.gz -o codefresh.tar.gz \
-    && tar -zxvf codefresh.tar.gz \
+RUN curl -L --silent https://github.com/codefresh-io/cli/releases/download/${CODEFRESH_VERSION}/codefresh-${CODEFRESH_VERSION}-alpine-x64.tar.gz | tar zxf - \
     && mv ./codefresh /usr/local/bin/codefresh \
     && chmod +x /usr/local/bin/codefresh
 
 # Kubectl #
 RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
-    && mv kubectl /usr/local/bin/kubectl \
+    && mv ./kubectl /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl
 
 WORKDIR /
