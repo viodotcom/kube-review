@@ -23,8 +23,8 @@ short_name=$(echo -n $name | cut -c1-15)
 hash=$(echo "$name" | rhash -p "%c" -)
 namespace=re-$short_name-$hash
 is_ephemeral=${APP_IS_EPHEMERAL:-true}
-host="$namespace.$APP_DOMAIN"
-url="https://$host"
+host=$namespace.$APP_DOMAIN
+url=https://$host
 kube_context=$KUBE_CONTEXT
 
 config_context() {
