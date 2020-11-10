@@ -127,8 +127,12 @@ test_chart() {
 
 export_variables() {
   # It is necessary to export these variables because we are using it on the pipelines
+  url="https://$namespace.$APP_DOMAIN"
+  export URL=$url
+  export NAMESPACE=$namespace
+
   cf_export NAMESPACE="$namespace"
-  cf_export URL="https://$namespace.$APP_DOMAIN"
+  cf_export URL="$url"
   cf_export K8S_CONTEXT_NAME="$KUBE_CONTEXT"
 }
 
