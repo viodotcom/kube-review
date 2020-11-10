@@ -3,10 +3,19 @@ FROM alpine:3.12
 LABEL maintainer="EEQ Team"
 LABEL service="Letsencrypt"
 
+ENV KUBECTL_VERSION=v1.19.3
+
 WORKDIR /
+
+# Certbot #
 RUN apk --no-cache --quiet update \
     && apk add --no-cache --quiet py-pip certbot \
     && pip3 install -U certbot-dns-route53 awscli
+
+# Kubectl #
+RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
+    && mv ./kubectl /usr/local/bin/kubectl \
+    && chmod +x /usr/local/bin/kubectl
 
 COPY letsencrypt/* ./
 RUN chmod +x certificate
