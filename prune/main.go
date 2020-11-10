@@ -212,6 +212,7 @@ type K8sNamespace struct {
 	BranchName        string
 	RepositoryName    string
 	RepositoryOwner   string
+	IsEphemeral       bool
 }
 
 func buildConfigFromFlags(contextName, kubeconfigPath string) (*rest.Config, error) {
@@ -280,6 +281,14 @@ func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 			updatedAt = time.Unix(updatedAtTimestamp, 0)
 		}
 
+		isEphemeral := true
+		s, err := strconv.ParseBool(data["app.kubernetes.io/is_ephemeral"])
+		if err != nil {
+			log.Printf("Got bad data at is_ephemeral annotation for namespace: %s", namespace.Name)
+		} else {
+			isEphemeral = s
+		}
+
 		nk8sNamespacesList = append(nk8sNamespacesList, K8sNamespace{
 			UpdatedAt:         &updatedAt,
 			Name:              namespace.Name,
@@ -288,6 +297,7 @@ func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 			PullRequestNumber: data["app.kubernetes.io/pull_request_number"],
 			RepositoryName:    data["app.kubernetes.io/repository_name"],
 			RepositoryOwner:   data["app.kubernetes.io/repository_owner"],
+			IsEphemeral:       isEphemeral,
 		})
 	}
 	return nk8sNamespacesList, nil
@@ -332,8 +342,14 @@ func run(c *cli.Context) error {
 		}
 
 		expired := time.Since(*namespace.UpdatedAt) >= time.Duration(c.Int("expiration"))*time.Hour
-		log.Printf("Name: %s Duration: %s, Expired: %t, Merged: %t",
-			namespace.Name, time.Since(*namespace.UpdatedAt), expired, merged)
+		log.Printf("Name: %s Duration: %s, Expired: %t, Merged: %t, Ephemeral: %t",
+			namespace.Name, time.Since(*namespace.UpdatedAt), expired, merged, namespace.IsEphemeral)
+		// If an env is not ephemeral we dont need to check
+		// We never touch non ephemeral environments
+		if !namespace.IsEphemeral {
+			continue
+		}
+
 		if expired || merged {
 			if !c.Bool("dryRun") {
 				if err := cfClient.DeleteEnvironment(namespace.Name); err != nil {

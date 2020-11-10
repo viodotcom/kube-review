@@ -5,9 +5,19 @@ set -e
 chart_version=${CHART_VERSION:-0.2.8}
 helm_version=3.0.3
 chart_ref=cf-review-env
-short_name=$(echo -n $NAME | cut -c1-15)
-hash=$(echo "$NAME" | rhash -p "%c" -)
+
+# This code is necessary to ensure backwards compatibility
+# The old name parameter included the prefix. In the new
+# way the prefix is informed in a different variable.
+# This code can be removed once all pipelines start using prefix.
+name=${NAME}
+if [ "$APP_PREFIX" != "" ]; then
+  name="$APP_PREFIX-${APP_NAME_OVERRIDE:-$APP_NAME}"
+fi
+short_name=$(echo -n $name | cut -c1-15)
+hash=$(echo "$name" | rhash -p "%c" -)
 namespace=re-$short_name-$hash
+is_ephemeral=${APP_IS_EPHEMERAL:-true}
 
 config_context() {
   # kubectl locks the config for each execution. To workaround
@@ -23,6 +33,7 @@ namespace_apply() {
   updated_at=$(date --utc +%s)
   export UPDATED_AT=$updated_at
   export NAMESPACE=$namespace
+  export IS_EPHEMERAL=$is_ephemeral
   cat <<EOF | envsubst | kubectl apply -f -
 apiVersion: v1
 kind: Namespace
@@ -36,6 +47,7 @@ metadata:
     app.kubernetes.io/repository_name: "$CF_REPO_NAME"
     app.kubernetes.io/repository_owner: "$CF_REPO_OWNER"
     app.kubernetes.io/updated_at: "$UPDATED_AT"
+    app.kubernetes.io/is_ephemeral: "$IS_EPHEMERAL"
   name: $NAMESPACE
 EOF
 }
