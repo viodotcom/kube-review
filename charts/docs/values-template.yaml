@@ -126,3 +126,10 @@ autoscaling:
   maxReplicas: 1
   targetCPUUtilizationPercentage: 50
   targetMemoryUtilizationPercentage: 50
+
+#####################
+# Container command #
+#####################
+customCommand:
+  enabled: true
+  command: ./myscript.sh

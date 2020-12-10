@@ -34,6 +34,3 @@ customHelmTestURL:
   enabled: false
   args: "/ping/1"
 # Example: https://URL/ping/1
-customCommand:
-  enabled: false
-  command: ./myScript.sh
