@@ -31,7 +31,7 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
-          {{- if eq .Values.customCommand }}
+          {{- if .Values.customCommand }}
           {{- if eq .Values.customCommand.enabled true }}
           command: ["{{ .Values.customCommand.command }}"]
           {{- end }}
