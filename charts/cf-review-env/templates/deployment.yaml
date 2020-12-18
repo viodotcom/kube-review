@@ -5,9 +5,7 @@ metadata:
   labels:
     {{- include "cf-review-env.labels" . | nindent 4 }}
 spec:
-{{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount | default "1" }}
-{{- end }}
   strategy:
 {{- if .Values.strategy }}
 {{ toYaml .Values.strategy | indent 4 }}
