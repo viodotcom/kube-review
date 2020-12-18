@@ -7,7 +7,7 @@ if [ "$PRE_HOOK" != "" ]; then
   eval "$PRE_HOOK"
 fi
 
-chart_version=${CHART_VERSION:-0.2.10}
+chart_version=${CHART_VERSION:-0.2.11}
 helm_version=3.0.3
 chart_ref=cf-review-env
 
