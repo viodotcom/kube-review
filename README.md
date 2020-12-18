@@ -23,5 +23,6 @@ When the new `chart version` is created the CI pipeline run and push the new cha
 | KUBE_CONTEXT | k8s-fh-ci-stg |
 | APP_DOMAIN | shared-stg.fih.io |
 | CHART_VERSION | 0.0.1+87d6164 |
+| CF_REVIEW_ENV_IMAGE_TAG | YOUR_BRANCH_NAME |
 
 **Note**: The value of the `CHART_VERSION` variable, you must add the new version of the chart created for testing.
