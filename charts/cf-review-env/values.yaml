@@ -19,8 +19,6 @@ resources:
   requests:
     cpu: 100m
     memory: 600Mi
-autoscaling:
-  enabled: true
 strategy:
   type: RollingUpdate
   rollingUpdate:
