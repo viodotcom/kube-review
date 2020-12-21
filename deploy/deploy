@@ -7,7 +7,7 @@ if [ "$PRE_HOOK" != "" ]; then
   eval "$PRE_HOOK"
 fi
 
-chart_version=${CHART_VERSION:-0.2.11}
+chart_version=${CHART_VERSION:-0.2.12}
 helm_version=3.0.3
 chart_ref=cf-review-env
 
@@ -60,7 +60,6 @@ metadata:
 EOF
 }
 
-
 apply_secret() {
   # If the user doesn't have secrets we need to generate an empty file
   # to make our chart happy, without this the deployment breaks
@@ -68,13 +67,7 @@ apply_secret() {
     touch /codefresh/volume/secrets.env
   fi
 
-  kubectl create secret generic "$namespace" --from-env-file=/codefresh/volume/secrets.env \
-    --dry-run=client -o yaml --save-config=true --namespace "$namespace" | kubectl apply -f -
-}
-
-generate_pull_secret() {
-  codefresh generate image-pull-secret --cluster "$kube_context" --namespace "$namespace" \
-    --registry "$APP_REGISTRY_NAME"
+  kubectl create secret generic "$namespace" --from-env-file=/codefresh/volume/secrets.env --dry-run=client -o yaml --save-config=true --namespace "$namespace" | kubectl apply -f -
 }
 
 install_chart() {
@@ -95,7 +88,6 @@ install_chart() {
   HELM_VERSION=$helm_version \
   CUSTOM_image_tag="$APP_IMAGE_TAG" \
   CUSTOM_image_repository="$APP_IMAGE_URL" \
-  CUSTOM_imagePullSecrets="$(kubectl get secret --namespace $namespace --field-selector='type=kubernetes.io/dockercfg' -o=jsonpath='{.items[0].metadata.name}')" \
   CUSTOM_envFrom_secretRef_name="$namespace" \
   CUSTOM_"ingress_hosts[0]_host=$host" \
   CUSTOM_"ingress_hosts[0]_paths[0]=/" \
@@ -143,7 +135,6 @@ export_variables() {
 config_context
 namespace_apply
 apply_secret
-generate_pull_secret
 install_chart
 test_chart
 export_variables
