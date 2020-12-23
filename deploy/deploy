@@ -131,8 +131,10 @@ export_variables() {
   # This is useful when multiple deployments are done in the same pipeline.
   # In such situation each deployment would override the variable of previous one.
   if [ "$APP_PREFIX" != "" ]; then
-    export "$APP_PREFIX"_URL="$url"
-    cf_export "$APP_PREFIX"_URL="$url"
+    # Replace dash (-) from app prefix by underscore (_)
+    valid_app_prefix=$(echo "bofh-api" | sed 's/\-/\_/g')
+    export "$valid_app_prefix"_URL="$url"
+    cf_export "$valid_app_prefix"_URL="$url"
   fi
 }
 
