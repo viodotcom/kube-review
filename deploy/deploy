@@ -127,19 +127,6 @@ test_chart() {
 export_variables() {
   # Export normally here so they are available to the post hook
   export URL=$url
-
-  # It is necessary to export these variables because we are using it on the pipelines
-  cf_export URL="$url"
-
-  # If APP_PREFIX is available we used it to prefix the exported variables
-  # This is useful when multiple deployments are done in the same pipeline.
-  # In such situation each deployment would override the variable of previous one.
-  if [ "$APP_PREFIX" != "" ]; then
-    # Replace dash (-) from app prefix by underscore (_)
-    valid_app_prefix=$(echo "$APP_PREFIX" | sed 's/\-/\_/g')
-    export "$valid_app_prefix"_URL="$url"
-    cf_export "$valid_app_prefix"_URL="$url"
-  fi
 }
 
 config_context
