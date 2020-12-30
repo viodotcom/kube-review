@@ -26,14 +26,15 @@ is_ephemeral=${APP_IS_EPHEMERAL:-true}
 host=$namespace.$APP_DOMAIN
 url=https://$host
 kube_context=$KUBE_CONTEXT
+kube_config_dir=$KUBE_CONFIG_DIR
 secrets_file=$SECRETS_FILE
 
 config_context() {
   # kubectl locks the config for each execution. To workaround
   # and allow multiple concurrent kubectl executions we copy the config
-  kubeconfig_dir=/codefresh/volume/sensitive/.kube-$namespace/
-  cp -R /codefresh/volume/sensitive/.kube "${kubeconfig_dir}"
-  export KUBECONFIG=${kubeconfig_dir}/config
+  scoped_kubeconfig_dir=$kube_config_dir-$namespace/
+  cp -R "$kube_config_dir" "${scoped_kubeconfig_dir}"
+  export KUBECONFIG=${scoped_kubeconfig_dir}/config
   kubectl config use-context "$kube_context"
 }
 
