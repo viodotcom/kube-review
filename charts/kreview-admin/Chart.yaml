@@ -1,13 +1,14 @@
 apiVersion: v2
-appVersion: 0.2.12
-name: cf-review-env
-description: A Helm chart a Codefresh review envrionment app
+appVersion: 1.16.0
+name: cf-review-env-admin
+description: The admin part of CodeFresh review app
 keywords:
   - review
   - environment
+  - admin
 maintainers:
   - name: FH EEQ Team
 type: application
 sources:
 - https://github.com/FindHotel/cf-review-env
-version: 0.2.12
+version: 0.0.1

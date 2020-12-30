@@ -7,9 +7,9 @@ if [ "$PRE_HOOK" != "" ]; then
   eval "$PRE_HOOK"
 fi
 
-chart_version=${CHART_VERSION:-0.2.12}
+chart_version=${CHART_VERSION:-0.3.0}
 helm_version=3.0.3
-chart_ref=cf-review-env
+chart_ref=kreview
 
 # This code is necessary to ensure backwards compatibility
 # The old name parameter included the prefix. In the new

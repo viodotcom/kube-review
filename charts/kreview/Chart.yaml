@@ -1,0 +1,13 @@
+apiVersion: v2
+appVersion: 0.3.0
+name: kreview
+description: A Helm chart to deploy and manage review environments
+keywords:
+  - review
+  - environment
+maintainers:
+  - name: FindHotel EEQ Team
+type: application
+sources:
+- https://github.com/FindHotel/kreview
+version: 0.3.0

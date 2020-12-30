@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "cf-review-env.fullname" . }}
+  name: {{ include "kreview.fullname" . }}
   labels:
-    {{- include "cf-review-env.labels" . | nindent 4 }}
+    {{- include "kreview.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type | default "ClusterIP" }}
   ports:
@@ -12,4 +12,4 @@ spec:
       port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
   selector:
-    {{- include "cf-review-env.selectorLabels" . | nindent 4 }}
+    {{- include "kreview.selectorLabels" . | nindent 4 }}

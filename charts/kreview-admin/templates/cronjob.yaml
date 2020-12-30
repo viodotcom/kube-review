@@ -1,0 +1,19 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "cf-review-env.fullname" . }}-prune
+  labels:
+    {{- include "cf-review-env.labels" . | nindent 4 }}
+spec:
+  schedule: "@hourly"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: prune
+            image: 934550854836.dkr.ecr.eu-west-1.amazonaws.com/cf-review-env-prod:latest
+            args:
+              - "/prune --cfToken=${CF_API_KEY} --k8sKubeconfig=$CF_KUBECONFIG_PATH
+                --k8sContextName=$K8S_CONTEXT_NAME --ghToken=$GITHUB_TOKEN --ghUserName=$GITHUB_USERNAME"
+          restartPolicy: OnFailure

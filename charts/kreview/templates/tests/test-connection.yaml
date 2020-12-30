@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "cf-review-env.fullname" . }}-test-connection"
+  name: "{{ include "kreview.fullname" . }}-test-connection"
   labels:
-    {{- include "cf-review-env.labels" . | nindent 4 }}
+    {{- include "kreview.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test-success
 spec:
