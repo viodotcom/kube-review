@@ -39,7 +39,7 @@ spec:
             # We never used this and it will basically be removed in the future.
             # Sp, it's better to only expose one host.
             - name: KR_HOST
-              value: {{- (index .Values.ingress.hosts 0).host }}
+              value: "{{- (index .Values.ingress.hosts 0).host }}"
           {{- if eq .Values.envFrom.enabled true }}
           envFrom:
             - secretRef:
