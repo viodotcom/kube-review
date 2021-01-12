@@ -32,3 +32,12 @@ customHelmTestURL:
   enabled: false
   args: "/ping/1"
 # Example: https://URL/ping/1
+livenessProbe:
+  httpGet:
+    path: "/"
+readinessProbe:
+  httpGet:
+    path: "/"
+startupProbe:
+  httpGet:
+    path: "/"
