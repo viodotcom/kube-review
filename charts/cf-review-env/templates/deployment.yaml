@@ -40,6 +40,10 @@ spec:
             # Sp, it's better to only expose one host.
             - name: KR_HOST
               value: "{{- (index .Values.ingress.hosts 0).host }}"
+            {{- if eq .Values.dockerDind.enabled true }}
+            - name: DOCKER_HOST
+              value: tcp://localhost:2375
+            {{- end }}
           {{- if eq .Values.envFrom.enabled true }}
           envFrom:
             - secretRef:
@@ -79,9 +83,6 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if eq .Values.dockerDind.enabled true }}
-          env:
-            - name: DOCKER_HOST
-              value: tcp://localhost:2375
         - name: dind-daemon
           image: docker:stable-dind
           env:
