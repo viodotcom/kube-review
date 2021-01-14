@@ -28,6 +28,10 @@ url=https://$host
 kube_context=$KUBE_CONTEXT
 kube_config_dir=$KUBE_CONFIG_DIR
 secrets_file=$SECRETS_FILE
+pull_request_number=$PULL_REQUEST_NUMBER
+branch_name=$BRANCH_NAME
+repo_name=$REPO_NAME
+repo_owner=$REPO_OWNER
 
 config_context() {
   # kubectl locks the config for each execution. To workaround
@@ -44,6 +48,10 @@ namespace_apply() {
   export UPDATED_AT=$updated_at
   export NAMESPACE=$namespace
   export IS_EPHEMERAL=$is_ephemeral
+  export PULL_REQUEST_NUMBER=$pull_request_number
+  export BRANCH_NAME=$branch_name
+  export REPO_NAME=$repo_name
+  export REPO_OWNER=$repo_owner
   cat <<EOF | envsubst | kubectl apply -f -
 apiVersion: v1
 kind: Namespace
@@ -52,10 +60,10 @@ metadata:
     app.kubernetes.io/name: cf-review-env
   annotations:
     app.kubernetes.io/instance: $NAMESPACE
-    app.kubernetes.io/pull_request_number: "$CF_PULL_REQUEST_NUMBER"
-    app.kubernetes.io/branch_name: "$CF_BRANCH"
-    app.kubernetes.io/repository_name: "$CF_REPO_NAME"
-    app.kubernetes.io/repository_owner: "$CF_REPO_OWNER"
+    app.kubernetes.io/pull_request_number: "$PULL_REQUEST_NUMBER"
+    app.kubernetes.io/branch_name: "$BRANCH_NAME"
+    app.kubernetes.io/repository_name: "$REPO_NAME"
+    app.kubernetes.io/repository_owner: "$REPO_OWNER"
     app.kubernetes.io/updated_at: "$UPDATED_AT"
     app.kubernetes.io/is_ephemeral: "$IS_EPHEMERAL"
   name: $NAMESPACE
