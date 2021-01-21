@@ -91,7 +91,7 @@ install_chart() {
   --set "ingress.tls[0].hosts[0]"=$host \
   --cleanup-on-fail
   --force \
-  --wait \
+  --wait
 }
 
 test_chart() {
