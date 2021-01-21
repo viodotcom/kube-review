@@ -27,7 +27,7 @@ ENV APP_DOMAIN $APP_DOMAIN
 
 # Default packages #
 RUN apk --no-cache --quiet update \
-    && apk add --no-cache --quiet rhash gettext libstdc++ curl
+    && apk add --no-cache --quiet rhash gettext libstdc++ curl jq
 
 # Codefresh #
 RUN curl -L --silent https://github.com/codefresh-io/cli/releases/download/${CODEFRESH_VERSION}/codefresh-${CODEFRESH_VERSION}-alpine-x64.tar.gz -o codefresh.tar.gz \
