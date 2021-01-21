@@ -8,7 +8,7 @@ if [ "$PRE_HOOK" != "" ]; then
 fi
 
 chart_version=${CHART_VERSION:-0.2.13}
-chart_ref=kube-review
+chart_ref=cf-review-env
 
 # This code is necessary to ensure backwards compatibility
 # The old name parameter included the prefix. In the new
