@@ -94,7 +94,7 @@ install_chart() {
   CUSTOM_"ingress_tls[0]_hosts[0]=$host" \
   SKIP_CF_STABLE_HELM_REPO=true \
   WAIT=true \
-  CMD_PS='--force' \
+  CMD_PS='--force --cleanup-on-fail' \
   /opt/bin/release_chart
 }
 
