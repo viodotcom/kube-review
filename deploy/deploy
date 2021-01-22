@@ -94,6 +94,7 @@ install_chart() {
   CUSTOM_"ingress_tls[0]_hosts[0]=$host" \
   SKIP_CF_STABLE_HELM_REPO=true \
   WAIT=true \
+  cmd_ps='--force' \
   /opt/bin/release_chart
 }
 
