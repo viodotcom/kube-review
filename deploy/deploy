@@ -94,6 +94,9 @@ install_chart() {
   --wait
 }
 
+# Exporting install_chart function
+export -f  install_chart
+
 test_chart() {
   TEST_CONNECTION=${TEST_CONNECTION:-true}
   if [ "$TEST_CONNECTION" = true ];
