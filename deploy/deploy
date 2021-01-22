@@ -74,6 +74,9 @@ install_chart() {
     echo "Using values file from user: $VALUES_FILE"
     export CUSTOMFILE_0="$VALUES_FILE"
   fi
+  
+  # https://github.com/chartmuseum/helm-push#custom-downloader
+  export HELM_REPO_USE_HTTP="true"
 
   helm upgrade $namespace \
   $chart_ref \
@@ -93,9 +96,6 @@ install_chart() {
   --force \
   --wait
 }
-
-# Exporting install_chart function
-export -f install_chart
 
 test_chart() {
   TEST_CONNECTION=${TEST_CONNECTION:-true}
