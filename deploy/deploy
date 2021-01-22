@@ -8,6 +8,7 @@ if [ "$PRE_HOOK" != "" ]; then
 fi
 
 chart_version=${CHART_VERSION:-0.2.13}
+helm_version=3.1.1
 chart_ref=cf-review-env
 
 # This code is necessary to ensure backwards compatibility
@@ -74,33 +75,38 @@ install_chart() {
     echo "Using values file from user: $VALUES_FILE"
     export CUSTOMFILE_0="$VALUES_FILE"
   fi
-  
-  # https://github.com/chartmuseum/helm-push#custom-downloader
-  export HELM_REPO_USE_HTTP="true"
 
-  helm upgrade $namespace \
-  $chart_ref \
-  --install \
-  --reset-values \
-  --repo $HELM_REPO_URL \
-  --version $chart_version \
-  --namespace $namespace \
-  --values $VALUES_FILE \
-  --set envFrom.secretRef.name=$namespace \
-  --set image.repository=$APP_IMAGE_URL \
-  --set image.tag=$APP_IMAGE_TAG \
-  --set "ingress.hosts[0].host"=$host \
-  --set "ingress.hosts[0].paths[0]"=/ \
-  --set "ingress.tls[0].hosts[0]"=$host \
-  --cleanup-on-fail
-  --force \
-  --wait
+  # We need to use env here because of the CUSTOM vars
+  # they have special charectes that export can't handle
+  env \
+  ACTION=install \
+  CHART_REPO_URL="$HELM_REPO_URL" \
+  CHART_REF=$chart_ref \
+  KUBE_CONTEXT="$kube_context" \
+  RELEASE_NAME="$namespace" \
+  CHART_VERSION="$chart_version" \
+  HELM_VERSION=$helm_version \
+  CUSTOM_image_tag="$APP_IMAGE_TAG" \
+  CUSTOM_image_repository="$APP_IMAGE_URL" \
+  CUSTOM_envFrom_secretRef_name="$namespace" \
+  CUSTOM_"ingress_hosts[0]_host=$host" \
+  CUSTOM_"ingress_hosts[0]_paths[0]=/" \
+  CUSTOM_"ingress_tls[0]_hosts[0]=$host" \
+  SKIP_CF_STABLE_HELM_REPO=true \
+  WAIT=true \
+  /opt/bin/release_chart
 }
 
 test_chart() {
   TEST_CONNECTION=${TEST_CONNECTION:-true}
   if [ "$TEST_CONNECTION" = true ];
   then
+    env ACTION=auth \
+    SKIP_CF_STABLE_HELM_REPO=true \
+    HELM_VERSION=$helm_version \
+    CHART_VERSION="$chart_version" \
+    KUBE_CONTEXT="$kube_context" \
+    /opt/bin/release_chart
     helm test "$namespace" --namespace "$namespace"
 
     # It is necessary to remove the test pod from the helm test bacause HPA metrics may
