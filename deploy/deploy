@@ -2,36 +2,29 @@
 # exit if any command fails
 set -e
 
-if [ "$PRE_HOOK" != "" ]; then
-  echo "Running pre hook command: $PRE_HOOK"
-  eval "$PRE_HOOK"
+if [ "$KR_PRE_HOOK" != "" ]; then
+  echo "Running pre hook command: $KR_PRE_HOOK"
+  eval "$KR_PRE_HOOK"
 fi
 
-chart_version=${CHART_VERSION:-0.2.13}
+chart_version=${KR_CHART_VERSION:-0.2.13}
 helm_version=3.1.1
 chart_ref=cf-review-env
 
-# This code is necessary to ensure backwards compatibility
-# The old name parameter included the prefix. In the new
-# way the prefix is informed in a different variable.
-# This code can be removed once all pipelines start using prefix.
-name=${NAME}
-if [ "$APP_PREFIX" != "" ]; then
-  name="$APP_PREFIX-${APP_NAME_OVERRIDE:-$APP_NAME}"
-fi
+name="$KR_PREFIX-${KR_ID_OVERRIDE:-$KR_ID_SUFIX}"
 short_name=$(echo -n $name | cut -c1-15)
 hash=$(echo "$name" | rhash -p "%c" -)
 namespace=re-$short_name-$hash
-is_ephemeral=${APP_IS_EPHEMERAL:-true}
-host=$namespace.$APP_DOMAIN
+is_ephemeral=${KR_IS_EPHEMERAL:-true}
+host=$namespace.$KR_DOMAIN
 url=https://$host
-kube_context=$KUBE_CONTEXT
-kube_config_file=$KUBE_CONFIG_FILE
-secrets_file=$SECRETS_FILE
-pull_request_number=$PULL_REQUEST_NUMBER
-branch_name=$BRANCH_NAME
-repo_name=$REPO_NAME
-repo_owner=$REPO_OWNER
+kube_context=$KR_KUBE_CONTEXT
+kube_config_file=$KR_KUBE_CONFIG_FILE
+secrets_file=$KR_SECRETS_FILE
+pull_request_number=$KR_PULL_REQUEST_NUMBER
+branch_name=$KR_BRANCH_NAME
+repo_name=$KR_REPO_NAME
+repo_owner=$KR_REPO_OWNER
 
 config_context() {
   # kubectl locks the config for each execution. To workaround
@@ -83,23 +76,23 @@ apply_secret() {
 }
 
 install_chart() {
-  if [ "$VALUES_FILE" != "" ]; then
-    echo "Using values file from user: $VALUES_FILE"
-    export CUSTOMFILE_0="$VALUES_FILE"
+  if [ "$KR_VALUES_FILE" != "" ]; then
+    echo "Using values file from user: $KR_VALUES_FILE"
+    export CUSTOMFILE_0="$KR_VALUES_FILE"
   fi
 
   # We need to use env here because of the CUSTOM vars
   # they have special charectes that export can't handle
   env \
   ACTION=install \
-  CHART_REPO_URL="$HELM_REPO_URL" \
+  CHART_REPO_URL="$KR_HELM_REPO_URL" \
   CHART_REF=$chart_ref \
   KUBE_CONTEXT="$kube_context" \
   RELEASE_NAME="$namespace" \
   CHART_VERSION="$chart_version" \
   HELM_VERSION=$helm_version \
-  CUSTOM_image_tag="$APP_IMAGE_TAG" \
-  CUSTOM_image_repository="$APP_IMAGE_URL" \
+  CUSTOM_image_tag="$KR_IMAGE_TAG" \
+  CUSTOM_image_repository="$KR_IMAGE_URL" \
   CUSTOM_envFrom_secretRef_name="$namespace" \
   CUSTOM_"ingress_hosts[0]_host=$host" \
   CUSTOM_"ingress_hosts[0]_paths[0]=/" \
@@ -111,8 +104,8 @@ install_chart() {
 }
 
 test_chart() {
-  TEST_CONNECTION=${TEST_CONNECTION:-true}
-  if [ "$TEST_CONNECTION" = true ];
+  TEST_CONNECTION=${KR_TEST_CONNECTION:-true}
+  if [ "$KR_TEST_CONNECTION" = true ];
   then
     env ACTION=auth \
     SKIP_CF_STABLE_HELM_REPO=true \
@@ -145,7 +138,7 @@ install_chart
 test_chart
 export_variables
 
-if [ "$POST_HOOK" != "" ]; then
-  echo "Running post hook command: $POST_HOOK"
-  eval "$POST_HOOK"
+if [ "$KR_POST_HOOK" != "" ]; then
+  echo "Running post hook command: $KR_POST_HOOK"
+  eval "$KR_POST_HOOK"
 fi
