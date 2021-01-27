@@ -11,7 +11,7 @@ chart_version=${KR_CHART_VERSION:-0.2.13}
 helm_version=3.1.1
 chart_ref=cf-review-env
 
-name="$KR_PREFIX-${KR_ID_OVERRIDE:-$KR_ID_SUFIX}"
+name="$KR_PREFIX-${KR_ID_OVERRIDE:-$KR_ID}"
 short_name=$(echo -n $name | cut -c1-15)
 hash=$(echo "$name" | rhash -p "%c" -)
 namespace=re-$short_name-$hash
