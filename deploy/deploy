@@ -2,37 +2,36 @@
 # exit if any command fails
 set -e
 
-if [ "$PRE_HOOK" != "" ]; then
-  echo "Running pre hook command: $PRE_HOOK"
-  eval "$PRE_HOOK"
+if [ "$KR_PRE_HOOK" != "" ]; then
+  echo "Running pre hook command: $KR_PRE_HOOK"
+  eval "$KR_PRE_HOOK"
 fi
 
-chart_version=${CHART_VERSION:-0.2.13}
+chart_version=${KR_CHART_VERSION:-0.2.13}
 helm_version=3.1.1
 chart_ref=cf-review-env
 
-# This code is necessary to ensure backwards compatibility
-# The old name parameter included the prefix. In the new
-# way the prefix is informed in a different variable.
-# This code can be removed once all pipelines start using prefix.
-name=${NAME}
-if [ "$APP_PREFIX" != "" ]; then
-  name="$APP_PREFIX-${APP_NAME_OVERRIDE:-$APP_NAME}"
-fi
+name="$KR_PREFIX-${KR_ID_OVERRIDE:-$KR_ID}"
 short_name=$(echo -n $name | cut -c1-15)
 hash=$(echo "$name" | rhash -p "%c" -)
 namespace=re-$short_name-$hash
-is_ephemeral=${APP_IS_EPHEMERAL:-true}
-host=$namespace.$APP_DOMAIN
+is_ephemeral=${KR_IS_EPHEMERAL:-true}
+host=$namespace.$KR_DOMAIN
 url=https://$host
-kube_context=$KUBE_CONTEXT
+kube_context=$KR_KUBE_CONTEXT
+kube_config_file=$KR_KUBE_CONFIG_FILE
+secrets_file=$KR_SECRETS_FILE
+pull_request_number=$KR_PULL_REQUEST_NUMBER
+branch_name=$KR_BRANCH_NAME
+repo_name=$KR_REPO_NAME
+repo_owner=$KR_REPO_OWNER
 
 config_context() {
   # kubectl locks the config for each execution. To workaround
   # and allow multiple concurrent kubectl executions we copy the config
-  kubeconfig_dir=/codefresh/volume/sensitive/.kube-$namespace/
-  cp -R /codefresh/volume/sensitive/.kube "${kubeconfig_dir}"
-  export KUBECONFIG=${kubeconfig_dir}/config
+  scoped_kubeconfig_file=$kube_config_file-$namespace
+  cp "$kube_config_file" "$scoped_kubeconfig_file"
+  export KUBECONFIG=${scoped_kubeconfig_file}
   kubectl config use-context "$kube_context"
 }
 
@@ -42,6 +41,10 @@ namespace_apply() {
   export UPDATED_AT=$updated_at
   export NAMESPACE=$namespace
   export IS_EPHEMERAL=$is_ephemeral
+  export PULL_REQUEST_NUMBER=$pull_request_number
+  export BRANCH_NAME=$branch_name
+  export REPO_NAME=$repo_name
+  export REPO_OWNER=$repo_owner
   cat <<EOF | envsubst | kubectl apply -f -
 apiVersion: v1
 kind: Namespace
@@ -50,10 +53,10 @@ metadata:
     app.kubernetes.io/name: cf-review-env
   annotations:
     app.kubernetes.io/instance: $NAMESPACE
-    app.kubernetes.io/pull_request_number: "$CF_PULL_REQUEST_NUMBER"
-    app.kubernetes.io/branch_name: "$CF_BRANCH"
-    app.kubernetes.io/repository_name: "$CF_REPO_NAME"
-    app.kubernetes.io/repository_owner: "$CF_REPO_OWNER"
+    app.kubernetes.io/pull_request_number: "$PULL_REQUEST_NUMBER"
+    app.kubernetes.io/branch_name: "$BRANCH_NAME"
+    app.kubernetes.io/repository_name: "$REPO_NAME"
+    app.kubernetes.io/repository_owner: "$REPO_OWNER"
     app.kubernetes.io/updated_at: "$UPDATED_AT"
     app.kubernetes.io/is_ephemeral: "$IS_EPHEMERAL"
   name: $NAMESPACE
@@ -63,31 +66,33 @@ EOF
 apply_secret() {
   # If the user doesn't have secrets we need to generate an empty file
   # to make our chart happy, without this the deployment breaks
-  if [ ! -f "/codefresh/volume/secrets.env" ]; then
-    touch /codefresh/volume/secrets.env
+  if [ "$secrets_file" != "" ]; then
+    secrets_file="secrets.env"
+    touch $secrets_file
   fi
 
-  kubectl create secret generic "$namespace" --from-env-file=/codefresh/volume/secrets.env --dry-run=client -o yaml --save-config=true --namespace "$namespace" | kubectl apply -f -
+  kubectl create secret generic "$namespace" --from-env-file=$secrets_file \
+    --dry-run=client -o yaml --save-config=true --namespace "$namespace" | kubectl apply -f -
 }
 
 install_chart() {
-  if [ "$VALUES_FILE" != "" ]; then
-    echo "Using values file from user: $VALUES_FILE"
-    export CUSTOMFILE_0="$VALUES_FILE"
+  if [ "$KR_VALUES_FILE" != "" ]; then
+    echo "Using values file from user: $KR_VALUES_FILE"
+    export CUSTOMFILE_0="$KR_VALUES_FILE"
   fi
 
   # We need to use env here because of the CUSTOM vars
   # they have special charectes that export can't handle
   env \
   ACTION=install \
-  CHART_REPO_URL="$HELM_REPO_URL" \
+  CHART_REPO_URL="$KR_HELM_REPO_URL" \
   CHART_REF=$chart_ref \
   KUBE_CONTEXT="$kube_context" \
   RELEASE_NAME="$namespace" \
   CHART_VERSION="$chart_version" \
   HELM_VERSION=$helm_version \
-  CUSTOM_image_tag="$APP_IMAGE_TAG" \
-  CUSTOM_image_repository="$APP_IMAGE_URL" \
+  CUSTOM_image_tag="$KR_IMAGE_TAG" \
+  CUSTOM_image_repository="$KR_IMAGE_URL" \
   CUSTOM_envFrom_secretRef_name="$namespace" \
   CUSTOM_"ingress_hosts[0]_host=$host" \
   CUSTOM_"ingress_hosts[0]_paths[0]=/" \
@@ -99,8 +104,8 @@ install_chart() {
 }
 
 test_chart() {
-  TEST_CONNECTION=${TEST_CONNECTION:-true}
-  if [ "$TEST_CONNECTION" = true ];
+  TEST_CONNECTION=${KR_TEST_CONNECTION:-true}
+  if [ "$KR_TEST_CONNECTION" = true ];
   then
     env ACTION=auth \
     SKIP_CF_STABLE_HELM_REPO=true \
@@ -124,19 +129,6 @@ test_chart() {
 export_variables() {
   # Export normally here so they are available to the post hook
   export URL=$url
-
-  # It is necessary to export these variables because we are using it on the pipelines
-  cf_export URL="$url"
-
-  # If APP_PREFIX is available we used it to prefix the exported variables
-  # This is useful when multiple deployments are done in the same pipeline.
-  # In such situation each deployment would override the variable of previous one.
-  if [ "$APP_PREFIX" != "" ]; then
-    # Replace dash (-) from app prefix by underscore (_)
-    valid_app_prefix=$(echo "$APP_PREFIX" | sed 's/\-/\_/g')
-    export "$valid_app_prefix"_URL="$url"
-    cf_export "$valid_app_prefix"_URL="$url"
-  fi
 }
 
 config_context
@@ -146,7 +138,7 @@ install_chart
 test_chart
 export_variables
 
-if [ "$POST_HOOK" != "" ]; then
-  echo "Running post hook command: $POST_HOOK"
-  eval "$POST_HOOK"
+if [ "$KR_POST_HOOK" != "" ]; then
+  echo "Running post hook command: $KR_POST_HOOK"
+  eval "$KR_POST_HOOK"
 fi
