@@ -254,7 +254,7 @@ func (k8s *K8sClient) DeleteNamespace(name string) error {
 func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 	namespacesClient := k8s.ClientSet.CoreV1().Namespaces()
 	namespaceList, err := namespacesClient.List(metav1.ListOptions{
-		LabelSelector: "app.kubernetes.io/name=cf-review-env",
+		LabelSelector: "app.kubernetes.io/name in (cf-review-env, kube-review)",
 	})
 	if err != nil {
 		return nil, err
@@ -303,7 +303,7 @@ func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 	return nk8sNamespacesList, nil
 }
 
-// run will list all namespaces that belong to cf-review-env
+// run will list all namespaces that belong to kube-review
 // if the name of the namespace matches and it's expired, both
 // cf review environment and the namespace will be deleted.
 func run(c *cli.Context) error {

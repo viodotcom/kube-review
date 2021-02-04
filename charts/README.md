@@ -1,4 +1,4 @@
-# cf-review-env Helm Chart
+# kube-review Helm Chart
 
 This is a `template helm chart` created to be used in the CI pipeline for all projects.
 
