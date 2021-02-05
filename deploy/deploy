@@ -75,15 +75,18 @@ apply_secret() {
     --dry-run=client -o yaml --save-config=true --namespace "$namespace" | kubectl apply -f -
 }
 
-install_chart() {
+uninstall_chart() {
   # There is a problem in Helm v3 when it is necessary to update the helm graph
   # sometimes an UPGRADE_FAILED occurs, to fix it, we first of all need to remove the old version
-  HELM_LIST=$(helm list -n "$namespace")
-  if [ -n "$HELM_LIST" ]; then
+  HELM_UNINSTALL=${HELM_UNINSTALL:-true}
+  if [ "${HELM_UNINSTALL}" = true ]
+  then
     echo "Uninstalling old version of the helm chart: $namespace"
     helm uninstall -n "$namespace" "$namespace"
   fi
-  
+}
+
+install_chart() {
   if [ "$KR_VALUES_FILE" != "" ]; then
     echo "Using values file from user: $KR_VALUES_FILE"
     export CUSTOMFILE_0="$KR_VALUES_FILE"
@@ -142,6 +145,7 @@ export_variables() {
 config_context
 namespace_apply
 apply_secret
+uninstall_chart || true
 install_chart
 test_chart
 export_variables
