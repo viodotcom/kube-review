@@ -78,12 +78,8 @@ apply_secret() {
 uninstall_chart() {
   # There is a problem in Helm v3 when it is necessary to update the helm graph
   # sometimes an UPGRADE_FAILED occurs, to fix it, we first of all need to remove the old version
-  HELM_UNINSTALL=${HELM_UNINSTALL:-true}
-  if [ "${HELM_UNINSTALL}" = true ]
-  then
-    echo "Uninstalling old version of the helm chart: $namespace"
-    helm uninstall -n "$namespace" "$namespace"
-  fi
+  echo "Uninstalling old version of the helm chart: $namespace"
+  helm uninstall -n "$namespace" "$namespace"
 }
 
 install_chart() {
