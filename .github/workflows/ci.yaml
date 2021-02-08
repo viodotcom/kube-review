@@ -2,11 +2,12 @@ name: ci
 on:
   push:
     branches-ignore:
-      - 'main'
+      - 'master'
 
 jobs:
   build:
     name: Building Docker image
+    runs-on: ubuntu-latest
     steps:
       - name: Extract branch name
         shell: bash
