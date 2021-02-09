@@ -9,7 +9,7 @@ REF.: https://helm.sh/docs/helm/helm_install/
 This is an example of `how to install`.
 
 ```
-helm install CHART_NAME ./cf-review-env \
+helm install CHART_NAME ./kube-review \
 --install \
 --reset-values \
 --namespace NAMESPACE_NAME \
@@ -31,7 +31,7 @@ REF: https://helm.sh/docs/helm/helm_upgrade/#helm
 This is an example of `how to upgrade`.
 
 ```
-helm upgrade CHART_NAME ./cf-review-env \
+helm upgrade CHART_NAME ./kube-review \
 --install \
 --reset-values \
 --namespace NAMESPACE_NAME \

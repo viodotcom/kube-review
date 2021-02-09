@@ -7,9 +7,9 @@ if [ "$KR_PRE_HOOK" != "" ]; then
   eval "$KR_PRE_HOOK"
 fi
 
-chart_version=${KR_CHART_VERSION:-0.2.13}
+chart_version=${KR_CHART_VERSION:-0.3}
 helm_version=3.1.1
-chart_ref=cf-review-env
+chart_ref=kube-review
 
 name="$KR_PREFIX-${KR_ID_OVERRIDE:-$KR_ID}"
 short_name=$(echo -n $name | cut -c1-15)
@@ -50,7 +50,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    app.kubernetes.io/name: cf-review-env
+    app.kubernetes.io/name: kube-review
   annotations:
     app.kubernetes.io/instance: $NAMESPACE
     app.kubernetes.io/pull_request_number: "$PULL_REQUEST_NUMBER"

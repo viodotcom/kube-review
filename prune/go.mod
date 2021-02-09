@@ -1,4 +1,4 @@
-module github.com/FindHotel/cf-review-env
+module github.com/FindHotel/kube-review
 
 go 1.14
 

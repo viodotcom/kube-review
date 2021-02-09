@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "cf-review-env.fullname" . }}
+  name: {{ include "kube-review.fullname" . }}
   labels:
-    {{- include "cf-review-env.labels" . | nindent 4 }}
+    {{- include "kube-review.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount | default "1" }}
   strategy:
@@ -14,14 +14,14 @@ spec:
   revisionHistoryLimit: {{ .Values.revisionHistoryLimit | default "10" }}
   selector:
     matchLabels:
-      {{- include "cf-review-env.selectorLabels" . | nindent 6 }}
+      {{- include "kube-review.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
         # Force all new release to recreate the pods #
         rollme: {{ randAlphaNum 5 | quote }}
       labels:
-        {{- include "cf-review-env.selectorLabels" . | nindent 8 }}
+        {{- include "kube-review.selectorLabels" . | nindent 8 }}
     spec:
       containers:
         - name: {{ .Chart.Name }}
@@ -101,7 +101,7 @@ spec:
         - name: docker-store
           emptyDir: {}
       {{- end }}
-      serviceAccountName: {{ include "cf-review-env.serviceAccountName" . }}
+      serviceAccountName: {{ include "kube-review.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       {{- with .Values.nodeSelector }}
