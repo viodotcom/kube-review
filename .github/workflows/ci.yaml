@@ -36,4 +36,5 @@ jobs:
           ECR_REPOSITORY: cf-review-env-prod
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.extract_branch.outputs.branch }} .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY --all-tags
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.extract_branch.outputs.branch }}
