@@ -5,7 +5,21 @@ on:
       - 'master'
 
 jobs:
-
+  helm:
+    name: Push to the Repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Push
+        shell: bash
+        env:
+          HELM_REPO_ACCESS_TOKEN: $CF_API_KEY
+          HELM_REPO_AUTH_HEADER: Authorization
+        run: |
+          helm version --short -c
+          helm repo add remote cm://h.cfcr.io/findhotel/lab/
+          helm dependency build charts/kube-review || helm dependency update charts/kube-review || echo "dependencies cannot be updated"
+          PACKAGE="$(helm package charts/kube-review --version 0.0.1+${{ github.sha }} --destination /tmp | cut -d " " -f 8)"
+          helm push $PACKAGE remote
 
   build:
     name: Building Docker image
