@@ -9,6 +9,9 @@ jobs:
     name: Push to the Repository
     runs-on: ubuntu-latest
     steps:
+      - name: Clone
+        uses: actions/checkout@v2
+
       - name: Push
         shell: bash
         env:
