@@ -52,7 +52,11 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: cf-review-env-prod
+          DEFAULT_HELM_REPO_URL: cm://h.cfcr.io/findhotel/lab/
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.extract_branch.outputs.branch }} .
+          docker build  \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.extract_branch.outputs.branch }} \
+            --build-arg DEFAULT_HELM_REPO_URL=$DEFAULT_HELM_REPO_URL .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.extract_branch.outputs.branch }}
