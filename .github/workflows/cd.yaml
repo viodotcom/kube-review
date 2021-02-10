@@ -32,11 +32,6 @@ jobs:
       - name: Clone
         uses: actions/checkout@v2
 
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -56,8 +51,8 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
             -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.extract_branch.outputs.branch }} \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:master \
             --build-arg DEFAULT_HELM_REPO_URL=$DEFAULT_HELM_REPO_URL .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.extract_branch.outputs.branch }}
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:master
