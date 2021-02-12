@@ -1,0 +1,16 @@
+serviceAccount:
+  create: true
+resources:
+  limits:
+    cpu: "1"
+    memory: 600Mi
+  requests:
+    cpu: 100m
+    memory: 600Mi
+image:
+  repository: 934550854836.dkr.ecr.eu-west-1.amazonaws.com/cf-review-env-prod
+  tag: latest
+command: /prune
+github:
+  ghToken: YOURTOKENHEE
+  ghUserName: YOURUSERNAMEHERE
