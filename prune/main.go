@@ -131,73 +131,6 @@ func (gh *GHClient) IsPRMerged(owner, repo, number string) (bool, error) {
 	return false, nil
 }
 
-// CFEnvironment holds information about a codefresh environment
-type CFEnvironment struct {
-	Name      string
-	ID        string
-	UpdatedAt time.Time
-}
-
-// CFResponse is a codefresh API response
-type CFResponse struct {
-	Doc []struct {
-		Metadata struct {
-			ID        string `json:"id"`
-			Name      string `json:"name"`
-			UpdatedAt string `json:"updated_at"`
-		} `json:"metadata"`
-	} `json:"docs"`
-}
-
-// CFClient is a client for the codefresh API
-type CFClient struct {
-	APIEndpoint string
-	APIToken    string
-	httpClient  *http.Client
-}
-
-// NewCFClient creates a new CFClient
-func NewCFClient(apiEndpoint string, apiToken string) *CFClient {
-	httpClient := http.Client{}
-	return &CFClient{
-		APIEndpoint: apiEndpoint,
-		APIToken:    apiToken,
-		httpClient:  &httpClient,
-	}
-}
-
-// DeleteEnvironment deletes an environment using environments-v2 endpoint
-func (cf *CFClient) DeleteEnvironment(name string) error {
-	endpoint, err := url.Parse(cf.APIEndpoint)
-	if err != nil {
-		return err
-	}
-
-	endpoint.Path = path.Join(endpoint.Path, "api/environments-v2", name)
-	req, err := http.NewRequest("DELETE", endpoint.String(), nil)
-	if err != nil {
-		return err
-	}
-
-	req.Header.Add("Authorization", cf.APIToken)
-	resp, err := cf.httpClient.Do(req)
-	if err != nil {
-		return err
-	}
-
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Got status code %d with body: %s", resp.Status, body)
-	}
-
-	return nil
-}
-
 // K8sClient for kubernetes cluter
 type K8sClient struct {
 	ClientSet *kubernetes.Clientset
@@ -304,11 +237,10 @@ func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 }
 
 // run will list all namespaces that belong to kube-review
-// if the name of the namespace matches and it's expired, both
-// cf review environment and the namespace will be deleted.
+// if the name of the namespace matches and it's expired,
+// the namespace will be deleted.
 func run(c *cli.Context) error {
 	ghClient := NewGHClient(c.String("ghEndpoint"), c.String("ghUserName"), c.String("ghToken"))
-	cfClient := NewCFClient(c.String("cfEndpoint"), c.String("cfToken"))
 	k8sClient, err := NewK8sClient(c.String("k8sContextName"), c.String("k8sKubeconfig"))
 	if err != nil {
 		log.Fatalf("error creating k8s client: %s", err)
@@ -352,12 +284,6 @@ func run(c *cli.Context) error {
 
 		if expired || merged {
 			if !c.Bool("dryRun") {
-				if err := cfClient.DeleteEnvironment(namespace.Name); err != nil {
-					log.Printf("warn could not delete environment: %s", err)
-				}
-			}
-			log.Printf("Environment deleted: %s", namespace.Name)
-			if !c.Bool("dryRun") {
 				if err := k8sClient.DeleteNamespace(namespace.Name); err != nil {
 					log.Printf("error deleting k8s namespace: %s", err)
 					continue
@@ -388,16 +314,6 @@ func main() {
 			Name:  "dryRun",
 			Usage: "only show logs but don'r perform deletess",
 			Value: false,
-		},
-		&cli.StringFlag{
-			Name:     "cfToken",
-			Usage:    "codefresh api token",
-			Required: true,
-		},
-		&cli.StringFlag{
-			Name:  "cfEndpoint",
-			Usage: "codefresh api endpoint",
-			Value: "https://g.codefresh.io",
 		},
 		&cli.StringFlag{
 			Name:     "k8sKubeconfig",
