@@ -24,6 +24,9 @@ jobs:
           helm dependency build charts/kube-review || helm dependency update charts/kube-review || echo "dependencies cannot be updated"
           PACKAGE="$(helm package charts/kube-review --version 0.0.1+${{ github.sha }} --destination /tmp | cut -d " " -f 8)"
           helm push $PACKAGE remote
+          helm dependency build charts/kube-review-prune || helm dependency update charts/kube-review-prune || echo "dependencies cannot be updated"
+          PACKAGE="$(helm package charts/kube-review-prune --version 0.0.1+${{ github.sha }} --destination /tmp | cut -d " " -f 8)"
+          helm push $PACKAGE remote
 
   build:
     name: Building Docker image
