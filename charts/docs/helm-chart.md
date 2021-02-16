@@ -46,6 +46,19 @@ helm upgrade CHART_NAME ./kube-review \
 --wait
 ```
 
+The same for the `kube-review-prune` chart:
+
+```
+helm upgrade CHART_NAME ./kube-review-prune \
+--install \
+--reset-values \
+--namespace NAMESPACE_NAME \
+--wait  \
+--set image.tag=IMAGE_TAG \
+--set github.ghToken=GITHUB_TOKEN \
+--set github.ghUserName=GITHUB_USERNAME
+```
+
 ## How to Uninstall
 
 REF.: https://helm.sh/docs/helm/helm_uninstall/

@@ -149,6 +149,11 @@ type K8sNamespace struct {
 }
 
 func buildConfigFromFlags(contextName, kubeconfigPath string) (*rest.Config, error) {
+	if kubeconfigPath == "" {
+		log.Printf("No kube config file informed, using in cluster config")
+		return rest.InClusterConfig()
+	}
+
 	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
 		&clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeconfigPath},
 		&clientcmd.ConfigOverrides{
@@ -317,13 +322,13 @@ func main() {
 		},
 		&cli.StringFlag{
 			Name:     "k8sKubeconfig",
-			Usage:    "absolute path to the kubeconfig file",
-			Required: true,
+			Usage:    "absolute path to the kubeconfig file, if not informed will use in cluster config",
+			Required: false,
 		},
 		&cli.StringFlag{
 			Name:     "k8sContextName",
 			Usage:    "the k8s context name to operate on",
-			Required: true,
+			Required: false,
 		},
 		&cli.StringFlag{
 			Name:  "ghEndpoint",
