@@ -20,7 +20,7 @@ host=$namespace.$KR_DOMAIN
 url=https://$host
 kube_context=$KR_KUBE_CONTEXT
 kube_config_file=$KR_KUBE_CONFIG_FILE
-secrets_file=$KR_SECRETS_FILE
+secrets_file=${KR_SECRETS_FILE:-"secrets.env"}
 pull_request_number=$KR_PULL_REQUEST_NUMBER
 branch_name=$KR_BRANCH_NAME
 repo_name=$KR_REPO_NAME
@@ -66,8 +66,7 @@ EOF
 apply_secret() {
   # If the user doesn't have secrets we need to generate an empty file
   # to make our chart happy, without this the deployment breaks
-  if [ "$secrets_file" != "" ]; then
-    secrets_file="secrets.env"
+  if [ ! -f "$secrets_file" ]; then
     touch $secrets_file
   fi
 
