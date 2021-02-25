@@ -65,6 +65,7 @@ EOF
 
 apply_secret() {
   if [ "$secrets_file" != "" ]; then
+    echo "Loading secrets file from: $secrets_file"
     kubectl create secret generic "$namespace" --from-env-file=$secrets_file \
       --dry-run=client -o yaml --save-config=true --namespace "$namespace" | kubectl apply -f -
   else
