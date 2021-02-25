@@ -67,7 +67,7 @@ apply_secret() {
   # If the user doesn't have secrets we need to generate an empty file
   # to make our chart happy, without this the deployment breaks
   if [ ! -f "$secrets_file" ]; then
-    echo "Secrets file: $secrets_file doesn't exist, loading empty file."
+    echo "Secrets file: $secrets_file doesn't exist, creating empty file."
     touch $secrets_file
   fi
 
