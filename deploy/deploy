@@ -25,6 +25,7 @@ pull_request_number=$KR_PULL_REQUEST_NUMBER
 branch_name=$KR_BRANCH_NAME
 repo_name=$KR_REPO_NAME
 repo_owner=$KR_REPO_OWNER
+test_connection=${KR_TEST_CONNECTION:-true}
 
 config_context() {
   # kubectl locks the config for each execution. To workaround
@@ -64,15 +65,13 @@ EOF
 }
 
 apply_secret() {
-  # If the user doesn't have secrets we need to generate an empty file
-  # to make our chart happy, without this the deployment breaks
   if [ "$secrets_file" != "" ]; then
-    secrets_file="secrets.env"
-    touch $secrets_file
+    echo "Loading secrets file from: $secrets_file"
+    kubectl create secret generic "$namespace" --from-env-file=$secrets_file \
+      --dry-run=client -o yaml --save-config=true --namespace "$namespace" | kubectl apply -f -
+  else
+    echo "Not secrets file to load"
   fi
-
-  kubectl create secret generic "$namespace" --from-env-file=$secrets_file \
-    --dry-run=client -o yaml --save-config=true --namespace "$namespace" | kubectl apply -f -
 }
 
 uninstall_chart() {
@@ -111,8 +110,7 @@ install_chart() {
 }
 
 test_chart() {
-  TEST_CONNECTION=${KR_TEST_CONNECTION:-true}
-  if [ "$KR_TEST_CONNECTION" = true ];
+  if [ "$test_connection" = true ];
   then
     env ACTION=auth \
     SKIP_CF_STABLE_HELM_REPO=true \
