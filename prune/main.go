@@ -119,11 +119,14 @@ func (gh *GHClient) IsPRMerged(owner, repo, number string) (bool, error) {
 		return false, err
 	}
 
+	// https://docs.github.com/en/rest/reference/pulls#check-if-a-pull-request-has-been-merged
 	switch resp.StatusCode {
 	case 204:
-		return false, nil
-	case 404:
+		// means merged
 		return true, nil
+	case 404:
+		// means not merged
+		return false, nil
 	default:
 		return false, fmt.Errorf("Got status code %d with body: %s", resp.Status, body)
 	}
