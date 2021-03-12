@@ -20,6 +20,7 @@ host=$namespace.$KR_DOMAIN
 url=https://$host
 kube_context=$KR_KUBE_CONTEXT
 kube_config_file=$KR_KUBE_CONFIG_FILE
+kube_logs_url=$KR_LOGS_URL
 secrets_file=$KR_SECRETS_FILE
 pull_request_number=$KR_PULL_REQUEST_NUMBER
 branch_name=$KR_BRANCH_NAME
@@ -108,8 +109,7 @@ install_chart() {
   CMD_PS='--cleanup-on-fail' \
   /opt/bin/release_chart
 
-  echo "INFO: You can follow the logs from your deployment on Datadog."
-  export $KR_LOGS_URL
+  echo "INFO: The Logs from your deployment on Datadog: $kube_logs_url"
 }
 
 test_chart() {
