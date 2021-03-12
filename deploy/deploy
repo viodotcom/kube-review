@@ -20,7 +20,7 @@ host=$namespace.$KR_DOMAIN
 url=https://$host
 kube_context=$KR_KUBE_CONTEXT
 kube_config_file=$KR_KUBE_CONFIG_FILE
-kube_logs_url=$KR_LOGS_URL
+kube_logs_url="https://app.datadoghq.com/logs?index=&query=kube_cluster_name%3Afh-ci-prod%20kube_namespace%3A$namespace"
 secrets_file=$KR_SECRETS_FILE
 pull_request_number=$KR_PULL_REQUEST_NUMBER
 branch_name=$KR_BRANCH_NAME
