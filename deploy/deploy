@@ -107,6 +107,11 @@ install_chart() {
   WAIT=true \
   CMD_PS='--cleanup-on-fail' \
   /opt/bin/release_chart
+
+  if [ "$KR_LOGS_URL" != "" ]; then
+    echo "INFO: You can follow the logs from your deployment on Datadog."
+    export $KR_LOGS_URL
+  fi
 }
 
 test_chart() {
