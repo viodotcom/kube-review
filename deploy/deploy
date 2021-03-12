@@ -20,13 +20,13 @@ host=$namespace.$KR_DOMAIN
 url=https://$host
 kube_context=$KR_KUBE_CONTEXT
 kube_config_file=$KR_KUBE_CONFIG_FILE
+kube_logs_url=$KR_LOGS_URL
 secrets_file=$KR_SECRETS_FILE
 pull_request_number=$KR_PULL_REQUEST_NUMBER
 branch_name=$KR_BRANCH_NAME
 repo_name=$KR_REPO_NAME
 repo_owner=$KR_REPO_OWNER
 test_connection=${KR_TEST_CONNECTION:-true}
-kube_logs_url="https://app.datadoghq.com/logs?index=&query=kube_cluster_name%3Afh-ci-prod%20kube_namespace%3A${KR_BRANCH_NAME}"
 
 config_context() {
   # kubectl locks the config for each execution. To workaround
