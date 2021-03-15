@@ -63,6 +63,8 @@ metadata:
     app.kubernetes.io/is_ephemeral: "$IS_EPHEMERAL"
   name: $NAMESPACE
 EOF
+# Exporting it here because we need the namespace name to the install_chart function
+export NAMESPACE=$namespace
 }
 
 apply_secret() {
@@ -137,7 +139,6 @@ test_chart() {
 export_variables() {
   # Export normally here so they are available to the post hook
   export URL=$url
-  export NAMESPACE=$namespace
 }
 
 config_context
