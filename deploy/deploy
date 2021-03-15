@@ -109,7 +109,8 @@ install_chart() {
   CMD_PS='--cleanup-on-fail' \
   /opt/bin/release_chart
 
-  echo "Logs of your deployment on Datadog"
+  echo "Follow the logs from your deployment in Datadog:"
+  echo "------------------------------------------------"
   echo "$kube_logs_url$namespace"
 }
 
