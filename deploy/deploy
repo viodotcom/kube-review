@@ -20,7 +20,7 @@ host=$namespace.$KR_DOMAIN
 url=https://$host
 kube_context=$KR_KUBE_CONTEXT
 kube_config_file=$KR_KUBE_CONFIG_FILE
-kube_logs_url="https://app.datadoghq.com/logs?index=&query=kube_cluster_name%3Afh-ci-prod%20kube_namespace%3A$namespace"
+kube_logs_url=$KR_LOGS_URL
 secrets_file=$KR_SECRETS_FILE
 pull_request_number=$KR_PULL_REQUEST_NUMBER
 branch_name=$KR_BRANCH_NAME
@@ -109,7 +109,7 @@ install_chart() {
   CMD_PS='--cleanup-on-fail' \
   /opt/bin/release_chart
 
-  echo "INFO: The Logs from your deployment on Datadog: $kube_logs_url"
+  echo "Logs of your deployment on Datadog: $kube_logs_url"
 }
 
 test_chart() {
@@ -127,7 +127,7 @@ test_chart() {
     # fail when we have a pod with completed status.
     # Issue: https://github.com/kubernetes/kubernetes/issues/79365
     # Issues: https://github.com/kubernetes/kubernetes/issues?page=1&q=is%3Aissue+is%3Aopen+HPA
-    echo "INFO: Removed the completed Test Pod.";
+    echo "Removed the completed Test Pod.";
     kubectl delete pod --selector="app.kubernetes.io/managed-by=Helm" --namespace "$namespace"
   else
     echo "Connection test is disabled.";
@@ -137,6 +137,7 @@ test_chart() {
 export_variables() {
   # Export normally here so they are available to the post hook
   export URL=$url
+  export NAMESPACE=$namespace
 }
 
 config_context
