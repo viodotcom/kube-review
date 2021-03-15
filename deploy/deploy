@@ -110,7 +110,7 @@ install_chart() {
   /opt/bin/release_chart
 
   echo "Follow the logs from your deployment in Datadog:"
-  echo "------------------------------------------------"
+  echo "-----------------------------------------------"
   echo "$kube_logs_url$namespace"
 }
 
