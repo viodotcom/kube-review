@@ -20,8 +20,7 @@ host=$namespace.$KR_DOMAIN
 url=https://$host
 kube_context=$KR_KUBE_CONTEXT
 kube_config_file=$KR_KUBE_CONFIG_FILE
-kube_log_url=$KR_LOG_URL
-kube_log_message=$KR_LOG_MESSAGE
+kube_post_install_msg=$KR_POST_INSTALL_MSG
 secrets_file=$KR_SECRETS_FILE
 pull_request_number=$KR_PULL_REQUEST_NUMBER
 branch_name=$KR_BRANCH_NAME
@@ -109,9 +108,6 @@ install_chart() {
   WAIT=true \
   CMD_PS='--cleanup-on-fail' \
   /opt/bin/release_chart
-
-  echo "$kube_log_message"
-  echo "$kube_log_url$namespace"
 }
 
 test_chart() {
@@ -141,6 +137,10 @@ export_variables() {
   export URL=$url
 }
 
+print_postinstall_message() {
+  printf "$KR_MESSAGE \n$KR_LOG_URL$namespace"
+}
+
 config_context
 namespace_apply
 apply_secret
@@ -148,6 +148,7 @@ uninstall_chart || true
 install_chart
 test_chart
 export_variables
+print_postinstall_message
 
 if [ "$KR_POST_HOOK" != "" ]; then
   echo "Running post hook command: $KR_POST_HOOK"
