@@ -138,7 +138,7 @@ export_variables() {
 }
 
 print_postinstall_message() {
-  printf "%s\n" "$KR_MESSAGE" "$KR_LOG_URL$namespace"
+  printf "%s\n" "$KR_MESSAGE $KR_LOG_URL$namespace"
 }
 
 config_context
