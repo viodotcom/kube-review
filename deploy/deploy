@@ -8,8 +8,8 @@ if [ "$KR_PRE_HOOK" != "" ]; then
 fi
 
 chart_version=${KR_CHART_VERSION:-0.3}
-helm_version=3.1.1
-chart_ref=kube-review
+helm_version=${KR_HELM_VERSION:-3.1.1}
+chart_ref=${KR_CHART_REF:-kube-review}
 
 name="$KR_PREFIX-${KR_ID_OVERRIDE:-$KR_ID}"
 short_name=$(echo -n $name | cut -c1-15)
@@ -20,6 +20,7 @@ host=$namespace.$KR_DOMAIN
 url=https://$host
 kube_context=$KR_KUBE_CONTEXT
 kube_config_file=$KR_KUBE_CONFIG_FILE
+kube_post_install_msg=$KR_POST_INSTALL_MSG
 secrets_file=$KR_SECRETS_FILE
 pull_request_number=$KR_PULL_REQUEST_NUMBER
 branch_name=$KR_BRANCH_NAME
@@ -124,7 +125,7 @@ test_chart() {
     # fail when we have a pod with completed status.
     # Issue: https://github.com/kubernetes/kubernetes/issues/79365
     # Issues: https://github.com/kubernetes/kubernetes/issues?page=1&q=is%3Aissue+is%3Aopen+HPA
-    echo "INFO: Removed the completed Test Pod.";
+    echo "Removed the completed Test Pod.";
     kubectl delete pod --selector="app.kubernetes.io/managed-by=Helm" --namespace "$namespace"
   else
     echo "Connection test is disabled.";
@@ -136,6 +137,10 @@ export_variables() {
   export URL=$url
 }
 
+print_postinstall_message() {
+  printf "%s\n" "$KR_MESSAGE" "$KR_LOG_URL$namespace"
+}
+
 config_context
 namespace_apply
 apply_secret
@@ -143,6 +148,7 @@ uninstall_chart || true
 install_chart
 test_chart
 export_variables
+print_postinstall_message
 
 if [ "$KR_POST_HOOK" != "" ]; then
   echo "Running post hook command: $KR_POST_HOOK"
