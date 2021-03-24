@@ -61,7 +61,7 @@ jobs:
           tags: |
             findhotelamsterdam/kube-review:${{ github.sha }}
             findhotelamsterdam/kube-review:${{ steps.extract_branch.outputs.branch }}
-          build-args:
-            - ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
-            - ECR_REPOSITORY=cf-review-env-prod
-            - DEFAULT_HELM_REPO_URL=cm://h.cfcr.io/findhotel/lab/
+          build-args: |
+            ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+            ECR_REPOSITORY=cf-review-env-prod
+            DEFAULT_HELM_REPO_URL=cm://h.cfcr.io/findhotel/lab/
