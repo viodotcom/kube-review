@@ -58,8 +58,9 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags:
-            - findhotelamsterdam/kube-review:${{ github.sha }},findhotelamsterdam/kube-review:${{ steps.extract_branch.outputs.branch }}
+          tags: |
+            findhotelamsterdam/kube-review:${{ github.sha }}
+            findhotelamsterdam/kube-review:${{ steps.extract_branch.outputs.branch }}
           build-args:
             - ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
             - ECR_REPOSITORY=cf-review-env-prod
