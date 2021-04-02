@@ -7,7 +7,7 @@ if [ "$KR_PRE_HOOK" != "" ]; then
   eval "$KR_PRE_HOOK"
 fi
 
-chart_version=${KR_CHART_VERSION:-0.3}
+chart_version=${KR_CHART_VERSION:-0.4}
 helm_version=${KR_HELM_VERSION:-3.1.1}
 chart_ref=${KR_CHART_REF:-kube-review}
 
