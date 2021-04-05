@@ -1,25 +1,41 @@
 # kube-review
 
-Review environment support for [CodeFresh](http://codefresh.io/) using [Kubernetes](https://kubernetes.io/).
+*kube-review* is a Kubernetes based platform to deploy and manage review environments.
 
-## Releases
+*kube-review* is a battle tested platform based on Kubernetes to deploy and managed review environments at scale. *kube-review* has been in use at FindHotel for more than a year and it's considered resilient and production ready.
 
-We use a very simple versioning model. The Docker image is always tagged with `latest` for the stable release (CD pipeline). During development the Docker image is tagged with `short commit hash` and `branch name` (CI pipeline).
+Based on Kubernetes, *kube-review* is very lean on resources as it is optimized to require few infra resources and to scale to high number of concurrent environments.
 
-The Helm Chart version uses SemVer for stable releases, but during development the version is always `0.0.1:{SHORT_COMMIT_HASH}`.
+In order to control the life cycle of a environment, *kube-review* requires integration with your source code repository. At this point we only support **GitHub**, but there is no reason why others couldn't be added.
 
-## How to use the development version
+**WARNING**: Although, *kube-review* is resilient and scalable, it's not meant to run live or customer facing workloads.
 
-**Note**: We should always use the `staging` environment when it is necessary to test a new `helm chart version`.
+### Features
 
-When the new `chart version` is created the CI pipeline run and push the new chart to the registry with the new version for example `0.0.1+87d6164` and we can use this new version following these steps:
+These are some of the features supported by *kube-review*:
 
-1 - Choose the project development pipeline that you would like to test (e.g.: [geolocation-service-lab](https://g.codefresh.io/projects/geolocation-service-lab/edit/pipelines/?projectId=5fbf87e2b4b6c926b5fe6ebc))
+- Simple and universal deployment through any CI/CD tool;
+- Public accessible URL with HTTPS support;
+- Automatic removal of expired environments by time on when the branch is merged;
+- Complex environments with side car containers support;
+- Secrets and environment variables;
+- Ephemerals and Non-Ephemerals environments;
+- Custom environment names;
+- Kubernetes resource parametrization through Helm values file.
+- Customization through pre and post install hooks;
+- Scalable and lean infra using Nginx Ingress and Let's Encrypt WildCards domains;
+- Environment isolation through namespaces;
+- Connection test after deployment.
 
-2 - Run a new deployment but first you need to add these variables in `BUILD VARIABLES`:
+## Documentation
 
-| Variable  | Value |
-|----- |-------|
-| CHART_VERSION | 0.0.1+87d6164 |
+**WARNING**: Docs are WIP and not complete yet.
 
-**Note**: The value of the `CHART_VERSION` variable, you must add the new version of the chart created for testing.
+- [Introduction](docs/introductions.md)
+- [Getting Started](docs/getting-started.md)
+- [Reference](docs/reference.md)
+- [Developing](docs/developing.md)
+
+## Licensing
+
+Apache License 2.0
