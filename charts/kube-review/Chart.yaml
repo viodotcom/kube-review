@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: 0.3
+appVersion: 0.4
 name: kube-review
 description: Helm chart that deploys a kube-review app
 keywords:
@@ -10,4 +10,4 @@ maintainers:
 type: application
 sources:
 - https://github.com/FindHotel/kube-review
-version: 0.3
+version: 0.4
