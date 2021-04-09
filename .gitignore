@@ -1,2 +1,3 @@
 cf-stop-k8s-env
 prune/prune
+**/.kustomize

@@ -1,0 +1,46 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namePrefix: kube-review-
+commonAnnotations:
+    app.kubernetes.io/version: "0.3"
+commonLabels:
+  app.kubernetes.io/instance: re-kube-review
+  app.kubernetes.io/name: kube-review
+resources:
+  - serviceaccount.yml
+  - service.yml
+  - ingress.yml
+  - test-connection.yml
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/ports/0/port
+        value: 8880
+      - op: replace
+        path: /spec/ports/0/targetPort
+        value: 8880
+    target:
+      kind: Service
+  - patch: |-
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: re-website-proxy-xxx.shared-prod.fih.io
+      - op: replace
+        path: /spec/rules/0/host
+        value: re-website-proxy-xxx.shared-prod.fih.io
+      - op: replace
+        path: /spec/rules/0/http/paths/0/backend/serviceName
+        value: kube-review-service-re-website-proxy-xxx
+      - op: replace
+        path: /spec/rules/0/http/paths/0/backend/servicePort
+        value: 8880
+    target:
+      kind: Ingress
+  - patch: |-
+      - op: replace
+        path: /spec/containers/0/args/0
+        value: re-website-proxy-xxx.shared-prod.fih.io
+    target:
+      kind: Pod
+      name: test-connection
