@@ -11,6 +11,7 @@ resources:
   - service.yml
   - ingress.yml
   - test-connection.yml
+  - deployment.yml
 
 patches:
   - patch: |-
@@ -25,10 +26,10 @@ patches:
   - patch: |-
       - op: replace
         path: /spec/tls/0/hosts/0
-        value: re-website-proxy-xxx.shared-prod.fih.io
+        value: re-website-proxy-xxx.shared-stg.fih.io
       - op: replace
         path: /spec/rules/0/host
-        value: re-website-proxy-xxx.shared-prod.fih.io
+        value: re-website-proxy-xxx.shared-stg.fih.io
       - op: replace
         path: /spec/rules/0/http/paths/0/backend/serviceName
         value: kube-review-service-re-website-proxy-xxx
@@ -40,7 +41,38 @@ patches:
   - patch: |-
       - op: replace
         path: /spec/containers/0/args/0
-        value: re-website-proxy-xxx.shared-prod.fih.io
+        value: re-website-proxy-xxx.shared-stg.fih.io
     target:
       kind: Pod
       name: test-connection
+  - patch: |-
+      - op: replace
+        path: /spec/template/metadata/annotations/rollme
+        value: kjdksl
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: 265409992602.dkr.ecr.eu-west-1.amazonaws.com/daedalus-proxy-main:44eddfd
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: re-website-proxy-xxx.shared-stg.fih.io
+      - op: replace
+        path: /spec/template/spec/containers/0/envFrom/0/secretRef/name
+        value: re-website-proxy-xxx
+      - op: replace
+        path: /spec/template/spec/containers/0/ports/0/containerPort
+        value: 8880
+      - op: replace
+        path: /spec/template/spec/containers/0/livenessProbe/httpGet/port
+        value: 8880
+      - op: replace
+        path: /spec/template/spec/containers/0/readinessProbe/httpGet/port
+        value: 8880
+      - op: replace
+        path: /spec/template/spec/containers/0/startupProbe/httpGet/port
+        value: 8880
+      - op: replace
+        path: /spec/template/spec/serviceAccountName
+        value: kube-review-serviceaccount
+    target:
+      kind: Deployment
+      name: deployment

@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kube-review
+  template:
+    metadata:
+      annotations:
+        # Force all new release to recreate the pods #
+        rollme: "hash"
+      labels:
+        app.kubernetes.io/name: kube-review
+    spec:
+      containers:
+        - name: kube-review
+          securityContext:
+            null
+          image: "265409992602.dkr.ecr.eu-west-1.amazonaws.com/daedalus-proxy-main:44eddfd"
+          imagePullPolicy: IfNotPresent
+          env:
+            # Altough the hosts is a list, we always have only one.
+            # We never used this and it will basically be removed in the future.
+            # Sp, it's better to only expose one host.
+            - name: KR_HOST
+              value: "id.domain"
+          envFrom:
+            - secretRef:
+                name: secret
+          ports:
+            - name: web
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 30
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 60
+          resources:
+            limits:
+              cpu: "1"
+              memory: 600Mi
+            requests:
+              cpu: 100m
+              memory: 600Mi
+      serviceAccountName: serviceaccount
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 40
+      dnsPolicy: ClusterFirst

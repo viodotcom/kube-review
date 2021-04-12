@@ -8,7 +8,6 @@ spec:
   tls:
     - hosts:
         - "id.domain"
-      secretName:
   rules:
     - host: "id.domain"
       http:
@@ -16,4 +15,4 @@ spec:
           - path: /
             backend:
               serviceName: name
-              servicePort: 8880
+              servicePort: 8080
