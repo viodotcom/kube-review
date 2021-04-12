@@ -13,6 +13,14 @@ resources:
   - test-connection.yml
   - deployment.yml
 
+secretGenerator:
+- name: secret
+  envs:
+  - env.txt
+  type: Opaque
+  options:
+    disableNameSuffixHash: true
+
 patches:
   - patch: |-
       - op: replace
@@ -55,9 +63,6 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/env/0/value
         value: re-website-proxy-xxx.shared-stg.fih.io
-      - op: replace
-        path: /spec/template/spec/containers/0/envFrom/0/secretRef/name
-        value: re-website-proxy-xxx
       - op: replace
         path: /spec/template/spec/containers/0/ports/0/containerPort
         value: 8880

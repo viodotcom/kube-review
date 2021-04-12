@@ -16,3 +16,9 @@ spec:
           startupProbe:
             httpGet:
               path: "/nginx_status"
+        - name: redis
+          image: "redis:alpine"
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
