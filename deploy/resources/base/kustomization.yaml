@@ -46,10 +46,7 @@ patches:
         value: 8880
     target:
       kind: Ingress
-  - patch: |-
-      - op: replace
-        path: /spec/containers/0/args/0
-        value: re-website-proxy-xxx.shared-stg.fih.io
+  - path: patches/test-connection.json
     target:
       kind: Pod
       name: test-connection
