@@ -6,3 +6,10 @@ resources:
 
 patches:
   - path: deployment.yml
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/1/image
+        value: redis:6.2.1
+    target:
+      kind: Deployment
+      name: deployment
