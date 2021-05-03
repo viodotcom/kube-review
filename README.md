@@ -29,7 +29,9 @@ These are some of the features supported by *kube-review*:
 
 ## Documentation
 
-WIP
+**WARNING**: Docs are WIP and not complete yet.
+
+- [Introduction](docs/introduction.md)
 
 ## Licensing
 
