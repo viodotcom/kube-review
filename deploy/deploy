@@ -7,9 +7,10 @@ if [ "$KR_PRE_HOOK" != "" ]; then
   eval "$KR_PRE_HOOK"
 fi
 
-chart_version=${KR_CHART_VERSION:-0.4}
-helm_version=${KR_HELM_VERSION:-3.1.1}
+chart_version=${KR_CHART_VERSION:-0.5}
+helm_version=${KR_HELM_VERSION:-3.2.4}
 chart_ref=${KR_CHART_REF:-kube-review}
+dockerhub_secret_name=${KR_DOCKERHUB_SECRET_NAME:-docker-cfg}
 
 name="$KR_PREFIX-${KR_ID_OVERRIDE:-$KR_ID}"
 short_name=$(echo -n $name | cut -c1-15)
@@ -73,6 +74,12 @@ apply_secret() {
   else
     echo "Not secrets file to load"
   fi
+}
+
+apply_docker_secret() {
+  echo "Creating Docker Hub Secret"
+  kubectl get secret $dockerhub_secret_name -n default -o yaml | sed s/"namespace: default"/"namespace: $namespace"/\
+  | kubectl apply -n $namespace -f -
 }
 
 uninstall_chart() {
@@ -144,6 +151,7 @@ print_postinstall_message() {
 config_context
 namespace_apply
 apply_secret
+apply_docker_secret
 uninstall_chart || true
 install_chart
 test_chart

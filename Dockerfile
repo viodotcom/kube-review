@@ -1,4 +1,4 @@
-FROM golang:1.14-alpine as base
+FROM golang:1.16.4-alpine3.13 as base
 
 LABEL maintainer="EEQ Team"
 LABEL service="Codefresh Deploy"
@@ -13,12 +13,12 @@ RUN go build -o ./prune .
 RUN chmod +x prune
 
 # Helm #
-FROM codefresh/cfstep-helm:3.1.1
+FROM codefresh/cfstep-helm:3.2.4
 
 ARG DEFAULT_HELM_REPO_URL
 
-ENV CODEFRESH_VERSION=v0.74.4
-ENV KUBECTL_VERSION=v1.19.3
+ENV CODEFRESH_VERSION=v0.75.18
+ENV KUBECTL_VERSION=v1.21.0
 ENV KR_HELM_REPO_URL $DEFAULT_HELM_REPO_URL
 
 # Default packages #

@@ -1,5 +1,8 @@
 serviceAccount:
   create: true
+  imagePullSecrets:
+    enabled: true
+    name: docker-cfg
 resources:
   limits:
     cpu: "1"
