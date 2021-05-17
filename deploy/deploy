@@ -84,7 +84,7 @@ copying_dockerhub_secret() {
   apiVersion: v1
   kind: Secret
   metadata:
-    name: docker-cfg
+    name: $dockerhub_secret_name
     namespace: $namespace
   data:
     .dockerconfigjson: $TOKEN
