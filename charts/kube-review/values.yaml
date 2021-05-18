@@ -1,7 +1,6 @@
 serviceAccount:
   create: true
   imagePullSecrets:
-    enabled: true
     name: docker-cfg
 deployment:
   ports:
