@@ -17,14 +17,15 @@ spec:
             - name: {{ .Chart.Name }}
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
               imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
-              {{- if .Values.imagePullSecrets }}
-              imagePullSecrets: {{ .Values.imagePullSecrets.name }}
-              {{- end }}
               command: ['{{ .Values.command }}']
               args:
                 - '--ghToken={{ .Values.github.ghToken }}'
                 - '--ghUserName={{ .Values.github.ghUserName }}'
               resources:
                 {{- toYaml .Values.resources | nindent 16 }}
+            {{- if .Values.imagePullSecrets }}
+            imagePullSecrets:
+            - name: {{ .Values.imagePullSecrets.name }}
+            {{- end }}
           restartPolicy: {{ .Values.restartPolicy | default "OnFailure" }}
           serviceAccountName: {{ include "kube-review-prune.serviceAccountName" . }}

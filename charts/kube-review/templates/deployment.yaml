@@ -29,9 +29,6 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
-          {{- if .Values.imagePullSecrets }}
-          imagePullSecrets: {{ .Values.imagePullSecrets.name }}
-          {{- end }}
           {{- if .Values.customCommand }}
           {{- if eq .Values.customCommand.enabled true }}
           command: ["{{ .Values.customCommand.command }}"]
@@ -100,6 +97,10 @@ spec:
           volumeMounts:
             - name: docker-store
               mountPath: /var/lib/docker
+        {{- if .Values.imagePullSecrets }}
+        imagePullSecrets:
+        - name: {{ .Values.imagePullSecrets.name }}
+        {{- end }}
       volumes:
         - name: docker-store
           emptyDir: {}
