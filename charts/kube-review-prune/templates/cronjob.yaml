@@ -17,6 +17,9 @@ spec:
             - name: {{ .Chart.Name }}
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
               imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+              {{- if .Values.imagePullSecrets }}
+              imagePullSecrets: {{ .Values.imagePullSecrets.name }}
+              {{- end }}
               command: ['{{ .Values.command }}']
               args:
                 - '--ghToken={{ .Values.github.ghToken }}'
