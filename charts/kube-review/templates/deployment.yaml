@@ -23,6 +23,9 @@ spec:
       labels:
         {{- include "kube-review.selectorLabels" . | nindent 8 }}
     spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml .Values.imagePullSecrets | nindent 12 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -97,10 +100,6 @@ spec:
           volumeMounts:
             - name: docker-store
               mountPath: /var/lib/docker
-        {{- if .Values.imagePullSecrets }}
-        imagePullSecrets:
-        - name: {{ .Values.imagePullSecrets.name }}
-        {{- end }}
       volumes:
         - name: docker-store
           emptyDir: {}

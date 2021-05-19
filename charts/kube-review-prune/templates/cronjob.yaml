@@ -13,6 +13,9 @@ spec:
           labels:
             {{- include "kube-review-prune.selectorLabels" . | nindent 12 }}
         spec:
+          {{- if .Values.imagePullSecrets }}
+          imagePullSecrets: {{ toYaml .Values.imagePullSecrets | nindent 16 }}
+          {{- end }}
           containers:
             - name: {{ .Chart.Name }}
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -23,9 +26,5 @@ spec:
                 - '--ghUserName={{ .Values.github.ghUserName }}'
               resources:
                 {{- toYaml .Values.resources | nindent 16 }}
-            {{- if .Values.imagePullSecrets }}
-            imagePullSecrets:
-            - name: {{ .Values.imagePullSecrets.name }}
-            {{- end }}
           restartPolicy: {{ .Values.restartPolicy | default "OnFailure" }}
           serviceAccountName: {{ include "kube-review-prune.serviceAccountName" . }}
