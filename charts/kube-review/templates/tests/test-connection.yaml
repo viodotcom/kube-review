@@ -7,6 +7,9 @@ metadata:
   annotations:
     "helm.sh/hook": test-success
 spec:
+  {{- if .Values.imagePullSecrets }}
+  imagePullSecrets: {{ toYaml .Values.imagePullSecrets | nindent 8 }}
+  {{- end }}
   containers:
   {{- range $index, $host := .Values.ingress.hosts }}
     {{- range .paths }}

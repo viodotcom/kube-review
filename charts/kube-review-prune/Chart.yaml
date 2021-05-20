@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: 0.1
+appVersion: 0.2
 name: kube-review-prune
 description: Helm chart that deploys a kube-review prune job
 keywords:
@@ -11,4 +11,4 @@ maintainers:
 type: application
 sources:
 - https://github.com/FindHotel/kube-review
-version: 0.1
+version: 0.2

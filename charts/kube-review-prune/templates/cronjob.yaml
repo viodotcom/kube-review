@@ -13,6 +13,9 @@ spec:
           labels:
             {{- include "kube-review-prune.selectorLabels" . | nindent 12 }}
         spec:
+          {{- if .Values.imagePullSecrets }}
+          imagePullSecrets: {{ toYaml .Values.imagePullSecrets | nindent 16 }}
+          {{- end }}
           containers:
             - name: {{ .Chart.Name }}
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
