@@ -22,15 +22,16 @@ jobs:
         env:
           HELM_REPO_ACCESS_TOKEN: ${{ secrets.CF_API_KEY }}
           HELM_REPO_AUTH_HEADER: Authorization
+          TIME: "${{ steps.current-time.outputs.time }}"
         run: |
           helm version --short -c
           helm plugin install https://github.com/chartmuseum/helm-push.git
           helm repo add remote cm://h.cfcr.io/findhotel/lab/
           helm dependency build charts/kube-review || helm dependency update charts/kube-review || echo "dependencies cannot be updated"
-          PACKAGE="$(helm package charts/kube-review --version 0.0.1-${{ steps.current-time.outputs.time }} --destination /tmp | cut -d " " -f 8)"
+          PACKAGE="$(helm package charts/kube-review --version 0.0.1-$TIME --destination /tmp | cut -d " " -f 8)"
           helm push $PACKAGE remote
           helm dependency build charts/kube-review-prune || helm dependency update charts/kube-review-prune || echo "dependencies cannot be updated"
-          PACKAGE="$(helm package charts/kube-review-prune --version 0.0.1-${{ steps.current-time.outputs.time }} --destination /tmp | cut -d " " -f 8)"
+          PACKAGE="$(helm package charts/kube-review-prune --version 0.0.1-$TIME --destination /tmp | cut -d " " -f 8)"
           helm push $PACKAGE remote
 
   build:
