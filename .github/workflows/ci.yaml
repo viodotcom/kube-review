@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Get current time
         id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H:%M:%S')"
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
 
       - name: Clone
         uses: actions/checkout@v2
