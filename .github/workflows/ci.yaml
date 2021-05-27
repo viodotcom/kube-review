@@ -9,6 +9,11 @@ jobs:
     name: Push to the Repository
     runs-on: ubuntu-latest
     steps:
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2.0.0
+        with:
+          format: YYYYMMDD-HH
+          utcOffset: "+08:00"
       - name: Clone
         uses: actions/checkout@v2
 
@@ -22,10 +27,10 @@ jobs:
           helm plugin install https://github.com/chartmuseum/helm-push.git
           helm repo add remote cm://h.cfcr.io/findhotel/lab/
           helm dependency build charts/kube-review || helm dependency update charts/kube-review || echo "dependencies cannot be updated"
-          PACKAGE="$(helm package charts/kube-review --version 0.0.1+${{ github.sha }} --destination /tmp | cut -d " " -f 8)"
+          PACKAGE="$(helm package charts/kube-review --version 0.0.1-${{ steps.current-time.outputs.time }} --destination /tmp | cut -d " " -f 8)"
           helm push $PACKAGE remote
           helm dependency build charts/kube-review-prune || helm dependency update charts/kube-review-prune || echo "dependencies cannot be updated"
-          PACKAGE="$(helm package charts/kube-review-prune --version 0.0.1+${{ github.sha }} --destination /tmp | cut -d " " -f 8)"
+          PACKAGE="$(helm package charts/kube-review-prune --version 0.0.1-${{ steps.current-time.outputs.time }} --destination /tmp | cut -d " " -f 8)"
           helm push $PACKAGE remote
 
   build:
