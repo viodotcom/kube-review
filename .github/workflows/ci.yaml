@@ -10,10 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get current time
-        uses: 1466587594/get-current-time@v2.0.0
-        with:
-          format: YYYYMMDD-HH
-          utcOffset: "+08:00"
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H:%M:%S')"
+
       - name: Clone
         uses: actions/checkout@v2
 
@@ -22,7 +21,7 @@ jobs:
         env:
           HELM_REPO_ACCESS_TOKEN: ${{ secrets.CF_API_KEY }}
           HELM_REPO_AUTH_HEADER: Authorization
-          TIME: "${{ steps.current-time.outputs.time }}"
+          TIME: "${{steps.date.outputs.date}}"
         run: |
           helm version --short -c
           helm plugin install https://github.com/chartmuseum/helm-push.git
