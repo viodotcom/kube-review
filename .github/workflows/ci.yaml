@@ -21,17 +21,19 @@ jobs:
         env:
           HELM_REPO_ACCESS_TOKEN: ${{ secrets.CF_API_KEY }}
           HELM_REPO_AUTH_HEADER: Authorization
+          HELM_REPO_NAME: cm://h.cfcr.io/findhotel/lab/
+          HELM_REPO_PLUGIN_NAME: https://github.com/chartmuseum/helm-push.git
           TIME: "${{steps.date.outputs.date}}"
         run: |
           helm version --short -c
-          helm plugin install https://github.com/chartmuseum/helm-push.git
-          helm repo add remote cm://h.cfcr.io/findhotel/lab/
+          helm plugin install $HELM_REPO_PLUGIN_NAME
+          helm repo add remote $HELM_REPO_NAME
           helm dependency build charts/kube-review || helm dependency update charts/kube-review || echo "dependencies cannot be updated"
-          KUBE_REVIEW_PACKAGE="$(helm package charts/kube-review --version 0.0.1-$TIME --destination /tmp)"
-          helm push $KUBE_REVIEW_PACKAGE remote
+          PACKAGE="$(helm package charts/kube-review --version 0.0.1-$TIME --destination /tmp)"
+          helm push $PACKAGE remote
           helm dependency build charts/kube-review-prune || helm dependency update charts/kube-review-prune || echo "dependencies cannot be updated"
-          KUBE_REVIEW_PRUNE_PACKAGE="$(helm package charts/kube-review-prune --version 0.0.1-$TIME --destination /tmp)"
-          helm push $KUBE_REVIEW_PRUNE_PACKAGE remote
+          PACKAGE="$(helm package charts/kube-review-prune --version 0.0.1-$TIME --destination /tmp)"
+          helm push $PACKAGE remote
           helm repo update
 
   build:
