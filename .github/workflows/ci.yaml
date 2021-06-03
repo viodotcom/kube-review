@@ -35,7 +35,7 @@ jobs:
           PACKAGE="$(helm package charts/kube-review-prune --version 0.0.1-$TIME --destination /tmp | cut -d " " -f 8)"
           helm push $PACKAGE remote
           helm repo update
-          helm search repo -l lab/kube-review | grep 0.0.1-$TIME
+          helm search repo -l lab/kube-review
 
   build:
     name: Building Docker image
