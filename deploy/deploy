@@ -37,6 +37,16 @@ branch_name=$KR_BRANCH_NAME
 repo_name=$KR_REPO_NAME
 repo_owner=$KR_REPO_OWNER
 
+echo_variables() {
+  echo "ECHO VARIABLES"
+  echo "==>> prefix ==>>"$prefix
+  echo "==>> KR_PREFIX ==>>"$KR_PREFIX
+  echo "==>> name ==>>"$name
+  echo "==>> short_name ==>>"$short_name
+  echo "==>> hash ==>>"$hash
+  echo "namespace="$namespace
+}
+
 config_context() {
   # kubectl locks the config for each execution. To workaround
   # and allow multiple concurrent kubectl executions we copy the config
@@ -165,6 +175,7 @@ print_postinstall_message() {
   printf "%s\n" "$KR_MESSAGE" "$KR_LOG_URL$namespace"
 }
 
+exporting_variables
 config_context
 namespace_apply
 apply_secret
