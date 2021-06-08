@@ -44,14 +44,6 @@ config_context() {
   cp "$kube_config_file" "$scoped_kubeconfig_file"
   export KUBECONFIG=${scoped_kubeconfig_file}
   kubectl config use-context "$kube_context"
-
-  echo "ECHO VARIABLES"
-  echo "==>> prefix ==>>$prefix"
-  echo "==>> KR_PREFIX ==>>$KR_PREFIX"
-  echo "==>> name ==>>$name"
-  echo "==>> short_name ==>>$short_name"
-  echo "==>> hash ==>>$hash"
-  echo "==>> namespace=$namespace"
 }
 
 namespace_apply() {
