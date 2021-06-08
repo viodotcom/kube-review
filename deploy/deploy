@@ -175,7 +175,7 @@ print_postinstall_message() {
   printf "%s\n" "$KR_MESSAGE" "$KR_LOG_URL$namespace"
 }
 
-exporting_variables
+echo_variables
 config_context
 namespace_apply
 apply_secret
