@@ -12,12 +12,13 @@ helm_version=${KR_HELM_VERSION:-3.2.4}
 chart_ref=${KR_CHART_REF:-kube-review}
 dockerhub_secret_name=${KR_DOCKERHUB_SECRET_NAME:-docker-cfg}
 dockerhub_namespace_name=${KR_DOCKERHUB_NAMESPACE_NAME:-default}
+prefix=${KR_PREFIX:-re}
 kube_config_file=${KR_KUBE_CONFIG_FILE:-$HOME/.kube/config}
 
-name="$KR_PREFIX-${KR_ID_OVERRIDE:-$KR_ID}"
+name="$prefix-${KR_ID_OVERRIDE:-$KR_ID}"
 short_name=$(echo -n $name | cut -c1-15)
 hash=$(echo "$name" | rhash -p "%c" -)
-namespace=$KR_PREFIX-$short_name-$hash
+namespace=$prefix-$short_name-$hash
 is_ephemeral=${KR_IS_EPHEMERAL:-true}
 host=$namespace.$KR_DOMAIN
 url=https://$host
