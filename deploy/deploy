@@ -13,12 +13,12 @@ helm_version=${KR_HELM_VERSION:-3.2.4}
 chart_ref=${KR_CHART_REF:-kube-review}
 
 # DockerHub variables
-dockerhub_secret_copy_enabled=${KR_DOCKERHUB_SECRET_COPY_ENABLED:-true}
+dockerhub_secret_copy_enabled=${KR_DOCKERHUB_SECRET_COPY_ENABLED:-false}
 dockerhub_secret_name=${KR_DOCKERHUB_SECRET_NAME:-docker-cfg}
 dockerhub_namespace_name=${KR_DOCKERHUB_NAMESPACE_NAME:-default}
 
 # App variables
-app_name=$KR_APP_NAME
+#app_name=$KR_APP_NAME
 pull_request_number=$KR_PULL_REQUEST_NUMBER
 branch_name=$KR_BRANCH_NAME
 repo_name=$KR_REPO_NAME
@@ -27,10 +27,11 @@ repo_owner=$KR_REPO_OWNER
 # Kube Review variables
 prefix=${KR_PREFIX:-re}
 kube_config_file=${KR_KUBE_CONFIG_FILE:-$HOME/.kube/config}
-name="${KR_ID_OVERRIDE:-$KR_ID}"
+name="$prefix-${KR_ID_OVERRIDE:-$KR_ID}"
 short_name=$(echo -n $name | cut -c1-15)
 hash=$(echo "$name" | rhash -p "%c" -)
-namespace=$prefix-$app_name-$short_name-$hash
+#namespace=$prefix-$app_name-$short_name-$hash
+namespace=$short_name-$hash
 is_ephemeral=${KR_IS_EPHEMERAL:-true}
 host=$namespace.$KR_DOMAIN
 url=https://$host
