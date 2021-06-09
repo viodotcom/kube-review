@@ -13,6 +13,7 @@ helm_version=${KR_HELM_VERSION:-3.2.4}
 chart_ref=${KR_CHART_REF:-kube-review}
 
 # DockerHub variables
+dockerhub_secret_copy_enable=${KR_DOCKERHUB_SECRET_COPY_ENABLE:-true}
 dockerhub_secret_name=${KR_DOCKERHUB_SECRET_NAME:-docker-cfg}
 dockerhub_namespace_name=${KR_DOCKERHUB_NAMESPACE_NAME:-default}
 
@@ -85,18 +86,21 @@ apply_secret() {
 }
 
 copying_dockerhub_secret() {
-  echo "Copying Docker Hub Secret"
-  TOKEN=$(kubectl -n $dockerhub_namespace_name get secret $dockerhub_secret_name --output="jsonpath={.data.\.dockerconfigjson}")
-  cat <<EOF | envsubst | kubectl apply -f -
-  apiVersion: v1
-  kind: Secret
-  metadata:
-    name: $dockerhub_secret_name
-    namespace: $namespace
-  data:
-    .dockerconfigjson: $TOKEN
-  type: kubernetes.io/dockerconfigjson
+  if [ "$dockerhub_secret_copy_enable" = true ];
+  then
+    echo "Copying Docker Hub Secret"
+    TOKEN=$(kubectl -n $dockerhub_namespace_name get secret $dockerhub_secret_name --output="jsonpath={.data.\.dockerconfigjson}")
+    cat <<EOF | envsubst | kubectl apply -f -
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: $dockerhub_secret_name
+      namespace: $namespace
+    data:
+      .dockerconfigjson: $TOKEN
+    type: kubernetes.io/dockerconfigjson
 EOF
+  fi
 }
 
 uninstall_chart() {
