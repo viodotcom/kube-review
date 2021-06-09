@@ -13,7 +13,7 @@ helm_version=${KR_HELM_VERSION:-3.2.4}
 chart_ref=${KR_CHART_REF:-kube-review}
 
 # DockerHub variables
-dockerhub_secret_copy_enabled=${KR_DOCKERHUB_SECRET_COPY_ENABLE:-true}
+dockerhub_secret_copy_enabled=${KR_DOCKERHUB_SECRET_COPY_ENABLED:-true}
 dockerhub_secret_name=${KR_DOCKERHUB_SECRET_NAME:-docker-cfg}
 dockerhub_namespace_name=${KR_DOCKERHUB_NAMESPACE_NAME:-default}
 
