@@ -128,7 +128,6 @@ install_chart() {
   HELM_VERSION=$helm_version \
   CUSTOM_image_tag="$KR_IMAGE_TAG" \
   CUSTOM_image_repository="$KR_IMAGE_URL" \
-  CUSTOM_envFrom_secretRef_name="$namespace" \
   CUSTOM_"ingress_hosts[0]_host=$host" \
   CUSTOM_"ingress_hosts[0]_paths[0]=/" \
   CUSTOM_"ingress_tls[0]_hosts[0]=$host" \
