@@ -23,7 +23,7 @@ ENV KR_HELM_REPO_URL $DEFAULT_HELM_REPO_URL
 
 # Default packages #
 RUN apk --no-cache --quiet update \
-    && apk add --no-cache --quiet rhash gettext libstdc++ curl bash git
+    && apk add --no-cache --quiet rhash gettext libstdc++ curl bash git jq
 
 # Codefresh #
 RUN curl -L --silent https://github.com/codefresh-io/cli/releases/download/${CODEFRESH_VERSION}/codefresh-${CODEFRESH_VERSION}-alpine-x64.tar.gz -o codefresh.tar.gz \
