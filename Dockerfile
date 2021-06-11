@@ -47,6 +47,3 @@ COPY deploy/* ./
 COPY --from=base /prune ./
 RUN chmod +x deploy
 RUN chmod +x prune
-
-# We need to do this because cfstep-helm has an entrypoint
-ENTRYPOINT []
