@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tutorial-prd
+  namespace: cert-manager
+spec:
+  secretName: tutorial-prd
+  commonName: '*.${MY_DOMAIN}'
+  dnsNames:
+  - '*.${MY_DOMAIN}'
+  issuerRef:
+    name: letsencrypt-prd
+    kind: ClusterIssuer
