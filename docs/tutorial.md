@@ -29,7 +29,7 @@ The following command creates a EKS Cluster and node group named `tutorial`:
     --with-oidc \
     --nodegroup-name tutorial \
     --node-type m5.large \
-    --managed
+    --managed \
     --region eu-west-1
 
 ### Configure
