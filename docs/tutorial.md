@@ -10,10 +10,10 @@ Before we start, we should define this variable that control the domain name to 
 
 ## Requirements
 
-To follow this guide you will need an **AWS Account** and the following software installed. Besides that, you will need **aws cli**, **eksctl**, **kubectl** and **helm**:
+To follow this guide you will need an **AWS Account** and the following software installed. Besides that, you will need **aws cli**, **eksctl**, **kubectl**, **helm** and **gettext**:
 
     brew tap weaveworks/tap
-    brew install weaveworks/tap/eksctl awscli kubectl helm
+    brew install weaveworks/tap/eksctl awscli kubectl helm gettext
 
 ## EKS Cluster
 
@@ -30,6 +30,7 @@ The following command creates a EKS Cluster and node group named `tutorial`:
     --nodegroup-name tutorial \
     --node-type m5.large \
     --managed
+    --region eu-west-1
 
 ### Configure
 
@@ -157,14 +158,14 @@ With this command we will deploy a container running Nginx as a review env:
     KR_ID=nginx \
     KR_IMAGE_URL=nginx \
     KR_IMAGE_TAG=latest \
-    KR_DOMAIN="tutorial.fih.io" \
+    KR_DOMAIN="${MY_DOMAIN}" \
     KR_VALUES_FILE="./docs/files/values.yaml" \
     deploy/deploy
 
 If everything goes well you should see something like this at end:
 
     1. Get the application URL by running these commands:
-    https://re--nginx-29be0616.tutorial.fih.io/
+    https://re--nginx-29be0616.my-domain.io/
     Removed the completed Test Pod.
     pod "re--nginx-29be0616-kube-review-test-connection" deleted
 
