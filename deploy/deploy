@@ -8,7 +8,7 @@ if [ "$KR_PRE_HOOK" != "" ]; then
 fi
 
 # Helm Chart variables
-chart_version=${KR_CHART_VERSION:-0.5}
+chart_version=${KR_CHART_VERSION}
 chart_ref=${KR_CHART_REF:-kube-review}
 
 # DockerHub variables
