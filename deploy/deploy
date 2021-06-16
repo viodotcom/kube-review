@@ -8,7 +8,7 @@ if [ "$KR_PRE_HOOK" != "" ]; then
 fi
 
 # Helm Chart variables
-chart_version=${KR_CHART_VERSION:-0.5}
+chart_version=${KR_CHART_VERSION}
 chart_ref=${KR_CHART_REF:-kube-review}
 
 # DockerHub variables
@@ -115,6 +115,7 @@ uninstall_chart() {
 install_chart() {
   (set -x; helm plugin install https://github.com/chartmuseum/helm-push.git || true)
   (set -x; helm repo add remote "$helm_repo")
+  (set -x; helm repo update)
 
   if [ "$KR_VALUES_FILE" != "" ]; then
     echo "Using values file from user: $KR_VALUES_FILE"
