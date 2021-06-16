@@ -32,6 +32,7 @@ These are some of the features supported by *kube-review*:
 **WARNING**: Docs are WIP and not complete yet.
 
 - [Introduction](docs/introduction.md)
+- [Tutorial](docs/tutorial.md)
 
 ## Licensing
 
