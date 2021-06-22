@@ -30,9 +30,9 @@ As we want to support a high number of review environments with HTTPS, we use Wi
 
 To manage the autoscaling and Nodes on your Kubernetes cluster in a cost effective way we recommend the use of spot instances. You can use pure and simple **AWS Spot Instances** but we recommend the **Spotinst** product.
 
-## App Component
+## Deploy Component
 
-The App component is the one that is deployed and executed on Kubernetes, running a Container Image built by the user.
+The Deploy component is the one that is deployed and executed on Kubernetes, running a Container Image built by the user.
 
 In order to deploy the necessary resources and configurations for the app, we use a **Helm Chart** that takes care of doing all the necessary lifting.
 
