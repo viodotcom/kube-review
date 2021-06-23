@@ -30,9 +30,9 @@ As we want to support a high number of review environments with HTTPS, we use Wi
 
 To manage the autoscaling and Nodes on your Kubernetes cluster in a cost effective way we recommend the use of spot instances. You can use pure and simple **AWS Spot Instances** but we recommend the **Spotinst** product.
 
-## App Component
+## Deploy Component
 
-The App component is the one that is deployed and executed on Kubernetes, running a Container Image built by the user.
+The Deploy component is the one that is deployed and executed on Kubernetes, running a Container Image built by the user.
 
 In order to deploy the necessary resources and configurations for the app, we use a **Helm Chart** that takes care of doing all the necessary lifting.
 
@@ -42,14 +42,14 @@ Using this image is the easiest way to deploy a review environment, specially fr
 
 Finally, the id of the review env is automatically generated based on the prefix *re*, the branch and a hash of the whole name. This way, we avoid issues with long branch names and DNS limitations, at same time that we achieve unique and yet readable names.
 
-## Purge Component
+## Prune Component
 
-The purge component is a Kubernetes cron job responsible by purging expired environments or environment on which the attached pull request or branch was already merged or removed.
+The prune component is a Kubernetes cron job responsible by purging expired environments or environment on which the attached pull request or branch was already merged or removed.
 
-The purge component will run every hour. Once it starts, it will scan all environments belonging to a *kube-review* environment. This is done through scanning namespaces that have the *kube-review* annotation.
+The prune component will run every hour. Once it starts, it will scan all environments belonging to a *kube-review* environment. This is done through scanning namespaces that have the *kube-review* annotation.
 
-Once it finds an environment that is deployed using *kube-review*, purge will get the metadata from the annotation and check if the PR is already merged or if the branch was deleted.
+Once it finds an environment that is deployed using *kube-review*, prune will get the metadata from the annotation and check if the PR is already merged or if the branch was deleted.
 
-To check for merged or removed PRs and branches, purge will contact the source code repository API. Right now we only support **GitHub**. If the environment is ephemeral, it will be removed if the expired time has passed, 5 days by default, or if the branch or PR was deleted/merged, whatever happens first.
+To check for merged or removed PRs and branches, prune will contact the source code repository API. Right now we only support **GitHub**. If the environment is ephemeral, it will be removed if the expired time has passed, 5 days by default, or if the branch or PR was deleted/merged, whatever happens first.
 
 If the environment is non-ephemeral, it will never be deleted. So, in order to destroy a non-ephemeral environment it first has to be changed to ephemeral.

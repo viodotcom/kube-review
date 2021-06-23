@@ -33,6 +33,7 @@ These are some of the features supported by *kube-review*:
 
 - [Introduction](docs/introduction.md)
 - [Tutorial](docs/tutorial.md)
+- [Reference](docs/reference.md)
 
 ## Licensing
 
