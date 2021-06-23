@@ -4,7 +4,7 @@ The `kube-review` is composed of two main components, `deploy` and `prune`.
 
 ## Deploy Component
 
-The deploy component is a `bash` script that can be used to deploy an review environment. At it's core it's a simple script that will do all the necessary magic to get a review env running. Therefore, the `deploy` component is a command that is called every-time that an environment needs to created or updated.
+The deploy component is a `bash` script that can be used to deploy a review environment. At it's core it's a simple script that will do all the necessary magic to get a review env running. Therefore, the `deploy` component is a command that is called every-time that an environment needs to created or updated.
 
 The basic flow of the components is, configure the correct kube context, create the namespace, create the resources, and test the installation. Depending on the use case, some other features might be used, like loading secrets, copying docker hub secrets or even running pre/post scripts.
 
