@@ -7,10 +7,6 @@ if [ "$KR_PRE_HOOK" != "" ]; then
   eval "$KR_PRE_HOOK"
 fi
 
-# Helm Chart variables
-chart_version=${KR_CHART_VERSION}
-chart_ref=${KR_CHART_REF:-kube-review}
-
 # DockerHub variables
 dockerhub_secret_copy_enabled=${KR_DOCKERHUB_SECRET_COPY_ENABLED:-false}
 dockerhub_secret_name=${KR_DOCKERHUB_SECRET_NAME:-docker-cfg}
@@ -24,7 +20,6 @@ repo_owner=$KR_REPO_OWNER
 
 # Kube Review variables
 prefix=${KR_PREFIX:-re}
-helm_repo=${KR_HELM_REPO_URL:-"cm://h.cfcr.io/findhotel/default"}
 kube_config_file=${KR_KUBE_CONFIG_FILE:-$HOME/.kube/config}
 name="$prefix-${KR_ID_OVERRIDE:-$KR_ID}"
 short_name=$(echo "$name" | cut -c1-15)
@@ -34,7 +29,6 @@ is_ephemeral=${KR_IS_EPHEMERAL:-true}
 host=$namespace.$KR_DOMAIN
 url=https://$host
 kube_context=$KR_KUBE_CONTEXT
-secrets_file=$KR_SECRETS_FILE
 test_connection=${KR_TEST_CONNECTION:-true}
 
 config_context() {
@@ -77,16 +71,6 @@ metadata:
 EOF
 }
 
-apply_secret() {
-  if [ "$secrets_file" != "" ]; then
-    echo "Loading secrets file from: $secrets_file"
-    kubectl create secret generic "$namespace" --from-env-file=$secrets_file \
-      --dry-run=client -o yaml --save-config=true --namespace "$namespace" | kubectl apply -f -
-  else
-    echo "Not secrets file to load"
-  fi
-}
-
 copying_dockerhub_secret() {
   if [ "$dockerhub_secret_copy_enabled" = true ];
   then
@@ -105,37 +89,23 @@ EOF
   fi
 }
 
-uninstall_chart() {
-  # There is a problem in Helm v3 when it is necessary to update the helm graph
-  # sometimes an UPGRADE_FAILED occurs, to fix it, we first of all need to remove the old version
-  echo "Uninstalling old version of the helm chart: $namespace"
-  (set -x; helm uninstall -n "$namespace" "$namespace")
-}
+install_resources () {
+  work_dir=$(mktemp -d)
 
-install_chart() {
-  (set -x; helm plugin install https://github.com/chartmuseum/helm-push.git || true)
-  (set -x; helm repo add remote "$helm_repo")
-  (set -x; helm repo update)
+  # Prepare directory structure and copy files
+	cp -R deploy/resources/base/* "$work_dir"
 
-  if [ "$KR_VALUES_FILE" != "" ]; then
-    echo "Using values file from user: $KR_VALUES_FILE"
-    opts+=(--values "$KR_VALUES_FILE")
-  fi
+  # Apply variable substituion on patches
+  for f in "$work_dir"/patches/*.json
+  do
+    KR_NAMESPACE=$namespace \
+    envsubst < "$f" | sponge "$f"
+	done
 
-  (set -x; helm upgrade "$namespace" \
-  "$chart_ref" \
-  --install \
-  --reset-values \
-  --repo "$helm_repo" \
-  --version "$chart_version" \
-  --namespace "$namespace" \
-  --set envFrom.secretRef.name="$namespace" \
-  --set image.repository="$KR_IMAGE_URL" \
-  --set image.tag="$KR_IMAGE_TAG" \
-  --set ingress.hosts[0].host="$host" \
-  --set ingress.hosts[0].paths[0]=/ \
-  --set ingress.tls[0].hosts[0]="$host" \
-  --wait --cleanup-on-fail "${opts[@]}")
+  cd "$work_dir"; rm -rf out/*
+  kustomize edit set label "app.kubernetes.io/instance:$namespace"
+  kustomize build | kubectl delete -f - -n "$namespace" --wait=true --all=true
+  kustomize build | kubectl apply -f - -n "$namespace" --wait=true
 }
 
 test_chart() {
@@ -167,11 +137,8 @@ print_postinstall_message() {
 
 config_context
 namespace_apply
-apply_secret
 copying_dockerhub_secret
-uninstall_chart || true
-install_chart
-test_chart
+install_resources
 export_variables
 print_postinstall_message
 

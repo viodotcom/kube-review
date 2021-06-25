@@ -1,0 +1,12 @@
+# Source: kube-review/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-connection
+spec:
+  containers:
+    - name: wget0
+      image: busybox
+      command: ['wget']
+      args: ['url']
+  restartPolicy: Never

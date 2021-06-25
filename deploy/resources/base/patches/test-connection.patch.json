@@ -1,0 +1,7 @@
+[
+    {
+        "op": "replace",
+        "path": "/spec/containers/0/args/0", 
+        "value": "https://$KR_NAMESPACE.$KR_DOMAIN"
+    }
+]

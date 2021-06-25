@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: kube-review
+          livenessProbe:
+            httpGet:
+              path: "/nginx_status"
+          readinessProbe:
+            httpGet:
+              path: "/nginx_status"
+          startupProbe:
+            httpGet:
+              path: "/nginx_status"
+        - name: redis
+          image: "redis:alpine"
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP

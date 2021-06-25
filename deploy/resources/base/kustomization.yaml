@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namePrefix: kube-review-
+commonAnnotations:
+    app.kubernetes.io/version: "0.5"
+commonLabels:
+  app.kubernetes.io/instance: re-kube-review
+  app.kubernetes.io/name: kube-review
+resources:
+  - serviceaccount.yml
+  - service.yml
+  - ingress.yml
+  - test-connection.yml
+  - deployment.yml
+
+secretGenerator:
+- name: secret
+  envs:
+  - env.txt
+  type: Opaque
+  options:
+    disableNameSuffixHash: true
+
+patches:
+  - path: patches/service.patch.json
+    target:
+      kind: Service
+  - path: patches/ingress.patch.json
+    target:
+      kind: Ingress
+  - path: patches/deployment.patch.json
+    target:
+      kind: Deployment
+      name: deployment
+  - path: patches/test-connection.patch.json
+    target:
+      kind: Pod
+      name: test-connection
