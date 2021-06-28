@@ -4,9 +4,9 @@ namePrefix: kube-review-
 commonAnnotations:
     app.kubernetes.io/version: "0.5"
 commonLabels:
-  app.kubernetes.io/instance: re-kube-review
   app.kubernetes.io/name: kube-review
 resources:
+  - namespace.yml
   - serviceaccount.yml
   - service.yml
   - ingress.yml
@@ -36,3 +36,6 @@ patches:
     target:
       kind: Pod
       name: test-connection
+  - path: patches/namespace.patch.json
+    target:
+      kind: Namespace

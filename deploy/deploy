@@ -7,11 +7,6 @@ if [ "$KR_PRE_HOOK" != "" ]; then
   eval "$KR_PRE_HOOK"
 fi
 
-# DockerHub variables
-dockerhub_secret_copy_enabled=${KR_DOCKERHUB_SECRET_COPY_ENABLED:-false}
-dockerhub_secret_name=${KR_DOCKERHUB_SECRET_NAME:-docker-cfg}
-dockerhub_namespace_name=${KR_DOCKERHUB_NAMESPACE_NAME:-default}
-
 # App variables
 pull_request_number=$KR_PULL_REQUEST_NUMBER
 branch_name=$KR_BRANCH_NAME
@@ -30,6 +25,7 @@ host=$namespace.$KR_DOMAIN
 url=https://$host
 kube_context=$KR_KUBE_CONTEXT
 test_connection=${KR_TEST_CONNECTION:-true}
+updated_at=$(date +%s)
 
 config_context() {
   # kubectl locks the config for each execution. To workaround
@@ -40,52 +36,6 @@ config_context() {
 
   if [ "$kube_context" != "" ]; then
     kubectl config use-context "$kube_context"
-  fi
-}
-
-namespace_apply() {
-  # Variables need to be export in order to be replaced by envsubst
-  updated_at=$(date +%s)
-  export UPDATED_AT=$updated_at
-  export NAMESPACE=$namespace
-  export IS_EPHEMERAL=$is_ephemeral
-  export PULL_REQUEST_NUMBER=$pull_request_number
-  export BRANCH_NAME=$branch_name
-  export REPO_NAME=$repo_name
-  export REPO_OWNER=$repo_owner
-  cat <<EOF | envsubst | kubectl apply -f -
-apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    app.kubernetes.io/name: kube-review
-  annotations:
-    app.kubernetes.io/instance: $NAMESPACE
-    app.kubernetes.io/pull_request_number: "$PULL_REQUEST_NUMBER"
-    app.kubernetes.io/branch_name: "$BRANCH_NAME"
-    app.kubernetes.io/repository_name: "$REPO_NAME"
-    app.kubernetes.io/repository_owner: "$REPO_OWNER"
-    app.kubernetes.io/updated_at: "$UPDATED_AT"
-    app.kubernetes.io/is_ephemeral: "$IS_EPHEMERAL"
-  name: $NAMESPACE
-EOF
-}
-
-copying_dockerhub_secret() {
-  if [ "$dockerhub_secret_copy_enabled" = true ];
-  then
-    echo "Copying Docker Hub Secret"
-    TOKEN=$(kubectl -n $dockerhub_namespace_name get secret $dockerhub_secret_name --output="jsonpath={.data.\.dockerconfigjson}")
-    cat <<EOF | envsubst | kubectl apply -f -
-    apiVersion: v1
-    kind: Secret
-    metadata:
-      name: $dockerhub_secret_name
-      namespace: $namespace
-    data:
-      .dockerconfigjson: $TOKEN
-    type: kubernetes.io/dockerconfigjson
-EOF
   fi
 }
 
@@ -103,22 +53,27 @@ install_resources () {
 	done
 
   cd "$work_dir"; rm -rf out/*
+  kustomize edit set namespace "$namespace"
   kustomize edit set label "app.kubernetes.io/instance:$namespace"
-  kustomize build | kubectl delete -f - -n "$namespace" --wait=true --all=true
+  kustomize edit add annotation --force \
+  app.kubernetes.io/pull_request_number:"$pull_request_number" \
+  app.kubernetes.io/branch_name:"$branch_name" \
+  app.kubernetes.io/repository_name:"$repo_name" \
+  app.kubernetes.io/repository_owner:"$repo_owner" \
+  app.kubernetes.io/updated_at:"$updated_at" \
+  app.kubernetes.io/is_ephemeral:"$is_ephemeral"
   kustomize build | kubectl apply -f - -n "$namespace" --wait=true
 }
 
-test_chart() {
+test_url() {
   if [ "$test_connection" = true ];
   then
-    (set -x; helm test "$namespace" --namespace "$namespace")
-
-    # It is necessary to remove the test pod from the helm test bacause HPA metrics may
-    # fail when we have a pod with completed status.
-    # Issue: https://github.com/kubernetes/kubernetes/issues/79365
-    # Issues: https://github.com/kubernetes/kubernetes/issues?page=1&q=is%3Aissue+is%3Aopen+HPA
-    echo "Removed the completed Test Pod.";
-    kubectl delete pod --selector="app.kubernetes.io/managed-by=Helm" --namespace "$namespace"
+    if curl --output /dev/null --silent --head --fail "$url"; then
+      echo "Connection test executed successfully.";
+    else
+      echo "Connection test has failed.";
+      exit 1;
+    fi
   else
     echo "Connection test is disabled.";
   fi
@@ -130,15 +85,16 @@ export_variables() {
 }
 
 print_postinstall_message() {
+  echo "Environment deployed with url: $url"
+
   if [ "$KR_MESSAGE" != "" ]; then
     printf "%s\n" "$KR_MESSAGE" "$KR_LOG_URL$namespace"
   fi
 }
 
 config_context
-namespace_apply
-copying_dockerhub_secret
 install_resources
+test_url
 export_variables
 print_postinstall_message
 
