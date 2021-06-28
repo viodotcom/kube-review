@@ -10,7 +10,6 @@ resources:
   - serviceaccount.yml
   - service.yml
   - ingress.yml
-  - test-connection.yml
   - deployment.yml
 
 secretGenerator:
@@ -32,10 +31,6 @@ patches:
     target:
       kind: Deployment
       name: deployment
-  - path: patches/test-connection.patch.json
-    target:
-      kind: Pod
-      name: test-connection
   - path: patches/namespace.patch.json
     target:
       kind: Namespace

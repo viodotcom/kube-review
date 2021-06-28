@@ -25,6 +25,8 @@ host=$namespace.$KR_DOMAIN
 url=https://$host
 kube_context=$KR_KUBE_CONTEXT
 test_connection=${KR_TEST_CONNECTION:-true}
+overlay_path=$KR_OVERLAY_PATH
+debug=${KR_DEBUG:-false}
 updated_at=$(date +%s)
 
 config_context() {
@@ -40,19 +42,27 @@ config_context() {
 }
 
 install_resources () {
+  # Prepare directory structure and copy files
   work_dir=$(mktemp -d)
 
-  # Prepare directory structure and copy files
-	cp -R deploy/resources/base/* "$work_dir"
+  # If we don't have a overlay to apply, we just run from base overlay
+	cp -R deploy/resources/base "$work_dir"
+  if [ "$overlay_path" != "" ]; then
+    cp -R "$overlay_path" "$work_dir/overlay"
+  fi
 
   # Apply variable substituion on patches
-  for f in "$work_dir"/patches/*.json
+  for f in "$work_dir"/**/patches/*.json
   do
     KR_NAMESPACE=$namespace \
     envsubst < "$f" | sponge "$f"
 	done
 
-  cd "$work_dir"; rm -rf out/*
+  cd "$work_dir/base"
+  if [ "$overlay_path" != "" ]; then
+    cd "$work_dir/overlay"
+  fi
+
   kustomize edit set namespace "$namespace"
   kustomize edit set label "app.kubernetes.io/instance:$namespace"
   kustomize edit add annotation --force \
@@ -62,6 +72,10 @@ install_resources () {
   app.kubernetes.io/repository_owner:"$repo_owner" \
   app.kubernetes.io/updated_at:"$updated_at" \
   app.kubernetes.io/is_ephemeral:"$is_ephemeral"
+  if [ "$debug" = "true" ]; then
+    kustomize build
+  fi
+
   kustomize build | kubectl apply -f - -n "$namespace" --wait=true
 
   # Rollout is necessary to force loading of secrets when only the secrets is updated

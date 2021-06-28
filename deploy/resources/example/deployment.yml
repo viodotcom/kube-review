@@ -7,15 +7,8 @@ spec:
     spec:
       containers:
         - name: kube-review
-          livenessProbe:
-            httpGet:
-              path: "/nginx_status"
-          readinessProbe:
-            httpGet:
-              path: "/nginx_status"
           startupProbe:
-            httpGet:
-              path: "/nginx_status"
+            periodSeconds: 10
         - name: redis
           image: "redis:alpine"
           ports:
