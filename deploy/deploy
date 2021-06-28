@@ -63,19 +63,22 @@ install_resources () {
   app.kubernetes.io/updated_at:"$updated_at" \
   app.kubernetes.io/is_ephemeral:"$is_ephemeral"
   kustomize build | kubectl apply -f - -n "$namespace" --wait=true
+
+  # Rollout is necessary to force loading of secrets when only the secrets is updated
+  kubectl rollout restart -n "$namespace" deployment/kube-review-deployment
 }
 
 test_url() {
   if [ "$test_connection" = true ];
   then
     if curl --output /dev/null --silent --head --fail "$url"; then
-      echo "Connection test executed successfully.";
+      echo "Connection test executed successfully";
     else
-      echo "Connection test has failed.";
+      echo "Connection test has failed";
       exit 1;
     fi
   else
-    echo "Connection test is disabled.";
+    echo "Connection test is disabled";
   fi
 }
 
