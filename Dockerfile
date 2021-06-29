@@ -19,7 +19,7 @@ ARG DEFAULT_HELM_REPO_URL
 ENV CODEFRESH_VERSION=v0.75.18
 ENV KUBECTL_VERSION=v1.20.5
 ENV HELM_VERSION=v3.2.4
-ENV KR_HELM_REPO_URL $DEFAULT_HELM_REPO_URL
+ENV KR_BASE_OVERLAY_PATH=/usr/local/kube-review/deploy/resources/base
 
 # Default packages #
 RUN apk --no-cache --quiet update \
@@ -42,8 +42,15 @@ RUN curl -L --silent https://get.helm.sh/helm-${HELM_VERSION}-linux-386.tar.gz -
     && mv linux-386/helm /usr/local/bin/helm \
     && chmod +x /usr/local/bin/helm
 
-WORKDIR /
-COPY deploy/* ./
-COPY --from=base /prune ./
-RUN chmod +x deploy
-RUN chmod +x prune
+WORKDIR /usr/local
+
+RUN mkdir -p kube-review/deploy
+COPY deploy/resources kube-review/deploy/
+COPY deploy/deploy kube-review/deploy/
+RUN chmod +x kube-review/deploy/deploy
+RUN ln -s /usr/local/kube-review/deploy/deploy /deploy
+
+RUN mkdir -p kube-review/prune
+COPY --from=base /prune kube-review/prune/
+RUN chmod +x kube-review/prune/prune
+RUN ln -s /usr/local/kube-review/prune/prune /prune
