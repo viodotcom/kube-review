@@ -160,7 +160,7 @@ With this command we will deploy a container running Nginx as a review env:
     KR_IMAGE_TAG=latest \
     KR_DOMAIN="${MY_DOMAIN}" \
     KR_VALUES_FILE="./docs/files/values.yaml" \
-    deploy/deploy
+    src/deploy/deploy
 
 If everything goes well you should see something like this at end:
 

@@ -7,9 +7,9 @@ metadata:
 spec:
   tls:
     - hosts:
-        - "id.domain"
+        - "PLACEHOLDER"
   rules:
-    - host: "id.domain"
+    - host: "PLACEHOLDER"
       http:
         paths:
           - path: /

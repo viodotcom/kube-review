@@ -26,11 +26,11 @@ spec:
         - name: kube-review
           securityContext:
             null
-          image: "image:tag"
+          image: "PLACEHOLDER:PLACEHOLDER"
           imagePullPolicy: IfNotPresent
           env:
             - name: KR_HOST
-              value: "id.domain"
+              value: "PLACEHOLDER"
           envFrom:
             - secretRef:
                 name: secret

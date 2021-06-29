@@ -26,7 +26,7 @@ url=https://$host
 kube_context=$KR_KUBE_CONTEXT
 test_connection=${KR_TEST_CONNECTION:-true}
 overlay_path=$KR_OVERLAY_PATH
-base_overlay_path=${KR_BASE_OVERLAY_PATH:-"deploy/resources/base"}
+base_overlay_path=${KR_BASE_OVERLAY_PATH:-"src/deploy/resources/base"}
 debug=${KR_DEBUG:-false}
 updated_at=$(date +%s)
 
