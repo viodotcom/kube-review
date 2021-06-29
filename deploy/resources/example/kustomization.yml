@@ -4,6 +4,15 @@ kind: Kustomization
 resources:
   - ../base
 
+secretGenerator:
+- name: secret
+  envs:
+  - env.txt
+  type: Opaque
+  options:
+    disableNameSuffixHash: true
+  behavior: merge
+
 patches:
   - path: deployment.yml
   - path: patches/deployment.patch.json
