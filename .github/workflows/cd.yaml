@@ -1,8 +1,7 @@
 name: cd
 on:
-  push:
-    branches:
-      - master
+  release:
+    types: [published, created, edited]
 
 jobs:
   helm:
@@ -48,8 +47,7 @@ jobs:
           push: true
           tags: |
             findhotelamsterdam/kube-review:${{ github.sha }}
-            findhotelamsterdam/kube-review:master
-            findhotelamsterdam/kube-review:latest
+            findhotelamsterdam/kube-review:${{github.event.release.tag_name}}
           build-args: |
             DEFAULT_HELM_REPO_URL=cm://h.cfcr.io/findhotel/default/
 
