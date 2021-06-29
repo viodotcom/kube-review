@@ -1,7 +1,0 @@
-[
-    {
-        "op": "replace",
-        "path": "/metadata/name", 
-        "value": "$KR_NAMESPACE"
-    }
-]

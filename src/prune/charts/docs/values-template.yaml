@@ -1,0 +1,135 @@
+#############################################################################
+# These are all parameters that possible to add in the values.yaml file for #
+# the apps and overwrite the default value from the helm template files     #
+# NOTE: These values are fictitious                                         #
+#############################################################################
+
+###################
+# Deployment File #
+###################
+replicaCount: 1
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+progressDeadlineSeconds: 600
+revisionHistoryLimit: 10
+securityContext:
+image:
+  repository:
+  tag:
+  pullPolicy: IfNotPresent
+envFrom:
+  enabled: true
+  secretRef:
+    name: "change_me_if_necessary"
+deployment:
+  ports:
+    name: web
+    containerPort: 5000
+    protocol: TCP
+livenessProbe:
+  httpGet:
+    path: "/"
+    scheme: "HTTP"
+    initialDelaySeconds: 10
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 10
+  successThreshold: 10
+  failureThreshold: 10
+readinessProbe:
+  httpGet:
+    path: "/"
+    scheme: "HTTP"
+    initialDelaySeconds: 10
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 10
+  successThreshold: 10
+  failureThreshold: 10
+startupProbe:
+  httpGet:
+    path: "/"
+    scheme: "HTTP"
+    initialDelaySeconds: 10
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 10
+  successThreshold: 10
+  failureThreshold: 10
+resources:
+  limits:
+    cpu: "1"
+    memory: 600Mi
+  requests:
+    cpu: 100m
+    memory: 600Mi
+dockerDind:
+  enabled: true
+  cpu:
+  memory:
+imagePullSecrets:
+  name:
+podSecurityContext:
+  privileged: true
+nodeSelector:
+  nodegroup-type:
+affinity:
+  nodeAffinity:
+tolerations:
+  - key: "example-key"
+    operator: "Exists"
+    effect: "NoSchedule"
+restartPolicy: Always
+terminationGracePeriodSeconds: 40
+dnsPolicy: ClusterFirst
+
+################
+# Service File #
+################
+service:
+  type: ClusterIP
+  port: 5000
+  name: web
+  protocol: TCP
+  targetPort: 5000
+
+########################
+# Service Account File #
+########################
+serviceAccount:
+  create: true | false
+  annotations:
+
+################
+# Ingress File #
+################
+ingress:
+  enabled: true | false
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  tls:
+    hosts:
+    secretName:
+  hosts:
+    host:
+    paths:
+
+############
+# HPA File #
+############
+autoscaling:
+  enabled: true | false
+  minReplicas: 1
+  maxReplicas: 1
+  targetCPUUtilizationPercentage: 50
+  targetMemoryUtilizationPercentage: 50
+
+#####################
+# Container command #
+#####################
+customCommand:
+  enabled: true
+  command: ./myscript.sh

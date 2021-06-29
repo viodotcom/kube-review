@@ -8,7 +8,7 @@ RUN apk --no-cache --quiet update \
 WORKDIR /
 
 # Prune
-COPY prune/* ./
+COPY src/prune/* ./
 RUN go build -o ./prune .
 RUN chmod +x prune
 
@@ -18,7 +18,6 @@ ARG DEFAULT_HELM_REPO_URL
 
 ENV CODEFRESH_VERSION=v0.75.18
 ENV KUBECTL_VERSION=v1.20.5
-ENV HELM_VERSION=v3.2.4
 ENV KR_BASE_OVERLAY_PATH=/usr/local/kube-review/deploy/resources/base
 
 # Default packages #
@@ -36,17 +35,11 @@ RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/
     && mv ./kubectl /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl
 
-# Helm #
-RUN curl -L --silent https://get.helm.sh/helm-${HELM_VERSION}-linux-386.tar.gz -o helm.tar.gz \
-    && tar -zxf helm.tar.gz \
-    && mv linux-386/helm /usr/local/bin/helm \
-    && chmod +x /usr/local/bin/helm
-
 WORKDIR /usr/local
 
 RUN mkdir -p kube-review/deploy
-COPY deploy/resources kube-review/deploy/
-COPY deploy/deploy kube-review/deploy/
+COPY src/deploy/resources kube-review/deploy/
+COPY src/deploy/deploy kube-review/deploy/
 RUN chmod +x kube-review/deploy/deploy
 RUN ln -s /usr/local/kube-review/deploy/deploy /deploy
 

@@ -1,0 +1,19 @@
+serviceAccount:
+  create: true
+imagePullSecrets:
+- name: docker-cfg
+resources:
+  limits:
+    cpu: "1"
+    memory: 600Mi
+  requests:
+    cpu: 100m
+    memory: 600Mi
+image:
+  repository: findhotelamsterdam/kube-review
+  tag: latest
+  pullPolicy: Always
+command: /prune
+github:
+  ghToken: YOURTOKENHEE
+  ghUserName: YOURUSERNAMEHERE

@@ -1,7 +1,0 @@
-[
-    {
-        "op": "replace",
-        "path": "/spec/ports/0/targetPort", 
-        "value": $KR_CONTAINER_PORT
-    }
-]
