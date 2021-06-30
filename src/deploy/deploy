@@ -2,6 +2,11 @@
 # exit if any command fails
 set -e
 
+verbose=${KR_VERBOSE:-false}
+if [ "$verbose" != "false" ]; then
+  set -x
+fi
+
 if [ "$KR_PRE_HOOK" != "" ]; then
   echo "Running pre hook command: $KR_PRE_HOOK"
   eval "$KR_PRE_HOOK"
@@ -27,7 +32,6 @@ kube_context=$KR_KUBE_CONTEXT
 test_connection=${KR_TEST_CONNECTION:-true}
 overlay_path=$KR_OVERLAY_PATH
 base_overlay_path=${KR_BASE_OVERLAY_PATH:-"src/deploy/resources/base"}
-debug=${KR_DEBUG:-false}
 updated_at=$(date +%s)
 
 config_context() {
@@ -73,7 +77,7 @@ install_resources () {
   app.kubernetes.io/repository_owner:"$repo_owner" \
   app.kubernetes.io/updated_at:"$updated_at" \
   app.kubernetes.io/is_ephemeral:"$is_ephemeral"
-  if [ "$debug" = "true" ]; then
+  if [ "$verbose" = "true" ]; then
     kustomize build
   fi
 
