@@ -38,8 +38,7 @@ RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/
 WORKDIR /usr/local
 
 RUN mkdir -p kube-review/deploy
-COPY src/deploy/resources kube-review/deploy/
-COPY src/deploy/deploy kube-review/deploy/
+COPY src/deploy kube-review/deploy/
 RUN chmod +x kube-review/deploy/deploy
 RUN ln -s /usr/local/kube-review/deploy/deploy /deploy
 
