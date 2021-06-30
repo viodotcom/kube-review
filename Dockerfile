@@ -18,6 +18,7 @@ ARG DEFAULT_HELM_REPO_URL
 
 ENV CODEFRESH_VERSION=v0.75.18
 ENV KUBECTL_VERSION=v1.20.5
+ENV KUSTOMIZE_VERSION=v4.1.3
 ENV KR_BASE_OVERLAY_PATH=/usr/local/kube-review/deploy/resources/base
 
 # Default packages #
@@ -34,6 +35,10 @@ RUN curl -L --silent https://github.com/codefresh-io/cli/releases/download/${COD
 RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
     && mv ./kubectl /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl
+
+RUN curl -L --silent https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz -o kustomize.tar.gz \
+    && tar -zxf kustomize.tar.gz \
+    && mv ./kustomize /usr/local/bin/kustomize
 
 WORKDIR /usr/local
 
