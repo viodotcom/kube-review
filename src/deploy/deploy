@@ -30,8 +30,10 @@ host=$namespace.$KR_DOMAIN
 url=https://$host
 kube_context=$KR_KUBE_CONTEXT
 test_connection=${KR_TEST_CONNECTION:-true}
+test_connection_url_path=${KR_TEST_CONNECTION_URL_PATH:-"/"}
 overlay_path=$KR_OVERLAY_PATH
 base_overlay_path=${KR_BASE_OVERLAY_PATH:-"src/deploy/resources/base"}
+
 updated_at=$(date +%s)
 
 config_context() {
@@ -90,7 +92,7 @@ install_resources () {
 test_url() {
   if [ "$test_connection" = true ];
   then
-    if curl --output /dev/null --silent --head --fail "$url"; then
+    if curl --output /dev/null --silent --head --fail "$url$test_connection_url_path"; then
       echo "Connection test executed successfully";
     else
       echo "Connection test has failed";
