@@ -5,6 +5,7 @@ set -e
 verbose=${KR_VERBOSE:-false}
 if [ "$verbose" != "false" ]; then
   set -x
+  export
 fi
 
 if [ "$KR_PRE_HOOK" != "" ]; then
