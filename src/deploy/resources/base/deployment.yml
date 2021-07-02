@@ -28,7 +28,7 @@ spec:
               value: "PLACEHOLDER"
           envFrom:
             - secretRef:
-                name: skube-review-secret
+                name: kube-review-secret
           ports:
             - name: web
               containerPort: 8080
