@@ -16,16 +16,11 @@ spec:
       app.kubernetes.io/name: kube-review
   template:
     metadata:
-      annotations:
-        # Force all new release to recreate the pods #
-        rollme: "hash"
       labels:
         app.kubernetes.io/name: kube-review
     spec:
       containers:
         - name: kube-review
-          securityContext:
-            null
           image: "PLACEHOLDER:PLACEHOLDER"
           imagePullPolicy: IfNotPresent
           env:
@@ -33,7 +28,7 @@ spec:
               value: "PLACEHOLDER"
           envFrom:
             - secretRef:
-                name: secret
+                name: skube-review-secret
           ports:
             - name: web
               containerPort: 8080
