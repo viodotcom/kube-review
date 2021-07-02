@@ -91,7 +91,7 @@ install_resources () {
 
   # Rollout is necessary to force loading of secrets when only the secrets is updated
   kubectl rollout restart -n "$namespace" deployment/kube-review-deployment
-  kubectl wait --timeout=300s --for=condition=ready -n "$namespace" -l \
+  kubectl wait --all=true --timeout=300s --for=condition=ready -n "$namespace" -l \
     app.kubernetes.io/instance="$namespace" pod
 }
 
