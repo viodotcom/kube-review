@@ -63,7 +63,10 @@ install_resources () {
   for f in "$work_dir"/**/patches/*.json
   do
     KR_NAMESPACE=$namespace \
-    envsubst < "$f" | sponge "$f"
+    envsubst < "$f" | sponge "$f";
+    if [ "$verbose" = "true" ]; then
+      cat "$f"
+    fi
 	done
 
   cd "$work_dir/base"
