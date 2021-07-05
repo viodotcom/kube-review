@@ -34,7 +34,7 @@ To manage the autoscaling and Nodes on your Kubernetes cluster in a cost effecti
 
 The Deploy component is the one that is deployed and executed on Kubernetes, running a Container Image built by the user.
 
-In order to deploy the necessary resources and configurations for the app, we use a **Helm Chart** that takes care of doing all the necessary lifting.
+In order to deploy the necessary resources and configurations for the app, we use a **Kustomize** based process that takes care of doing all the necessary lifting while allowing customization.
 
 In order to make installation even simpler, the app is deployed through a shell script. The script is baked inside the *kube-review* public container image.
 

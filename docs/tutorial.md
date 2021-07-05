@@ -151,7 +151,7 @@ Now that we have **nginx ingress** running, we just have to create the wild card
 
 Now that everything is installed and working, we just need to call the deploy script to actually deploy a review env.
 
-Note that because nginx is running on port **80** instead of the default **5000**, we need to use a values file in order to override the service port.
+Note that this example is using kustomize overlays to add a redis as a sidecar container. This example also demonstrates how one can use dynamic variables with overlays. The `LABEL` variable will be used to replace the version of redis to be used.
 
 With this command we will deploy a container running Nginx as a review env:
     
@@ -159,15 +159,15 @@ With this command we will deploy a container running Nginx as a review env:
     KR_IMAGE_URL=nginx \
     KR_IMAGE_TAG=latest \
     KR_DOMAIN="${MY_DOMAIN}" \
-    KR_VALUES_FILE="./docs/files/values.yaml" \
+    KR_CONTAINER_PORT="80" \
+    KR_OVERLAY_PATH=src/deploy/resources/example \
+    LABEL=6.2.1 \
     src/deploy/deploy
 
 If everything goes well you should see something like this at end:
 
-    1. Get the application URL by running these commands:
-    https://re--nginx-29be0616.my-domain.io/
-    Removed the completed Test Pod.
-    pod "re--nginx-29be0616-kube-review-test-connection" deleted
+    Connection test executed successfully
+    Environment deployed with url: https://re-xxxx.my-domain.io
 
 You can use that url to test the deployed environment.
 

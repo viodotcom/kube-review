@@ -21,8 +21,8 @@ These are some of the features supported by *kube-review*:
 - Secrets and environment variables;
 - Ephemerals and Non-Ephemerals environments;
 - Custom environment names;
-- Kubernetes resource parametrization through Helm values file.
-- Customization through pre and post install hooks;
+- Open to full customization through kustomize overlays;
+- Extension through pre and post install hooks;
 - Scalable and lean infra using Nginx Ingress and Let's Encrypt WildCards domains;
 - Environment isolation through namespaces;
 - Connection test after deployment.
@@ -34,6 +34,7 @@ These are some of the features supported by *kube-review*:
 - [Introduction](docs/introduction.md)
 - [Tutorial](docs/tutorial.md)
 - [Reference](docs/reference.md)
+- [Customization](docs/customization.md)
 
 ## Licensing
 
