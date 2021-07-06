@@ -36,7 +36,7 @@ RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/
     && mv ./kubectl /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl
 
-RUN curl -L --silent https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz -o kustomize.tar.gz \
+RUN curl -L --silent https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz -o kustomize.tar.gz \
     && tar -zxf kustomize.tar.gz \
     && mv ./kustomize /usr/local/bin/kustomize
 

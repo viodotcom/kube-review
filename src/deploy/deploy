@@ -54,7 +54,7 @@ install_resources () {
   work_dir=$(mktemp -d)
 
   # If we don't have a overlay to apply, we just run from base overlay
-	cp -R "$base_overlay_path" "$work_dir"
+  cp -R "$base_overlay_path" "$work_dir"
   if [ "$overlay_path" != "" ]; then
     cp -R "$overlay_path" "$work_dir/overlay"
   fi
