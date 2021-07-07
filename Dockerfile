@@ -8,7 +8,7 @@ RUN apk --no-cache --quiet update \
 WORKDIR /
 
 # Prune
-COPY prune/* ./
+COPY src/prune/* ./
 RUN go build -o ./prune .
 RUN chmod +x prune
 
@@ -18,12 +18,12 @@ ARG DEFAULT_HELM_REPO_URL
 
 ENV CODEFRESH_VERSION=v0.75.18
 ENV KUBECTL_VERSION=v1.20.5
-ENV HELM_VERSION=v3.2.4
-ENV KR_HELM_REPO_URL $DEFAULT_HELM_REPO_URL
+ENV KUSTOMIZE_VERSION=v4.1.3
+ENV KR_BASE_OVERLAY_PATH=/usr/local/kube-review/deploy/resources/base
 
 # Default packages #
 RUN apk --no-cache --quiet update \
-    && apk add --no-cache --quiet rhash gettext libstdc++ curl bash git jq
+    && apk add --no-cache --quiet rhash gettext moreutils libstdc++ curl bash git jq
 
 # Codefresh #
 RUN curl -L --silent https://github.com/codefresh-io/cli/releases/download/${CODEFRESH_VERSION}/codefresh-${CODEFRESH_VERSION}-alpine-x64.tar.gz -o codefresh.tar.gz \
@@ -36,14 +36,18 @@ RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/
     && mv ./kubectl /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl
 
-# Helm #
-RUN curl -L --silent https://get.helm.sh/helm-${HELM_VERSION}-linux-386.tar.gz -o helm.tar.gz \
-    && tar -zxf helm.tar.gz \
-    && mv linux-386/helm /usr/local/bin/helm \
-    && chmod +x /usr/local/bin/helm
+RUN curl -L --silent https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz -o kustomize.tar.gz \
+    && tar -zxf kustomize.tar.gz \
+    && mv ./kustomize /usr/local/bin/kustomize
 
-WORKDIR /
-COPY deploy/* ./
-COPY --from=base /prune ./
-RUN chmod +x deploy
-RUN chmod +x prune
+WORKDIR /usr/local
+
+RUN mkdir -p kube-review/deploy
+COPY src/deploy kube-review/deploy/
+RUN chmod +x kube-review/deploy/deploy
+RUN ln -s /usr/local/kube-review/deploy/deploy /deploy
+
+RUN mkdir -p kube-review/prune
+COPY --from=base /prune kube-review/prune/
+RUN chmod +x kube-review/prune/prune
+RUN ln -s /usr/local/kube-review/prune/prune /prune

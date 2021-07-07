@@ -1,0 +1,133 @@
+#!/bin/bash
+# exit if any command fails
+set -e
+
+verbose=${KR_VERBOSE:-false}
+if [ "$verbose" != "false" ]; then
+  set -x
+  export
+fi
+
+if [ "$KR_PRE_HOOK" != "" ]; then
+  echo "Running pre hook command: $KR_PRE_HOOK"
+  eval "$KR_PRE_HOOK"
+fi
+
+# App variables
+pull_request_number=$KR_PULL_REQUEST_NUMBER
+branch_name=$KR_BRANCH_NAME
+repo_name=$KR_REPO_NAME
+repo_owner=$KR_REPO_OWNER
+
+# Kube Review variables
+prefix=${KR_PREFIX:-re}
+kube_config_file=${KR_KUBE_CONFIG_FILE:-$HOME/.kube/config}
+name="$prefix-${KR_ID_OVERRIDE:-$KR_ID}"
+short_name=$(echo "$name" | cut -c1-15)
+hash=$(echo "$name" | rhash -p "%c" -)
+namespace=$short_name-$hash
+is_ephemeral=${KR_IS_EPHEMERAL:-true}
+host=$namespace.$KR_DOMAIN
+url=https://$host
+kube_context=$KR_KUBE_CONTEXT
+test_connection=${KR_TEST_CONNECTION:-true}
+test_connection_url_path=${KR_TEST_CONNECTION_URL_PATH:-"/"}
+overlay_path=$KR_OVERLAY_PATH
+base_overlay_path=${KR_BASE_OVERLAY_PATH:-"src/deploy/resources/base"}
+
+updated_at=$(date +%s)
+
+config_context() {
+  # kubectl locks the config for each execution. To workaround
+  # and allow multiple concurrent kubectl executions we copy the config
+  scoped_kubeconfig_file=$kube_config_file-$namespace
+  cp "$kube_config_file" "$scoped_kubeconfig_file"
+  export KUBECONFIG=${scoped_kubeconfig_file}
+
+  if [ "$kube_context" != "" ]; then
+    kubectl config use-context "$kube_context"
+  fi
+}
+
+install_resources () {
+  # Prepare directory structure and copy files
+  work_dir=$(mktemp -d)
+
+  # If we don't have a overlay to apply, we just run from base overlay
+  cp -R "$base_overlay_path" "$work_dir"
+  if [ "$overlay_path" != "" ]; then
+    cp -R "$overlay_path" "$work_dir/overlay"
+  fi
+
+  # Apply variable substituion on patches
+  for f in "$work_dir"/**/patches/*.json
+  do
+    KR_NAMESPACE=$namespace \
+    envsubst < "$f" | sponge "$f";
+    if [ "$verbose" = "true" ]; then
+      cat "$f"
+    fi
+	done
+
+  cd "$work_dir/base"
+  if [ "$overlay_path" != "" ]; then
+    cd "$work_dir/overlay"
+  fi
+
+  kustomize edit set namespace "$namespace"
+  kustomize edit set label "app.kubernetes.io/instance:$namespace"
+  kustomize edit add annotation --force \
+  app.kubernetes.io/pull_request_number:"$pull_request_number" \
+  app.kubernetes.io/branch_name:"$branch_name" \
+  app.kubernetes.io/repository_name:"$repo_name" \
+  app.kubernetes.io/repository_owner:"$repo_owner" \
+  app.kubernetes.io/updated_at:"$updated_at" \
+  app.kubernetes.io/is_ephemeral:"$is_ephemeral"
+  if [ "$verbose" = "true" ]; then
+    kustomize build
+  fi
+
+  kustomize build | kubectl apply -f - -n "$namespace" --wait=true
+
+  # Rollout is necessary to force loading of secrets when only the secrets is updated
+  kubectl rollout restart -n "$namespace" deployment/kube-review-deployment
+  kubectl rollout status --timeout=5m -n "$namespace" deployment/kube-review-deployment
+}
+
+test_url() {
+  if [ "$test_connection" = true ];
+  then
+    if curl --output /dev/null --silent --head --fail "$url$test_connection_url_path"; then
+      echo "Connection test executed successfully";
+    else
+      echo "Connection test has failed";
+      exit 1;
+    fi
+  else
+    echo "Connection test is disabled";
+  fi
+}
+
+export_variables() {
+  # Export normally here so they are available to the post hook
+  export URL=$url
+}
+
+print_postinstall_message() {
+  echo "Environment deployed with url: $url"
+
+  if [ "$KR_MESSAGE" != "" ]; then
+    printf "%s\n" "$KR_MESSAGE" "$KR_LOG_URL$namespace"
+  fi
+}
+
+config_context
+install_resources
+test_url
+export_variables
+print_postinstall_message
+
+if [ "$KR_POST_HOOK" != "" ]; then
+  echo "Running post hook command: $KR_POST_HOOK"
+  eval "$KR_POST_HOOK"
+fi

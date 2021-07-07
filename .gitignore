@@ -1,2 +1,1 @@
-cf-stop-k8s-env
-prune/prune
+src/prune/prune
