@@ -75,8 +75,8 @@ install_resources () {
   fi
 
   kustomize edit set namespace "$namespace"
-  kustomize edit set label "app.kubernetes.io/instance:$namespace"
   kustomize edit add annotation --force \
+  app.kubernetes.io/instance:"$namespace" \
   app.kubernetes.io/pull_request_number:"$pull_request_number" \
   app.kubernetes.io/branch_name:"$branch_name" \
   app.kubernetes.io/repository_name:"$repo_name" \
