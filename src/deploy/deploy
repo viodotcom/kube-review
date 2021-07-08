@@ -97,11 +97,14 @@ install_resources () {
 test_url() {
   if [ "$test_connection" = true ];
   then
-    if curl --output /dev/null --silent --head --fail "$url$test_connection_url_path"; then
-      echo "Connection test executed successfully";
-    else
-      echo "Connection test has failed";
+    full_url=$url$test_connection_url_path
+    echo "Running connection test against: $full_url"
+    output=$(curl --silent --head --fail --retry 3 "$full_url")
+    if [[ $? != 0 ]]; then
+      echo "Connection test has failed with the following test output: $output";
       exit 1;
+    else
+      echo "Connection test executed successfully";
     fi
   else
     echo "Connection test is disabled";
