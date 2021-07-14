@@ -87,7 +87,8 @@ install_resources () {
     kustomize build
   fi
 
-  kustomize build | kubectl apply -f - -n "$namespace" --wait=true
+  kustomize build | kubectl apply --prune -l "app.kubernetes.io/name=kube-review" \
+    -f - -n "$namespace" --wait=true
 
   # Rollout is necessary to force loading of secrets when only the secrets is updated
   kubectl rollout restart -n "$namespace" deployment/kube-review-deployment
