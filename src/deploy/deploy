@@ -98,7 +98,10 @@ install_resources () {
   # Rollout is necessary to force loading of secrets when only the secrets is updated
   kubectl rollout restart -n "$namespace" deployment/kube-review-deployment
   kubectl rollout status --timeout=5m -n "$namespace" deployment/kube-review-deployment
-  kubectl describe -n "$namespace" deployment/kube-review-deployment
+
+  if [ "$verbose" = "true" ]; then
+      kubectl describe -n "$namespace" pods
+  fi
 }
 
 test_url() {
