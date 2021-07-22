@@ -98,6 +98,10 @@ install_resources () {
   # Rollout is necessary to force loading of secrets when only the secrets is updated
   kubectl rollout restart -n "$namespace" deployment/kube-review-deployment
   kubectl rollout status --timeout=5m -n "$namespace" deployment/kube-review-deployment
+
+  if [ "$verbose" = "true" ]; then
+      kubectl describe -n "$namespace" pods
+  fi
 }
 
 test_url() {
@@ -105,7 +109,7 @@ test_url() {
   then
     full_url=$url$test_connection_url_path
     echo "Running connection test against: $full_url"
-    output=$(curl --silent --head --fail --retry 3 "$full_url")
+    output=$(curl --silent --fail --retry 3 "$full_url")
     if [[ $? != 0 ]]; then
       echo "Connection test has failed with the following test output: $output";
       exit 1;
