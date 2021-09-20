@@ -15,7 +15,7 @@ The `deploy` components contains many options which can be passed as environment
 | Name | Description | Default Value | Required |
 | - | - | - | - |
 | KR_ID | A unique identifier for the review environment. It's recommended this to be the branch name. | - | true |
-| KR_IMAGE | The full url of the container image, including the tag that the app should run. | - | true |
+| KR_IMAGE | The full url of the container image, including the tag that the app should run. e.g: `KR_IMAGE=123456789012.dkr.ecr.eu-west-1.amazonaws.com/ecr-repo-name@sha256:2de5d881318951e48c69987df478b076f2b2ac9971d12f1b342347ed51ff7f4b` | - | true |
 | KR_DOMAIN | The domain on which the app should be available. e.g: `foo.com` | - | true |
 | KR_CONTAINER_PORT | The port exposed by the main container. | - | true |
 | KR_KUBE_CONTEXT | The kube context from the kube config file that should be used. | Default to current context. | false |
