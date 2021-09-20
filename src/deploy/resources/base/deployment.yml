@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: kube-review
-          image: "PLACEHOLDER:PLACEHOLDER"
+          image: "PLACEHOLDER"
           imagePullPolicy: IfNotPresent
           env:
             - name: KR_HOST
