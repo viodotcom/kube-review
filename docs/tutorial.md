@@ -156,8 +156,7 @@ Note that this example is using kustomize overlays to add a redis as a sidecar c
 With this command we will deploy a container running Nginx as a review env:
     
     KR_ID=nginx \
-    KR_IMAGE_URL=nginx \
-    KR_IMAGE_TAG=latest \
+    KR_IMAGE=nginx:latest \
     KR_DOMAIN="${MY_DOMAIN}" \
     KR_CONTAINER_PORT="80" \
     KR_OVERLAY_PATH=src/deploy/resources/example \
