@@ -25,9 +25,9 @@ jobs:
           HELM_REPO_AUTH_HEADER: Authorization
           HELM_REPO_NAME: cm://h.cfcr.io/findhotel/lab/
           #HELM_REPO_PLUGIN_NAME: https://github.com/chartmuseum/helm-push.git
-          # Since, Helm version v3.7.0 there is a bug related to helm push
+          # Since Helm version v3.7.0 there is a bug related to helm push
           # https://github.com/chartmuseum/helm-push/issues/109
-          # As paliative alternative, there is this PR https://github.com/chartmuseum/helm-push/pull/110
+          # As an alternative, there is this PR https://github.com/chartmuseum/helm-push/pull/110
           HELM_REPO_PLUGIN_NAME: https://github.com/emanuelflp/helm-push.git
           TIME: "${{steps.date.outputs.date}}"
         run: |
