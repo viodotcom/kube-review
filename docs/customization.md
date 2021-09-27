@@ -70,8 +70,7 @@ Finally, in order to use the overlay one has to specify the `KR_OVERLAY_PATH` va
 
 ```
 KR_ID=nginx \
-KR_IMAGE_URL=nginx \
-KR_IMAGE_TAG=latest \
+KR_IMAGE=nginx:latest \
 KR_DOMAIN="my-domain.io" \
 KR_CONTAINER_PORT="80" \
 KR_OVERLAY_PATH=src/deploy/resources/example \
