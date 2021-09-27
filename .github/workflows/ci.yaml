@@ -36,7 +36,6 @@ jobs:
           helm repo add remote $HELM_REPO_NAME
           helm dependency build src/prune/charts/kube-review-prune || helm dependency update charts/kube-review-prune || echo "dependencies cannot be updated"
           PACKAGE="$(helm package src/prune/charts/kube-review-prune --version 0.0.1-$TIME --destination /tmp | cut -d " " -f 8)"
-          #helm push $PACKAGE remote
           helm legacy-push $PACKAGE remote
 
   build:
