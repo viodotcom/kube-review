@@ -24,11 +24,7 @@ jobs:
           HELM_REPO_ACCESS_TOKEN: ${{ secrets.CF_API_KEY }}
           HELM_REPO_AUTH_HEADER: Authorization
           HELM_REPO_NAME: cm://h.cfcr.io/findhotel/lab/
-          #HELM_REPO_PLUGIN_NAME: https://github.com/chartmuseum/helm-push.git
-          # Since Helm version v3.7.0 there is a bug related to helm push
-          # https://github.com/chartmuseum/helm-push/issues/109
-          # As an alternative, there is this PR https://github.com/chartmuseum/helm-push/pull/110
-          HELM_REPO_PLUGIN_NAME: https://github.com/emanuelflp/helm-push.git
+          HELM_REPO_PLUGIN_NAME: https://github.com/chartmuseum/helm-push.git
           TIME: "${{steps.date.outputs.date}}"
         run: |
           helm version --short -c
@@ -36,7 +32,7 @@ jobs:
           helm repo add remote $HELM_REPO_NAME
           helm dependency build src/prune/charts/kube-review-prune || helm dependency update charts/kube-review-prune || echo "dependencies cannot be updated"
           PACKAGE="$(helm package src/prune/charts/kube-review-prune --version 0.0.1-$TIME --destination /tmp | cut -d " " -f 8)"
-          helm legacy-push $PACKAGE remote
+          helm cm-push $PACKAGE remote
 
   build:
     name: Building Docker image
