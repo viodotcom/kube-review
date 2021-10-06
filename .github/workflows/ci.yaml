@@ -26,7 +26,6 @@ jobs:
           HELM_REPO_NAME: cm://h.cfcr.io/findhotel/lab/
           HELM_REPO_PLUGIN_NAME: https://github.com/chartmuseum/helm-push.git
           TIME: "${{steps.date.outputs.date}}"
-          #HELM_EXPERIMENTAL_OCI: 1
         run: |
           helm version --short -c
           helm plugin install $HELM_REPO_PLUGIN_NAME
