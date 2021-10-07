@@ -89,6 +89,7 @@ install_resources () {
   fi
 
   if [ "$delete_before_apply" != false ]; then
+    kubectl --namespace "$namespace" delete pods --all --grace-period=0 --force
     kubectl delete namespace "$namespace" --wait=true --ignore-not-found=true
   fi
 
