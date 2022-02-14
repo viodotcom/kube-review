@@ -109,9 +109,6 @@ install_resources () {
     kubectl rollout restart -n "$namespace" deployment/kube-review-deployment    
   fi
 
-  echo "Waiting for Pods to become ready";
-  kubectl -n "$namespace" wait --timeout 5m --for condition=Ready pods --all
-
   echo "Deployment rollout status";
   kubectl rollout status --timeout 5m -n "$namespace" deployment/kube-review-deployment
 
