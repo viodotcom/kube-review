@@ -111,7 +111,10 @@ install_resources () {
   kubectl rollout status --timeout=5m -n "$namespace" deployment/kube-review-deployment
 
   if [ "$verbose" = "true" ]; then
-      kubectl describe -n "$namespace" pods
+      echo "Verbose mode Enabled - Describing Pods"
+      kubectl -n "$namespace" describe pods
+      echo "Verbose mode Enabled - Showing Pods Logs"
+      kubectl -n "$namespace" logs deployment/kube-review-deployment --all-containers=true
   fi
 }
 
