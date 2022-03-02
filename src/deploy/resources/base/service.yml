@@ -4,9 +4,10 @@ metadata:
   name: service
 spec:
   type: ClusterIP
+  selector:
+    app.kubernetes.io/name: kube-review
   ports:
     - name: web
       protocol: TCP
       port: 80
       targetPort: 8080
-
