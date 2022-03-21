@@ -1,10 +1,11 @@
 FROM golang:1.16.4-alpine as base
 
 LABEL maintainer="EEQ Team"
-LABEL service="Codefresh Deploy"
+LABEL service="CI/CD"
 
 RUN apk --no-cache --quiet update \
     && apk add --no-cache --quiet git
+
 WORKDIR /
 
 # Prune
@@ -12,33 +13,35 @@ COPY src/prune/* ./
 RUN go build -o ./prune .
 RUN chmod +x prune
 
-FROM alpine:3.13.5
+FROM alpine
 
 ARG DEFAULT_HELM_REPO_URL
 
-ENV CODEFRESH_VERSION=v0.75.18
 ENV KUBECTL_VERSION=v1.20.5
-ENV KUSTOMIZE_VERSION=v4.1.3
+ENV KUSTOMIZE_VERSION=v4.5.2
 ENV KR_BASE_OVERLAY_PATH=/usr/local/kube-review/deploy/resources/base
 
 # Default packages #
 RUN apk --no-cache --quiet update \
     && apk add --no-cache --quiet rhash gettext moreutils libstdc++ curl bash git jq
 
-# Codefresh #
-RUN curl -L --silent https://github.com/codefresh-io/cli/releases/download/${CODEFRESH_VERSION}/codefresh-${CODEFRESH_VERSION}-alpine-x64.tar.gz -o codefresh.tar.gz \
-    && tar -zxf codefresh.tar.gz \
-    && mv ./codefresh /usr/local/bin/codefresh \
-    && chmod +x /usr/local/bin/codefresh
-
 # Kubectl #
 RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
     && mv ./kubectl /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl
 
+# Kustomize
 RUN curl -L --silent https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz -o kustomize.tar.gz \
     && tar -zxf kustomize.tar.gz \
     && mv ./kustomize /usr/local/bin/kustomize
+
+# AWSCLI
+RUN apk add --no-cache --quiet python3 py3-pip \
+    && pip3 install --upgrade pip \
+    && pip3 install awscli
+
+# Cleaning
+RUN rm -rf /var/cache/apk/*
 
 WORKDIR /usr/local
 
