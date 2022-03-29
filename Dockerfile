@@ -22,7 +22,7 @@ ENV KR_BASE_OVERLAY_PATH=/usr/local/kube-review/deploy/resources/base
 
 # Default packages #
 RUN apk --no-cache --quiet update \
-    && apk add --no-cache --quiet curl
+    && apk add --no-cache --quiet rhash gettext moreutils curl bash git jq
 
 # Kubectl #
 RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
