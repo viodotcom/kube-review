@@ -1,10 +1,9 @@
 FROM golang:1.16.4-alpine as base
 
 LABEL maintainer="EEQ Team"
-LABEL service="CI/CD"
+LABEL service="Kube Review"
 
-RUN apk --no-cache --quiet update \
-    && apk add --no-cache --quiet git
+RUN apk --no-cache --quiet update
 
 WORKDIR /
 
@@ -23,7 +22,7 @@ ENV KR_BASE_OVERLAY_PATH=/usr/local/kube-review/deploy/resources/base
 
 # Default packages #
 RUN apk --no-cache --quiet update \
-    && apk add --no-cache --quiet rhash gettext moreutils libstdc++ curl bash git jq
+    && apk add --no-cache --quiet curl
 
 # Kubectl #
 RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
@@ -33,12 +32,8 @@ RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/
 # Kustomize
 RUN curl -L --silent https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz -o kustomize.tar.gz \
     && tar -zxf kustomize.tar.gz \
-    && mv ./kustomize /usr/local/bin/kustomize
-
-# AWSCLI
-RUN apk add --no-cache --quiet python3 py3-pip \
-    && pip3 install --upgrade pip \
-    && pip3 install awscli
+    && mv ./kustomize /usr/local/bin/kustomize \
+    && rm -f kustomize.tar.gz
 
 # Cleaning
 RUN rm -rf /var/cache/apk/*
