@@ -13,7 +13,7 @@ Before we start, we should define this variable that control the domain name to 
 To follow this guide you will need an **AWS Account** and the following software installed. Besides that, you will need **aws cli**, **eksctl**, **kubectl**, **helm** and **gettext**:
 
     brew tap weaveworks/tap
-    brew install weaveworks/tap/eksctl awscli kubectl helm gettext
+    brew install weaveworks/tap/eksctl awscli kubectl helm gettext rhash
 
 ## EKS Cluster
 
