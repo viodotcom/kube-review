@@ -14,7 +14,7 @@ Environments can be deployed manually or through a CI/CD pipeline. Connecting th
 
 When deployed across an organization, review environment will be deployed in the same across all teams. This removes the confusion and the work of maintaining adhoc infrastructure for each product.
 
-### Infrascture
+### Infrastucture
 
 The *kube-review* project is based on Kubernetes. Every environment deployed runs in its own namespace.
 
@@ -24,7 +24,7 @@ Therefore, the Load Balancer will send requests to the **Nginx Ingress**, which 
 
 In order to support HTTPS, Let's Encrypt is used as ACME to automatically handle certificate issuing and renewing.
 
-To use a well defined domain, users can choose any product for DNS resolution, we recommend **AWS Route 53**. Therefore, Route 53 will point the DNS entry to AWS ELB.
+To use a well defined domain, users can choose any product for DNS resolution, we recommend **AWS Route 53**. Therefore, Route 53 will point the DNS entry to **AWS ELB**.
 
 As we want to support a high number of review environments with HTTPS, we use WildCard domain certificates, in order to avoid hitting **Let's Encrypt** rate limiting.
 
@@ -40,11 +40,11 @@ In order to make installation even simpler, the app is deployed through a shell 
 
 Using this image is the easiest way to deploy a review environment, specially from inside a CI/CD pipeline, as the image already contains all the necessary requirements.
 
-Finally, the id of the review env is automatically generated based on the prefix *re*, the branch and a hash of the whole name. This way, we avoid issues with long branch names and DNS limitations, at same time that we achieve unique and yet readable names.
+Finally, the ID of the review env is automatically generated based on the prefix *re*, the branch and a hash of the whole name. This way, we avoid issues with long branch names and DNS limitations, at same time that we achieve unique and yet readable names.
 
 ## Prune Component
 
-The prune component is a Kubernetes cron job responsible by purging expired environments or environment on which the attached pull request or branch was already merged or removed.
+The prune component is a Kubernetes `cron job` responsible by purging expired environments or environment on which the attached pull request or branch was already merged or removed.
 
 The prune component will run every hour. Once it starts, it will scan all environments belonging to a *kube-review* environment. This is done through scanning namespaces that have the *kube-review* annotation.
 

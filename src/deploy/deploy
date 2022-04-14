@@ -38,6 +38,19 @@ delete_before_apply=${KR_DELETE_BEFORE_APPLY:-false}
 
 updated_at=$(date +%s)
 
+export_variables() {
+  # Export normally here so they are available to the post hook
+  export URL=$url
+}
+
+print_preinstall_message() {
+  echo "Environment will be deployed with url: $url"
+
+  if [ "$KR_MESSAGE" != "" ]; then
+    printf "%s\n" "$KR_MESSAGE" "$KR_LOG_URL$namespace"
+  fi
+}
+
 config_context() {
   # kubectl locks the config for each execution. To workaround
   # and allow multiple concurrent kubectl executions we copy the config
@@ -135,24 +148,11 @@ test_url() {
   fi
 }
 
-export_variables() {
-  # Export normally here so they are available to the post hook
-  export URL=$url
-}
-
-print_postinstall_message() {
-  echo "Environment deployed with url: $url"
-
-  if [ "$KR_MESSAGE" != "" ]; then
-    printf "%s\n" "$KR_MESSAGE" "$KR_LOG_URL$namespace"
-  fi
-}
-
+export_variables
+print_preinstall_message
 config_context
 install_resources
 test_url
-export_variables
-print_postinstall_message
 
 if [ "$KR_POST_HOOK" != "" ]; then
   echo "Running post hook command: $KR_POST_HOOK"
