@@ -123,11 +123,21 @@ install_resources () {
 
   kubectl rollout status --timeout=5m -n "$namespace" deployment/kube-review-deployment
 
-  if [ "$verbose" = "true" ]; then
-      echo "Verbose mode Enabled - Describing Pods"
-      kubectl -n "$namespace" describe pods
-      echo "Verbose mode Enabled - Showing Pods Logs"
-      kubectl -n "$namespace" logs deployment/kube-review-deployment --all-containers=true
+  if [ $? -ne 0 ]; then
+    echo "Rollout was not Successful... Describing Deployed Pods"
+    kubectl -n "$namespace" describe pods
+    echo "Showing Namespace Events"
+    kubectl -n "$namespace" get events
+
+    if [ "$verbose" = "true" ]; then
+      echo "[VERBOSE] Showing Pods Logs"
+      for pod_names in $(kubectl get pods --no-headers -o custom-columns=":metadata.name" -n "$namespace" --field-selector status.phase=Running)
+      do
+        echo "Logs from Pod '"$pod_names"'" "in" the Namespace "'"$namespace"':"
+        kubectl -n "$namespace" logs "$pod_names" --all-containers=true
+        echo
+      done
+    fi
   fi
 }
 
