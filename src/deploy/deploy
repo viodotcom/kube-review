@@ -125,6 +125,7 @@ install_resources () {
 
   echo "Describing Deployed Pods"
   kubectl -n "$namespace" describe pods
+  echo "Showing Namespace Events"
   kubectl -n "$namespace" get events
 
   if [ "$verbose" = "true" ]; then
@@ -136,7 +137,6 @@ install_resources () {
       echo
     done
   fi
-
 }
 
 test_url() {
