@@ -48,7 +48,7 @@ jobs:
         with:
           push: true
           tags: |
-            findhotelamsterdam/kube-review:${{ github.sha }}
+            findhotelamsterdam/kube-review:latest
             findhotelamsterdam/kube-review:${{ github.event.release.tag_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
