@@ -1,4 +1,4 @@
-FROM golang:1.17.10-alpine3.15 as base
+FROM golang:1.18.2-alpine3.15 as base
 
 LABEL maintainer="EEQ Team"
 LABEL service="Kube Review"
