@@ -10,6 +10,7 @@ import (
 	"path"
 	"strconv"
 	"time"
+	"context"
 
 	"github.com/gobwas/glob"
 	cli "github.com/urfave/cli/v2"
@@ -183,7 +184,7 @@ func (k8s *K8sClient) DeleteNamespace(name string) error {
 	// The name of the deployment and the namespace are the same
 	namespacesClient := k8s.ClientSet.CoreV1().Namespaces()
 	deletePolicy := metav1.DeletePropagationForeground
-	if err := namespacesClient.Delete(name, &metav1.DeleteOptions{
+	if err := namespacesClient.Delete(context.TODO(),name,metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	}); err != nil {
 		return err
@@ -194,7 +195,7 @@ func (k8s *K8sClient) DeleteNamespace(name string) error {
 // NamespaceList deletes a namespace
 func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 	namespacesClient := k8s.ClientSet.CoreV1().Namespaces()
-	namespaceList, err := namespacesClient.List(metav1.ListOptions{
+	namespaceList, err := namespacesClient.List(context.TODO(),metav1.ListOptions{
 		LabelSelector: "app.kubernetes.io/name in (cf-review-env, kube-review)",
 	})
 	if err != nil {
