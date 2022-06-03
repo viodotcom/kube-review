@@ -45,7 +45,7 @@ config_context() {
   fi
 }
 
-install_resources () {
+restart() {
   # Rollout is necessary to force loading of secrets when only the secrets is updated
   echo "Re-deployment, executing rollout";
   kubectl rollout restart -n "$namespace" deployment/kube-review-deployment    
