@@ -4,13 +4,17 @@ The `kube-review` is composed of two main components, `deploy` and `prune`.
 
 ## Deploy Component
 
-The deploy component is a `bash` script that can be used to deploy a review environment. At it's core it's a simple script that will do all the necessary magic to get a review env running. Therefore, the `deploy` component is a command that is called every-time that an environment needs to created or updated.
+The deploy component contains a set of commands that can be used to manage review environments. These are simple scripts that will do all the necessary magic to manage a review environment. 
 
-The basic flow of the components is, configure the correct kube context, create the resources, and test the installation. Depending on the use case, some other features might be used, like running pre/post scripts.
+### Deploy Command
 
-### Options
+Deploy create or update a review environment.
 
-The `deploy` components contains many options which can be passed as environment variables. This is the list of all options:
+The basic flow of the components is, configure the correct kube context, create/update the resources, and test the installation. Depending on the use case, some other features might be used, like running pre/post scripts.
+
+#### Options
+
+The `deploy` command contains many options which can be passed as environment variables. This is the list of all options:
 
 | Name | Description | Default Value | Required |
 | - | - | - | - |
@@ -32,6 +36,29 @@ The `deploy` components contains many options which can be passed as environment
 | KR_POST_HOOK | A shell command to be executed after the deployment is finished. | - | false |
 | KR_BASE_OVERLAY_PATH | The path containing the base kustomize overlay to be used. | src/deploy/resources/base | false |
 | KR_OVERLAY_PATH | The path containing a kustomize overlay to be used. | - | false |
+| KR_VERBOSE | Prints verbose or debug messages. Should not be used in production. | false | false |
+
+### Restart Command
+
+Restarts an already deployed review environment.
+
+The basic flow of the components is, configure the correct kube context, restart the service, and test the installation. Depending on the use case, some other features might be used, like running pre/post scripts.
+
+#### Options
+
+The `restart` command contains many options which can be passed as environment variables. This is the list of all options:
+
+| Name | Description | Default Value | Required |
+| - | - | - | - |
+| KR_ID | A unique identifier for the review environment. It's recommended this to be the branch name. | - | true |
+| KR_DOMAIN | The domain on which the app should be available. e.g: `foo.com` | - | true |
+| KR_KUBE_CONTEXT | The kube context from the kube config file that should be used. | Default to current context. | false |
+| KR_PREFIX | A prefix to be added to the name of the environment. | re | false |
+| KR_KUBE_CONFIG_FILE | The kube config file used for connecting to Kuberneres. The file has to be accessible on the local file system during execution of the script. | $HOME/.kube/config | false |
+| KR_TEST_CONNECTION | Enable/disable testing the url of the environment once the deployment is done. If the connection fails the deployment will also fails. | true | false |
+| KR_TEST_CONNECTION_URL_PATH | A custom url path to be appended to the final url when running a connection test. | / | false |
+| KR_PRE_HOOK | A shell command to be executed before the deployment starts. | - | false |
+| KR_POST_HOOK | A shell command to be executed after the deployment is finished. | - | false |
 | KR_VERBOSE | Prints verbose or debug messages. Should not be used in production. | false | false |
 
 ## Prune Component
