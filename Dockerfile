@@ -45,6 +45,11 @@ COPY src/deploy kube-review/deploy/
 RUN chmod +x kube-review/deploy/deploy
 RUN ln -s /usr/local/kube-review/deploy/deploy /deploy
 
+RUN mkdir -p kube-review/restart
+COPY src/restart kube-review/restart/
+RUN chmod +x kube-review/restart/restart
+RUN ln -s /usr/local/kube-review/restart/restart /restart
+
 RUN mkdir -p kube-review/prune
 COPY --from=base /prune kube-review/prune/
 RUN chmod +x kube-review/prune/prune
