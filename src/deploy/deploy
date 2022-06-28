@@ -128,6 +128,9 @@ install_resources () {
     kubectl -n "$namespace" describe pods
     echo "Showing Namespace Events"
     kubectl -n "$namespace" get events
+    if [ "$verbose" = "false" ]; then
+      exit 1;
+    fi
 
     if [ "$verbose" = "true" ]; then
       echo "[VERBOSE] Showing Pods Logs"
@@ -137,6 +140,7 @@ install_resources () {
         kubectl -n "$namespace" logs "$pod_names" --all-containers=true
         echo
       done
+      exit 1;
     fi
   fi
 }
