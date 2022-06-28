@@ -1,6 +1,6 @@
 #!/bin/bash
-# exit if any command fails
-set -e
+# overrides default `set -e`: Do not exit if a command fails.
+set +e
 
 verbose=${KR_VERBOSE:-false}
 if [ "$verbose" != "false" ]; then
