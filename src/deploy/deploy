@@ -130,15 +130,12 @@ install_resources () {
     kubectl -n "$namespace" get events
     if [ "$verbose" = "false" ]; then
       exit 1;
-    fi
-
-    if [ "$verbose" = "true" ]; then
+    else
       echo "[VERBOSE] Showing Pods Logs"
       for pod_names in $(kubectl get pods --no-headers -o custom-columns=":metadata.name" -n "$namespace" --field-selector status.phase=Running)
       do
         echo "Logs from Pod '"$pod_names"'" "in" the Namespace "'"$namespace"':"
         kubectl -n "$namespace" logs "$pod_names" --all-containers=true
-        echo
       done
       exit 1;
     fi
