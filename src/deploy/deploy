@@ -1,6 +1,6 @@
 #!/bin/bash
-# overrides default `set -e`: Do not exit if a command fails.
-set +e
+# exit if any command fails
+set -e
 
 verbose=${KR_VERBOSE:-false}
 if [ "$verbose" != "false" ]; then
@@ -121,13 +121,14 @@ install_resources () {
     kubectl rollout restart -n "$namespace" deployment/kube-review-deployment    
   fi
 
-  kubectl rollout status --timeout=5m -n "$namespace" deployment/kube-review-deployment
-
-  if [ $? -ne 0 ]; then
+  if kubectl rollout status --timeout=5m -n "$namespace" deployment/kube-review-deployment; then
+    echo "Rollout successfully executed"
+  else
     echo "Rollout was not Successful... Describing Deployed Pods"
     kubectl -n "$namespace" describe pods
     echo "Showing Namespace Events"
     kubectl -n "$namespace" get events
+
     if [ "$verbose" = "false" ]; then
       exit 1;
     else
