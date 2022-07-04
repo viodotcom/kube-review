@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -9,8 +10,8 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 	"time"
-	"context"
 
 	"github.com/gobwas/glob"
 	cli "github.com/urfave/cli/v2"
@@ -184,7 +185,7 @@ func (k8s *K8sClient) DeleteNamespace(name string) error {
 	// The name of the deployment and the namespace are the same
 	namespacesClient := k8s.ClientSet.CoreV1().Namespaces()
 	deletePolicy := metav1.DeletePropagationForeground
-	if err := namespacesClient.Delete(context.TODO(),name,metav1.DeleteOptions{
+	if err := namespacesClient.Delete(context.TODO(), name, metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	}); err != nil {
 		return err
@@ -195,7 +196,7 @@ func (k8s *K8sClient) DeleteNamespace(name string) error {
 // NamespaceList deletes a namespace
 func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 	namespacesClient := k8s.ClientSet.CoreV1().Namespaces()
-	namespaceList, err := namespacesClient.List(context.TODO(),metav1.ListOptions{
+	namespaceList, err := namespacesClient.List(context.TODO(), metav1.ListOptions{
 		LabelSelector: "app.kubernetes.io/name in (cf-review-env, kube-review)",
 	})
 	if err != nil {
@@ -287,6 +288,11 @@ func run(c *cli.Context) error {
 			namespace.Name, time.Since(*namespace.UpdatedAt), expired, merged, namespace.IsEphemeral)
 		// If an env is not ephemeral we dont need to check
 		// We never touch non ephemeral environments
+
+		if !strings.Contains(namespace.Name, "e2e") && namespace.IsEphemeral {
+			expired = true
+		}
+
 		if !namespace.IsEphemeral {
 			continue
 		}
