@@ -10,7 +10,6 @@ import (
 	"os"
 	"path"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gobwas/glob"
@@ -283,18 +282,16 @@ func run(c *cli.Context) error {
 			merged = merged
 		}
 
-		expired := time.Since(*namespace.UpdatedAt) >= time.Duration(c.Int("expiration"))*time.Hour
-		log.Printf("Name: %s Duration: %s, Expired: %t, Merged: %t, Ephemeral: %t",
-			namespace.Name, time.Since(*namespace.UpdatedAt), expired, merged, namespace.IsEphemeral)
-		// If an env is not ephemeral we dont need to check
-		// We never touch non ephemeral environments
-
-		if !strings.Contains(namespace.Name, "e2e") && namespace.IsEphemeral {
-			expired = true
-		}
+		var expired bool
 
 		if !namespace.IsEphemeral {
-			continue
+			expired = time.Since(*namespace.UpdatedAt) >= time.Duration(c.Int("expiration"))*time.Hour
+			log.Printf("Name: %s Duration: %s, Expired: %t, Merged: %t, Ephemeral: %t",
+				namespace.Name, time.Since(*namespace.UpdatedAt), expired, merged, namespace.IsEphemeral)
+		} else {
+			expired = time.Since(*namespace.UpdatedAt) >= time.Duration(c.Int("nonEpimeralexpiration"))*time.Hour
+			log.Printf("Name: %s Duration: %s, Expired: %t, Merged: %t, Ephemeral: %t",
+				namespace.Name, time.Since(*namespace.UpdatedAt), expired, merged, namespace.IsEphemeral)
 		}
 
 		if expired || merged {
@@ -322,12 +319,17 @@ func main() {
 		},
 		&cli.IntFlag{
 			Name:  "expiration",
-			Usage: "how many hous to consider an environment stale",
+			Usage: "how many hours to consider an ephimeral environment stale",
 			Value: 120,
+		},
+		&cli.IntFlag{
+			Name:  "nonEpimeralexpiration",
+			Usage: "how many hours to consider an non-ephimeral environment stale",
+			Value: 730, //around 30 days
 		},
 		&cli.BoolFlag{
 			Name:  "dryRun",
-			Usage: "only show logs but don'r perform deletess",
+			Usage: "only show logs but don't perform deletes",
 			Value: false,
 		},
 		&cli.StringFlag{
