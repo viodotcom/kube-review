@@ -282,17 +282,15 @@ func run(c *cli.Context) error {
 			merged = merged
 		}
 
-		var expired bool
-
+		expiration := time.Duration(c.Int("ephemeralExpiration")) * time.Hour
 		if !namespace.IsEphemeral {
-			expired = time.Since(*namespace.UpdatedAt) >= time.Duration(c.Int("expiration"))*time.Hour
-			log.Printf("Name: %s Duration: %s, Expired: %t, Merged: %t, Ephemeral: %t",
-				namespace.Name, time.Since(*namespace.UpdatedAt), expired, merged, namespace.IsEphemeral)
-		} else {
-			expired = time.Since(*namespace.UpdatedAt) >= time.Duration(c.Int("nonEpimeralexpiration"))*time.Hour
-			log.Printf("Name: %s Duration: %s, Expired: %t, Merged: %t, Ephemeral: %t",
-				namespace.Name, time.Since(*namespace.UpdatedAt), expired, merged, namespace.IsEphemeral)
+			expiration = time.Duration(c.Int("nonEphemeralExpiration")) * time.Hour
 		}
+
+		expired := time.Since(*namespace.UpdatedAt) >= expiration
+
+		log.Printf("Name: %s Duration: %s, Expired: %t, Merged: %t, Ephemeral: %t",
+			namespace.Name, time.Since(*namespace.UpdatedAt), expired, merged, namespace.IsEphemeral)
 
 		if expired || merged {
 			if !c.Bool("dryRun") {
@@ -318,12 +316,12 @@ func main() {
 			Value:    "*",
 		},
 		&cli.IntFlag{
-			Name:  "expiration",
-			Usage: "how many hours to consider an ephimeral environment stale",
+			Name:  "ephemeralExpiration",
+			Usage: "how many hours to consider an ephemeral environment stale",
 			Value: 120,
 		},
 		&cli.IntFlag{
-			Name:  "nonEpimeralexpiration",
+			Name:  "nonEphemeralExpiration",
 			Usage: "how many hours to consider an non-ephimeral environment stale",
 			Value: 730, //around 30 days
 		},
