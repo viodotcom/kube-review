@@ -22,12 +22,11 @@ ENV KR_BASE_OVERLAY_PATH=/usr/local/kube-review/deploy/resources/base
 
 # Default packages #
 RUN apk --no-cache --quiet update \
-    && apk add --no-cache --quiet rhash gettext moreutils curl bash git jq
+    && apk add --no-cache --quiet rhash gettext moreutils curl bash git jq python3 py3-pip
 
-## AWS CLI
-RUN curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
-  && unzip -q awscliv2.zip \
-  && ./aws/install
+# AWS CLI
+RUN pip3 install --no-python-version-warning --upgrade --quiet pip \
+  && pip3 install --no-python-version-warning --quiet awscli
 
 # Kubectl #
 RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
