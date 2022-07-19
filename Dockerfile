@@ -16,24 +16,28 @@ FROM alpine
 
 ARG DEFAULT_HELM_REPO_URL
 
-ENV KUBECTL_VERSION=v1.20.5
-ENV KUSTOMIZE_VERSION=v4.5.2
+ENV KUBECTL_VERSION=v1.22.5
+ENV KUSTOMIZE_VERSION=v4.5.5
 ENV KR_BASE_OVERLAY_PATH=/usr/local/kube-review/deploy/resources/base
 
 # Default packages #
 RUN apk --no-cache --quiet update \
-    && apk add --no-cache --quiet rhash gettext moreutils curl bash git jq
+    && apk add --no-cache --quiet rhash gettext moreutils curl bash git jq python3 py3-pip
+
+# AWS CLI
+RUN pip3 install --no-python-version-warning --upgrade --quiet pip \
+  && pip3 install --no-python-version-warning --quiet awscli
 
 # Kubectl #
 RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
-    && mv ./kubectl /usr/local/bin/kubectl \
-    && chmod +x /usr/local/bin/kubectl
+  && mv ./kubectl /usr/local/bin/kubectl \
+  && chmod +x /usr/local/bin/kubectl
 
 # Kustomize
 RUN curl -L --silent https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz -o kustomize.tar.gz \
-    && tar -zxf kustomize.tar.gz \
-    && mv ./kustomize /usr/local/bin/kustomize \
-    && rm -f kustomize.tar.gz
+  && tar -zxf kustomize.tar.gz \
+  && mv ./kustomize /usr/local/bin/kustomize \
+  && rm -f kustomize.tar.gz
 
 # Cleaning
 RUN rm -rf /var/cache/apk/*
