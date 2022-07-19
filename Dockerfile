@@ -25,20 +25,20 @@ RUN apk --no-cache --quiet update \
     && apk add --no-cache --quiet rhash gettext moreutils curl bash git jq
 
 ## AWS CLI
-RUN sudo curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
-  && sudo unzip -q awscliv2.zip \
-  && sudo ./aws/install
+RUN curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+  && unzip -q awscliv2.zip \
+  && ./aws/install
 
 # Kubectl #
 RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
-    && mv ./kubectl /usr/local/bin/kubectl \
-    && chmod +x /usr/local/bin/kubectl
+  && mv ./kubectl /usr/local/bin/kubectl \
+  && chmod +x /usr/local/bin/kubectl
 
 # Kustomize
 RUN curl -L --silent https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz -o kustomize.tar.gz \
-    && tar -zxf kustomize.tar.gz \
-    && mv ./kustomize /usr/local/bin/kustomize \
-    && rm -f kustomize.tar.gz
+  && tar -zxf kustomize.tar.gz \
+  && mv ./kustomize /usr/local/bin/kustomize \
+  && rm -f kustomize.tar.gz
 
 # Cleaning
 RUN rm -rf /var/cache/apk/*
