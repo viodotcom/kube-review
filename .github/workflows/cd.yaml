@@ -55,7 +55,7 @@ jobs:
           tags: |
             findhotelamsterdam/kube-review:latest
             findhotelamsterdam/kube-review:${{ github.event.release.tag_name }}
-            findhotelamsterdam/kube-review:"${{ steps.major_release.outputs.MAJOR_VERSION }}"
+            findhotelamsterdam/kube-review:${{ steps.major_release.outputs.MAJOR_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
