@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,7 +11,6 @@ import (
 	"path"
 	"strconv"
 	"time"
-	"context"
 
 	"github.com/gobwas/glob"
 	cli "github.com/urfave/cli/v2"
@@ -184,7 +184,7 @@ func (k8s *K8sClient) DeleteNamespace(name string) error {
 	// The name of the deployment and the namespace are the same
 	namespacesClient := k8s.ClientSet.CoreV1().Namespaces()
 	deletePolicy := metav1.DeletePropagationForeground
-	if err := namespacesClient.Delete(context.TODO(),name,metav1.DeleteOptions{
+	if err := namespacesClient.Delete(context.TODO(), name, metav1.DeleteOptions{
 		PropagationPolicy: &deletePolicy,
 	}); err != nil {
 		return err
@@ -195,7 +195,7 @@ func (k8s *K8sClient) DeleteNamespace(name string) error {
 // NamespaceList deletes a namespace
 func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 	namespacesClient := k8s.ClientSet.CoreV1().Namespaces()
-	namespaceList, err := namespacesClient.List(context.TODO(),metav1.ListOptions{
+	namespaceList, err := namespacesClient.List(context.TODO(), metav1.ListOptions{
 		LabelSelector: "app.kubernetes.io/name in (cf-review-env, kube-review)",
 	})
 	if err != nil {
@@ -282,14 +282,15 @@ func run(c *cli.Context) error {
 			merged = merged
 		}
 
-		expired := time.Since(*namespace.UpdatedAt) >= time.Duration(c.Int("expiration"))*time.Hour
+		expiration := time.Duration(c.Int("ephemeralExpiration")) * time.Hour
+		if !namespace.IsEphemeral {
+			expiration = time.Duration(c.Int("nonEphemeralExpiration")) * time.Hour
+		}
+
+		expired := time.Since(*namespace.UpdatedAt) >= expiration
+
 		log.Printf("Name: %s Duration: %s, Expired: %t, Merged: %t, Ephemeral: %t",
 			namespace.Name, time.Since(*namespace.UpdatedAt), expired, merged, namespace.IsEphemeral)
-		// If an env is not ephemeral we dont need to check
-		// We never touch non ephemeral environments
-		if !namespace.IsEphemeral {
-			continue
-		}
 
 		if expired || merged {
 			if !c.Bool("dryRun") {
@@ -315,13 +316,18 @@ func main() {
 			Value:    "*",
 		},
 		&cli.IntFlag{
-			Name:  "expiration",
-			Usage: "how many hous to consider an environment stale",
+			Name:  "ephemeralExpiration",
+			Usage: "how many hours to consider an ephemeral environment stale",
 			Value: 120,
+		},
+		&cli.IntFlag{
+			Name:  "nonEphemeralExpiration",
+			Usage: "how many hours to consider an non-ephimeral environment stale",
+			Value: 730, //around 30 days
 		},
 		&cli.BoolFlag{
 			Name:  "dryRun",
-			Usage: "only show logs but don'r perform deletess",
+			Usage: "only show logs but don't perform deletes",
 			Value: false,
 		},
 		&cli.StringFlag{
