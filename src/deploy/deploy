@@ -18,6 +18,7 @@ pull_request_number=$KR_PULL_REQUEST_NUMBER
 branch_name=$KR_BRANCH_NAME
 repo_name=$KR_REPO_NAME
 repo_owner=$KR_REPO_OWNER
+job_url=$KR_JOB_URL
 
 # Kube Review variables
 prefix=${KR_PREFIX:-re}
@@ -96,7 +97,8 @@ install_resources () {
   app.kubernetes.io/repository_name:"$repo_name" \
   app.kubernetes.io/repository_owner:"$repo_owner" \
   app.kubernetes.io/updated_at:"$updated_at" \
-  app.kubernetes.io/is_ephemeral:"$is_ephemeral"
+  app.kubernetes.io/is_ephemeral:"$is_ephemeral" \
+  app.kubernetes.io/job_url:'"'$job_url'"'
   if [ "$verbose" = "true" ]; then
     kustomize build
   fi
