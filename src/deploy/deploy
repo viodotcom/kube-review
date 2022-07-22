@@ -91,14 +91,14 @@ install_resources () {
 
   kustomize edit set namespace "$namespace"
   kustomize edit add annotation --force \
-  app.kubernetes.io/instance: "$namespace" \
-  app.kubernetes.io/pull_request_number: "$pull_request_number" \
-  app.kubernetes.io/branch_name: "$branch_name" \
-  app.kubernetes.io/repository_name: "$repo_name" \
-  app.kubernetes.io/repository_owner: "$repo_owner" \
-  app.kubernetes.io/updated_at: "$updated_at" \
-  app.kubernetes.io/is_ephemeral: "$is_ephemeral" \
-  app.kubernetes.io/job_url: "$job_url"
+  app.kubernetes.io/instance:"$namespace" \
+  app.kubernetes.io/pull_request_number:"$pull_request_number" \
+  app.kubernetes.io/branch_name:"$branch_name" \
+  app.kubernetes.io/repository_name:"$repo_name" \
+  app.kubernetes.io/repository_owner:"$repo_owner" \
+  app.kubernetes.io/updated_at:"$updated_at" \
+  app.kubernetes.io/is_ephemeral:"$is_ephemeral" \
+  app.kubernetes.io/job_url:"$job_url"
   if [ "$verbose" = "true" ]; then
     kustomize build
   fi
