@@ -98,7 +98,7 @@ install_resources () {
   app.kubernetes.io/repository_owner:"$repo_owner" \
   app.kubernetes.io/updated_at:"$updated_at" \
   app.kubernetes.io/is_ephemeral:"$is_ephemeral" \
-  app.kubernetes.io/job_url:"$job_url"
+  app.kubernetes.io/job_url:'"$job_url"'
   if [ "$verbose" = "true" ]; then
     kustomize build
   fi
