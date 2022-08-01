@@ -292,7 +292,7 @@ func run(c *cli.Context) error {
 		log.Printf("Name: %s Duration: %s, Expired: %t, Merged: %t, Ephemeral: %t",
 			namespace.Name, time.Since(*namespace.UpdatedAt), expired, merged, namespace.IsEphemeral)
 
-		if expired || merged {
+		if expired || (merged && namespace.IsEphemeral) {
 			if !c.Bool("dryRun") {
 				if err := k8sClient.DeleteNamespace(namespace.Name); err != nil {
 					log.Printf("error deleting k8s namespace: %s", err)
