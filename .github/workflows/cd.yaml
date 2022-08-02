@@ -5,7 +5,7 @@ on:
 
 jobs:
   helm:
-    name: Push to the Repository
+    name: Push to the Helm Repository
     runs-on: ubuntu-latest
     steps:
       - name: Clone
@@ -14,17 +14,17 @@ jobs:
       - name: Push
         shell: bash
         env:
-          HELM_REPO_ACCESS_TOKEN: ${{ secrets.CF_API_KEY }}
-          HELM_REPO_AUTH_HEADER: Authorization
-          HELM_REPO_NAME: cm://h.cfcr.io/findhotel/default/
-          HELM_REPO_PLUGIN_NAME: https://github.com/chartmuseum/helm-push.git
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          HELM_REPO_NAME: s3://fh-eeq-helm-repository/charts
+          HELM_REPO_PLUGIN_NAME: https://github.com/hypnoglow/helm-s3.git
         run: |
           helm version --short -c
           helm plugin install $HELM_REPO_PLUGIN_NAME
           helm repo add remote $HELM_REPO_NAME
           helm dependency build src/prune/charts/kube-review-prune || helm dependency update charts/kube-review-prune || echo "dependencies cannot be updated"
           PACKAGE="$(helm package src/prune/charts/kube-review-prune --destination /tmp | cut -d " " -f 8)"
-          helm cm-push $PACKAGE remote
+          helm pull $PACKAGE remote
 
   build:
     name: Building Docker image
@@ -59,4 +59,4 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            DEFAULT_HELM_REPO_URL=cm://h.cfcr.io/findhotel/default/
+            DEFAULT_HELM_REPO_URL=s3://fh-eeq-helm-repository/charts

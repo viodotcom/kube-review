@@ -196,7 +196,7 @@ func (k8s *K8sClient) DeleteNamespace(name string) error {
 func (k8s *K8sClient) NamespaceList() ([]K8sNamespace, error) {
 	namespacesClient := k8s.ClientSet.CoreV1().Namespaces()
 	namespaceList, err := namespacesClient.List(context.TODO(), metav1.ListOptions{
-		LabelSelector: "app.kubernetes.io/name in (cf-review-env, kube-review)",
+		LabelSelector: "app.kubernetes.io/name in (kube-review)",
 	})
 	if err != nil {
 		return nil, err
