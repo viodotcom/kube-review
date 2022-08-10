@@ -1,0 +1,29 @@
+# Note that the update mode is left unset, so it defaults to "Auto" mode.
+---
+apiVersion: "autoscaling.k8s.io/v1"
+kind: VerticalPodAutoscaler
+metadata:
+  name: vpa
+spec:
+  # recommenders field can be unset when using the default recommender.
+  # When using an alternative recommender, the alternative recommender's name
+  # can be specified as the following in a list.
+  # recommenders: 
+  #   - name: 'alternative'
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: Deployment
+    name: deployment
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kube-review
+  resourcePolicy:
+    containerPolicies:
+      - containerName: 'kube-review'
+        minAllowed:
+          cpu: "1"
+          memory: 600Mii
+        maxAllowed:
+          cpu: 1
+          memory: 600Mi
+        controlledResources: ["cpu", "memory"]
