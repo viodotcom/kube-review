@@ -14,7 +14,7 @@ spec:
       - containerName: 'kube-review'
         minAllowed:
           cpu: "1"
-          memory: 600Mii
+          memory: 600Mi
         maxAllowed:
           cpu: "1"
           memory: 600Mi
