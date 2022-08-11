@@ -6,7 +6,7 @@ spec:
   targetRef:
     apiVersion: "apps/v1"
     kind: Deployment
-    name: deployment
+    name: kube-review-deployment
   updatePolicy:
     updateMode: "Auto"
   resourcePolicy:
