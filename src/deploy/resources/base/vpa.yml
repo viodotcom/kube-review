@@ -16,6 +16,6 @@ spec:
           cpu: "1"
           memory: 600Mii
         maxAllowed:
-          cpu: 1
+          cpu: "1"
           memory: 600Mi
         controlledResources: ["cpu", "memory"]
