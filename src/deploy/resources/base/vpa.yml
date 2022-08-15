@@ -1,0 +1,21 @@
+apiVersion: "autoscaling.k8s.io/v1"
+kind: VerticalPodAutoscaler
+metadata:
+  name: vpa
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: Deployment
+    name: kube-review-deployment
+  updatePolicy:
+    updateMode: "Off"
+  resourcePolicy:
+    containerPolicies:
+      - containerName: '*'
+        minAllowed:
+          cpu: "100m"
+          memory: 256Mi
+        maxAllowed:
+          cpu: "4"
+          memory: 100240Mi
+        controlledResources: ["cpu", "memory"]

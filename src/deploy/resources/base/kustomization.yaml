@@ -9,6 +9,7 @@ resources:
   - service.yml
   - ingress.yml
   - deployment.yml
+  - vpa.yml
 
 secretGenerator:
 - name: secret
