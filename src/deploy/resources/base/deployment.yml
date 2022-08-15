@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: deployment
-  labels:
-    app.kubernetes.io/name: kube-review
 spec:
   replicas: 1
   strategy:

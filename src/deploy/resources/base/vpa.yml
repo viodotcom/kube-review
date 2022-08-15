@@ -8,14 +8,14 @@ spec:
     kind: Deployment
     name: kube-review-deployment
   updatePolicy:
-    updateMode: "Auto"
+    updateMode: "Off"
   resourcePolicy:
     containerPolicies:
-      - containerName: 'kube-review'
+      - containerName: '*'
         minAllowed:
-          cpu: "1"
-          memory: 600Mi
+          cpu: "100m"
+          memory: 256Mi
         maxAllowed:
-          cpu: "1"
-          memory: 600Mi
+          cpu: "4"
+          memory: 100240Mi
         controlledResources: ["cpu", "memory"]
