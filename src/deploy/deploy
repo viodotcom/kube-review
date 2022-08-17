@@ -13,14 +13,6 @@ if [ "$KR_PRE_HOOK" != "" ]; then
   eval "$KR_PRE_HOOK"
 fi
 
-build () {
-    ./build
-}
-
-build () {
-    ./install
-}
-
 build
 install
 
