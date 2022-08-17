@@ -27,6 +27,7 @@ kube_context=$KR_KUBE_CONTEXT
 overlay_path=$KR_OVERLAY_PATH
 base_overlay_path=${KR_BASE_OVERLAY_PATH:-"src/build/resources/base"}
 
+# TODO change this to build time
 updated_at=$(date +%s)
 
 config_context() {

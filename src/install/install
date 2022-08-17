@@ -23,6 +23,7 @@ test_connection=${KR_TEST_CONNECTION:-true}
 test_connection_url_path=${KR_TEST_CONNECTION_URL_PATH:-"/"}
 delete_before_apply=${KR_DELETE_BEFORE_APPLY:-false}
 
+# TODO find a way to implement this
 updated_at=$(date +%s)
 
 export_variables() {
