@@ -8,7 +8,7 @@ spec:
     kind: Deployment
     name: kube-review-deployment
   updatePolicy:
-    updateMode: "Auto"
+    updateMode: "Off"
   resourcePolicy:
     containerPolicies:
       - containerName: '*'
