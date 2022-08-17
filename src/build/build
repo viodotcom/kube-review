@@ -81,8 +81,7 @@ build_resources () {
   fi
 
   resources=$(kustomize build)
-  kubectl create secret kube-review-build "$namespace" \
-    --dry-run=client \
+  kubectl create secret generic -n kube-review-build "$namespace" \
     --from-literal=resources="$resources" \
     -o yaml | \
     kubectl apply -f -
