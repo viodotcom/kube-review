@@ -82,7 +82,6 @@ build_resources () {
 
   resources=$(kustomize build)
   kubectl create secret kube-review-build "$namespace" \
-    --save-config \
     --dry-run=client \
     --from-literal=resources="$resources" \
     -o yaml | \
