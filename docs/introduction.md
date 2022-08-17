@@ -1,3 +1,9 @@
+- [Introduction](#introduction)
+  * [Review Environments](#review-environments)
+    + [Infrastucture](#infrastucture)
+  * [Deploy Component](#deploy-component)
+  * [Prune Component](#prune-component)
+
 # Introduction
 
 ## Review Environments
@@ -16,7 +22,7 @@ When deployed across an organization, review environment will be deployed in the
 
 ### Infrastucture
 
-The *kube-review* project is based on Kubernetes. Every environment deployed runs in its own namespace.
+The *Kube-Review* project is based on Kubernetes. Every environment deployed runs in its own namespace.
 
 Every environment deployed can expose a service port, which will be publicly exposed using **Nginx Ingress**. The ingress itself will be load balanced through a public load balancer. At this point we only support **AWS ELB**.
 
@@ -36,7 +42,7 @@ The Deploy component is the one that is deployed and executed on Kubernetes, run
 
 In order to deploy the necessary resources and configurations for the app, we use a **Kustomize** based process that takes care of doing all the necessary lifting while allowing customization.
 
-In order to make installation even simpler, the app is deployed through a shell script. The script is baked inside the *kube-review* public container image.
+In order to make installation even simpler, the app is deployed through a shell script. The script is baked inside the *Kube-Review* public container image.
 
 Using this image is the easiest way to deploy a review environment, specially from inside a CI/CD pipeline, as the image already contains all the necessary requirements.
 
@@ -46,9 +52,9 @@ Finally, the ID of the review env is automatically generated based on the prefix
 
 The prune component is a Kubernetes `cron job` responsible by purging expired environments or environment on which the attached pull request or branch was already merged or removed.
 
-The prune component will run every hour. Once it starts, it will scan all environments belonging to a *kube-review* environment. This is done through scanning namespaces that have the *kube-review* annotation.
+The prune component will run every hour. Once it starts, it will scan all environments belonging to a *Kube-Review* environment. This is done through scanning namespaces that have the *Kube-Review* annotation.
 
-Once it finds an environment that is deployed using *kube-review*, prune will get the metadata from the annotation and check if the PR is already merged or if the branch was deleted.
+Once it finds an environment that is deployed using *Kube-Review*, prune will get the metadata from the annotation and check if the PR is already merged or if the branch was deleted.
 
 To check for merged or removed PRs and branches, prune will contact the source code repository API. Right now we only support **GitHub**. If the environment is ephemeral, it will be removed if the expired time has passed, 5 days by default, or if the branch or PR was deleted/merged, whatever happens first.
 

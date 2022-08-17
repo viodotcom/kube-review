@@ -1,3 +1,12 @@
+- [Reference](#reference)
+  * [Deploy Component](#deploy-component)
+    + [Deploy Command](#deploy-command)
+      - [Options](#options)
+    + [Restart Command](#restart-command)
+      - [Options](#options-1)
+  * [Prune Component](#prune-component)
+    + [Options](#options-2)
+
 # Reference
 
 The `kube-review` is composed of two main components, `deploy` and `prune`.
