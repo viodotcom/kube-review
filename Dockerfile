@@ -54,6 +54,16 @@ COPY src/restart kube-review/restart/
 RUN chmod +x kube-review/restart/restart
 RUN ln -s /usr/local/kube-review/restart/restart /restart
 
+RUN mkdir -p kube-review/build
+COPY src/build kube-review/build/
+RUN chmod +x kube-review/build/build
+RUN ln -s /usr/local/kube-review/build/build /build
+
+RUN mkdir -p kube-review/install
+COPY src/install kube-review/install/
+RUN chmod +x kube-review/install/install
+RUN ln -s /usr/local/kube-review/install/install /install
+
 RUN mkdir -p kube-review/prune
 COPY --from=base /prune kube-review/prune/
 RUN chmod +x kube-review/prune/prune
