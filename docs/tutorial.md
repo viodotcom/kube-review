@@ -202,7 +202,7 @@ cd autoscaler/vertical-pod-autoscaler/
 
 For more information, you can also check this [guide](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler).
 
-We are using the VPA service with `updateMode: "Off"` by default for all containers, including the `kube-review` and `sidecar`. In order for you to change these settings, we recommend for you to use the [customization](customization.md) page. You can see the file created for this project [here](../src/deploy/resources/base/vpa.yml).
+We are using the VPA service with `updateMode: "Off"` by default for all containers, including the `kube-review` and `sidecar`. To change these settings, we recommend that you use the [customization](customization.md) page. You can see the file created for this project [here](../src/deploy/resources/base/vpa.yml).
 
 ## Deploying an environment
 
