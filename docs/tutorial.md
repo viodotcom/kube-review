@@ -192,32 +192,17 @@ envsubst < ./docs/files/aws_route53-dns_change.json | aws route53 change-resourc
 
 ### Vertical Pod autoscaling - VPA
 
-The VPA service is an extra component to install and for that you can follow this [guide](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler). You can see the file created for this project [here](../src/deploy/resources/base/vpa.yml).
-Explicaning it a bit with some specific details, you can see the same settings below but basically, we are using the VPA for all containers, including the `kube-review` and `sidecar`.
+The VPA service is a mandatory component to install and for that you can follow these steps below:
 
-```yaml
-apiVersion: "autoscaling.k8s.io/v1"
-kind: VerticalPodAutoscaler
-metadata:
-  name: vpa
-spec:
-  targetRef:
-    apiVersion: "apps/v1"
-    kind: Deployment
-    name: kube-review-deployment
-  updatePolicy:
-    updateMode: "Auto"
-  resourcePolicy:
-    containerPolicies:
-      - containerName: '*'
-        minAllowed:
-          cpu: "100m"
-          memory: 256Mi
-        maxAllowed:
-          cpu: "4"
-          memory: 100240Mi
-        controlledResources: ["cpu", "memory"]
+```shell
+git clone https://github.com/kubernetes/autoscaler.git
+cd autoscaler/vertical-pod-autoscaler/
+./hack/vpa-up.sh
 ```
+
+For more information, you can also check this [guide](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler).
+
+We are using the VPA service with `updateMode: "Off"` by default for all containers, including the `kube-review` and `sidecar`. In order for you to change these settings, we recommend for you to use the [customization](customization.md) page. You can see the file created for this project [here](../src/deploy/resources/base/vpa.yml).
 
 ## Deploying an environment
 
