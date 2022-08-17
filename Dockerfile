@@ -18,7 +18,7 @@ ARG DEFAULT_HELM_REPO_URL
 
 ENV KUBECTL_VERSION=v1.22.5
 ENV KUSTOMIZE_VERSION=v4.5.5
-ENV KR_BASE_OVERLAY_PATH=/usr/local/kube-review/deploy/resources/base
+ENV KR_BASE_OVERLAY_PATH=/usr/local/kube-review/build/resources/base
 
 # Default packages #
 RUN apk --no-cache --quiet update \
