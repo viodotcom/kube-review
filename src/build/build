@@ -89,6 +89,5 @@ build_resources () {
     kubectl apply -f -
 }
 
-export_variables
 config_context
 build_resources
