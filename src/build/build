@@ -22,13 +22,11 @@ name="$prefix-${KR_ID_OVERRIDE:-$KR_ID}"
 short_name=$(echo "$name" | cut -c1-15 | awk '{print tolower($0)}')
 hash=$(echo "$name" | rhash -p "%c" -)
 namespace=$short_name-$hash
-is_ephemeral=${KR_IS_EPHEMERAL:-true}
 kube_context=$KR_KUBE_CONTEXT
 overlay_path=$KR_OVERLAY_PATH
 base_overlay_path=${KR_BASE_OVERLAY_PATH:-"src/build/resources/base"}
 
-# TODO change this to build time
-updated_at=$(date +%s)
+build_at=$(date +%s)
 
 config_context() {
   # kubectl locks the config for each execution. To workaround
@@ -52,40 +50,29 @@ build_resources () {
     cp -R "$overlay_path" "$work_dir/overlay"
   fi
 
-  # Apply variable substituion on patches
-  for f in "$work_dir"/**/patches/*.json
-  do
-    KR_NAMESPACE=$namespace \
-    envsubst < "$f" | sponge "$f";
-    if [ "$verbose" = "true" ]; then
-      cat "$f"
-    fi
-	done
-
-  cd "$work_dir/base"
+  overlay_target="base"
   if [ "$overlay_path" != "" ]; then
-    cd "$work_dir/overlay"
+    overlay_target="overlay"
   fi
 
-  kustomize edit set namespace "$namespace"
+  cd "$work_dir/$overlay_target"
   kustomize edit add annotation --force \
-  app.kubernetes.io/instance:"$namespace" \
   app.kubernetes.io/pull_request_number:"$pull_request_number" \
   app.kubernetes.io/branch_name:"$branch_name" \
   app.kubernetes.io/repository_name:"$repo_name" \
   app.kubernetes.io/repository_owner:"$repo_owner" \
-  app.kubernetes.io/updated_at:"$updated_at" \
-  app.kubernetes.io/is_ephemeral:"$is_ephemeral" \
+  app.kubernetes.io/build_at:"$build_at" \
   app.kubernetes.io/job_url:'"'$job_url'"'
-  if [ "$verbose" = "true" ]; then
-    kustomize build
-  fi
+
+  cd; tar -cfv overlay.tar "$work_dir"
+  resources=$(base64 < "overlay.tar")
 
   resources=$(kustomize build)
   kubectl create secret generic -n kube-review-build "$namespace" \
     --save-config \
     --dry-run=client \
     --from-literal=resources="$resources" \
+    --from-literal=overlay_target="$overlay_target" \
     -o yaml | \
     kubectl apply -f -
 }
