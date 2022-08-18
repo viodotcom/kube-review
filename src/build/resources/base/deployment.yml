@@ -26,6 +26,9 @@ spec:
           env:
             - name: KR_HOST
               value: "PLACEHOLDER"
+          env:
+            - name: KR_STACK_SUFFIX
+              value: "PLACEHOLDER"
           envFrom:
             - secretRef:
                 name: kube-review-secret

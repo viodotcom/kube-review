@@ -11,6 +11,11 @@
     },
     {
         "op": "replace",
+        "path": "/spec/template/spec/containers/0/env/1/value",
+        "value": "$KR_STACK_ID.$KR_DOMAIN"
+    },
+    {
+        "op": "replace",
         "path": "/spec/template/spec/containers/0/ports/0/containerPort", 
         "value": $KR_CONTAINER_PORT
     },

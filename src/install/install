@@ -11,14 +11,19 @@ fi
 # Kube Review variables
 prefix=${KR_PREFIX:-re}
 kube_config_file=${KR_KUBE_CONFIG_FILE:-$HOME/.kube/config}
-name="$prefix-${KR_ID_OVERRIDE:-$KR_ID}"
-orignal_name="$prefix-$KR_ID"
-short_name=$(echo "$name" | cut -c1-15 | awk '{print tolower($0)}')
-short_name_original=$(echo "$orignal_name" | cut -c1-15 | awk '{print tolower($0)}')
-hash=$(echo "$name" | rhash -p "%c" -)
-hash_original=$(echo "$orignal_name" | rhash -p "%c" -)
-namespace=$short_name-$hash
-namespace_original=$short_name_original-$hash_original
+
+stack_name="${KR_ID_OVERRIDE:-$KR_ID}"
+stack_name_hash=$(echo "$stack_name" | rhash -p "%c" -)
+stack_name_short=$(echo "$stack_name" | cut -c1-25 | awk '{print tolower($0)}')
+stack_id=$stack_name_short-$stack_name_hash
+namespace=$prefix-$stack_id
+
+original_stack_name="$KR_ID"
+original_stack_name_hash=$(echo "$original_stack_name" | rhash -p "%c" -)
+original_stack_name_short=$(echo "$original_stack_name" | cut -c1-25 | awk '{print tolower($0)}')
+original_stack_id=$original_stack_name_short-$original_stack_name_hash
+original_namespace=$prefix-$original_stack_id
+
 is_ephemeral=${KR_IS_EPHEMERAL:-true}
 host=$namespace.$KR_DOMAIN
 url=https://$host
@@ -59,15 +64,16 @@ install_resources () {
   cd "$work_dir"
   
   # Get orverlay resources and untar into a folder
-  kubectl get secrets -n kube-review-build "$namespace_original" -o jsonpath='{.data.resources}' | base64 -d > overlay.tar
+  kubectl get secrets -n kube-review-build "$original_namespace" -o jsonpath='{.data.resources}' | base64 -d > overlay.tar
   tar -v -xf overlay.tar
 
   # Get the overlay target and enter the directory
-  target=$(kubectl get secrets -n kube-review-build "$namespace_original" -o jsonpath='{.data.overlay_target}' | base64 -d)
+  target=$(kubectl get secrets -n kube-review-build "$original_namespace" -o jsonpath='{.data.overlay_target}' | base64 -d)
   cd "$target"
 
   # Apply variable substituion on patches only to variables present (compgen)
   export KR_NAMESPACE=$namespace
+  export KR_STACK_ID=$stack_id
   for f in "$work_dir"/**/patches/*.json
   do
     envsubst "$(compgen -e | awk '$0="${"$0"}"')" < "$f" | sponge "$f";
