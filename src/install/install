@@ -60,7 +60,7 @@ install_resources () {
   
   # Get orverlay resources and untar into a folder
   kubectl get secrets -n kube-review-build "$namespace_original" -o jsonpath='{.data.resources}' | base64 -d > overlay.tar
-  tar -xf overlay.tar
+  tar -v -xf overlay.tar
 
   # Get the overlay target and enter the directory
   target=$(kubectl get secrets -n kube-review-build "$namespace_original" -o jsonpath='{.data.overlay_target}' | base64 -d)

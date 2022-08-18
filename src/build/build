@@ -64,7 +64,7 @@ build_resources () {
   app.kubernetes.io/build_at:"$build_at" \
   app.kubernetes.io/job_url:'"'$job_url'"'
 
-  cd /tmp; tar -v -cf overlay.tar "$work_dir"
+  cd /tmp; tar -C "$work_dir" -v -cf overlay.tar .
   kubectl create secret generic -n kube-review-build "$namespace" \
     --save-config \
     --dry-run=client \
