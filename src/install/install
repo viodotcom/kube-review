@@ -67,9 +67,9 @@ install_resources () {
   cd "$target"
 
   # Apply variable substituion on patches only to variables present (compgen)
+  export KR_NAMESPACE=$namespace
   for f in "$work_dir"/**/patches/*.json
   do
-    KR_NAMESPACE=$namespace \
     envsubst "$(compgen -e | awk '$0="${"$0"}"')" < "$f" | sponge "$f";
     if [ "$verbose" = "true" ]; then
       cat "$f"
