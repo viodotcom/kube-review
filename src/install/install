@@ -66,11 +66,11 @@ install_resources () {
   target=$(kubectl get secrets -n kube-review-build "$namespace_original" -o jsonpath='{.data.overlay_target}' | base64 -d)
   cd "$target"
 
-  # Apply variable substituion on patches
+  # Apply variable substituion on patches only to variables present (compgen)
   for f in "$work_dir"/**/patches/*.json
   do
     KR_NAMESPACE=$namespace \
-    envsubst < "$f" | sponge "$f";
+    envsubst "$(compgen -e | awk '$0="${"$0"}"')" < "$f" | sponge "$f";
     if [ "$verbose" = "true" ]; then
       cat "$f"
     fi

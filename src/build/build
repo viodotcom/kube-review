@@ -55,6 +55,15 @@ build_resources () {
     overlay_target="overlay"
   fi
 
+  # Apply variable substituion on patches only to variables present (compgen)
+  for f in "$work_dir"/**/patches/*.json
+  do
+    envsubst "$(compgen -e | awk '$0="${"$0"}"')" < "$f" | sponge "$f";
+    if [ "$verbose" = "true" ]; then
+      cat "$f"
+    fi
+	done
+
   cd "$work_dir/$overlay_target"
   kustomize edit add annotation --force \
   app.kubernetes.io/pull_request_number:"$pull_request_number" \
@@ -62,7 +71,7 @@ build_resources () {
   app.kubernetes.io/repository_name:"$repo_name" \
   app.kubernetes.io/repository_owner:"$repo_owner" \
   app.kubernetes.io/build_at:"$build_at" \
-  app.kubernetes.io/job_url:'"'$job_url'"'
+  app.kubernetes.io/job_build_url:'"'$job_url'"'
 
   cd /tmp; tar -C "$work_dir" -v -cf overlay.tar .
   kubectl create secret generic -n kube-review-build "$namespace" \
