@@ -17,5 +17,5 @@ spec:
           memory: 256Mi
         maxAllowed:
           cpu: "4"
-          memory: 100240Mi
+          memory: 10Gi
         controlledResources: ["cpu", "memory"]
