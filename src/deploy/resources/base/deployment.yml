@@ -19,6 +19,13 @@ spec:
       labels:
         app.kubernetes.io/name: kube-review
     spec:
+      nodeSelector:
+        nodegroup-type: "github-runners"
+      tolerations:
+        - effect: NoSchedule
+          key: nodegroup-type
+          operator: Equal
+          value: "github-runners"
       containers:
         - name: kube-review
           image: "PLACEHOLDER"
