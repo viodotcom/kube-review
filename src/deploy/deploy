@@ -123,7 +123,7 @@ install_resources () {
     kubectl rollout restart -n "$namespace" deployment/kube-review-deployment    
   fi
 
-  if kubectl rollout status --timeout=5m -n "$namespace" deployment/kube-review-deployment; then
+  if kubectl rollout status --timeout=10m -n "$namespace" deployment/kube-review-deployment; then
     echo "Rollout successfully executed"
   else
     echo "Rollout was not Successful... Describing Deployed Pods"
