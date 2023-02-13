@@ -70,7 +70,7 @@ install_resources () {
   work_dir=$(mktemp -d)
 
   if [ "$shared_path" != "" ]; then
-    cp -R "$shared_path" "$work_dir"
+    cp -R "$shared_path" "$work_dir/shared_path"
   fi
 
   # If we don't have a overlay to apply, we just run from base overlay
