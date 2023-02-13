@@ -69,10 +69,6 @@ install_resources () {
   # Prepare directory structure and copy files
   work_dir=$(mktemp -d)
 
-  if [ "$shared_path" != "" ]; then
-    cp -R "$shared_path" "$work_dir/shared_path"
-  fi
-
   # If we don't have a overlay to apply, we just run from base overlay
   cp -R "$base_overlay_path" "$work_dir"
   if [ "$overlay_path" != "" ]; then
@@ -92,6 +88,11 @@ install_resources () {
   cd "$work_dir/base"
   if [ "$overlay_path" != "" ]; then
     cd "$work_dir/overlay"
+  fi
+
+  # Copy files to shared path if it is present
+  if [ "$shared_path" != "" ]; then
+    cp -R "$shared_path" "./__shared_path"
   fi
 
   kustomize edit set namespace "$namespace"
