@@ -33,6 +33,7 @@ url=https://$host
 kube_context=$KR_KUBE_CONTEXT
 test_connection=${KR_TEST_CONNECTION:-true}
 test_connection_url_path=${KR_TEST_CONNECTION_URL_PATH:-"/"}
+shared_path=$KR_SHARED_PATH
 overlay_path=$KR_OVERLAY_PATH
 base_overlay_path=${KR_BASE_OVERLAY_PATH:-"src/deploy/resources/base"}
 delete_before_apply=${KR_DELETE_BEFORE_APPLY:-false}
@@ -67,6 +68,10 @@ config_context() {
 install_resources () {
   # Prepare directory structure and copy files
   work_dir=$(mktemp -d)
+
+  if [ "$shared_path" != "" ]; then
+    cp -R "$shared_path" "$work_dir"
+  fi
 
   # If we don't have a overlay to apply, we just run from base overlay
   cp -R "$base_overlay_path" "$work_dir"
