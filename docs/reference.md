@@ -46,6 +46,7 @@ The `deploy` command contains many options which can be passed as environment va
 | KR_BASE_OVERLAY_PATH | The path containing the base kustomize overlay to be used. | src/deploy/resources/base | false |
 | KR_OVERLAY_PATH | The path containing a kustomize overlay to be used. | - | false |
 | KR_VERBOSE | Prints verbose or debug messages. Should not be used in production. | false | false |
+| KR_SHARED_PATH | The path of a folder that will be copied to `__shared_path/` folder into the overlay path. Can be used to load files from the host as configMaps, for example. | - | false |
 
 ### Restart Command
 
