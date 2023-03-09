@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Get current time
         id: date
-        run: echo "date=$(date +'%Y-%m-%d-%H-%M-%S')" >> $GITHUB_ENV
+        run: echo "date=$(date +'%Y-%m-%d-%H-%M-%S')" >> $GITHUB_OUTPUT
 
       - name: Clone
         uses: actions/checkout@v3
@@ -25,7 +25,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           HELM_REPO_NAME: s3://fh-eeq-helm-repository/charts
           HELM_REPO_PLUGIN_NAME: https://github.com/hypnoglow/helm-s3.git
-          TIME: "${{steps.date.outputs.date}}"
+          TIME: ${{ steps.date.outputs.date }}
         run: |
           helm version --short -c
           helm plugin install $HELM_REPO_PLUGIN_NAME
