@@ -44,12 +44,11 @@ jobs:
 
       - name: Get major release version
         id: major_release
-        run: |
-          echo "::set-output name=MAJOR_VERSION::$(echo ${{ github.event.release.tag_name }} | cut -d '.' -f1)"
+        run: echo "MAJOR_VERSION=$(echo ${{ github.event.release.tag_name }} | cut -d '.' -f1)"
 
       - name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           push: true
           tags: |

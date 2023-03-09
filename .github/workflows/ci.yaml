@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Get current time
         id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d-%H-%M-%S')"
+        run: echo "date=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
 
       - name: Clone
         uses: actions/checkout@v3
@@ -41,11 +41,6 @@ jobs:
       - name: Clone
         uses: actions/checkout@v3
 
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -56,12 +51,14 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
         with:
           push: true
           tags: |
             findhotelamsterdam/kube-review:${{ github.sha }}
-            findhotelamsterdam/kube-review:${{ steps.extract_branch.outputs.branch }}
+            findhotelamsterdam/kube-review:${{ github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
