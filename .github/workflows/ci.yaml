@@ -58,7 +58,7 @@ jobs:
           push: true
           tags: |
             findhotelamsterdam/kube-review:${{ github.sha }}
-            findhotelamsterdam/kube-review:${{ github.ref_name }}
+            findhotelamsterdam/kube-review:${{ env.BRANCH_NAME }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
