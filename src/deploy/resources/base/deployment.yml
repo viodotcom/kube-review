@@ -3,12 +3,6 @@ kind: Deployment
 metadata:
   name: deployment
 spec:
-  replicas: 1
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
-    type: RollingUpdate
   progressDeadlineSeconds: 600
   revisionHistoryLimit: 10
   selector:

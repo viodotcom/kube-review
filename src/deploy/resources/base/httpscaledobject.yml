@@ -9,5 +9,5 @@ spec:
     service: service
     port: 80
   replicas:
-    min: 1
+    min: 0
     max: 2
