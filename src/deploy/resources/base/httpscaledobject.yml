@@ -1,0 +1,13 @@
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: keda
+spec:
+  host: "PLACEHOLDER"
+  scaleTargetRef:
+    deployment: deployment
+    service: service
+    port: 80
+  replicas:
+    min: 1
+    max: 2
