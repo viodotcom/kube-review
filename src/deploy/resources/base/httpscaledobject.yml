@@ -4,10 +4,8 @@ metadata:
   name: keda
 spec:
   host: "PLACEHOLDER"
+  targetPendingRequests: 100
   scaleTargetRef:
     deployment: kube-review-deployment
     service: kube-review-service
-    port: 80
-  replicas:
-    min: 0
-    max: 2
+    port: 8080
