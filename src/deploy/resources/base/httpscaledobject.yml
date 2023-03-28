@@ -5,8 +5,8 @@ metadata:
 spec:
   host: "PLACEHOLDER"
   scaleTargetRef:
-    deployment: deployment
-    service: service
+    deployment: kube-review-deployment
+    service: kube-review-service
     port: 80
   replicas:
     min: 0
