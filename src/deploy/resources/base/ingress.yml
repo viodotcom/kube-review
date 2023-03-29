@@ -1,7 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress
+  name: "PLACEHOLDER"
+  namespace: keda
   annotations:
     kubernetes.io/ingress.class: nginx
 spec:
@@ -16,6 +17,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: kube-review-service
+                name: keda-add-ons-http-interceptor-proxy
                 port:
-                  number: 80
+                  number: 8080

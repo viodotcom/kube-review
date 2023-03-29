@@ -30,8 +30,9 @@ These are some of the features supported by *Kube-Review*:
 - Extension through pre and post install hooks;
 - Scalable and lean infra using Nginx Ingress and Let's Encrypt WildCards domains;
 - Environment isolation through namespaces;
-- Connection test after deployment.
-- [Vertical Pod Autoscaling](https://cloud.google.com/kubernetes-engine/docs/concepts/verticalpodautoscaler)
+- Connection test after deployment;
+- [Vertical Pod Autoscaling](https://cloud.google.com/kubernetes-engine/docs/concepts/verticalpodautoscaler);
+- [Scaling From/To zero with Keda HTTP Add-On](https://github.com/kedacore/charts/tree/main/http-add-on)
 
 ## Documentation
 

@@ -1,6 +1,11 @@
 [
     {
         "op": "replace",
+        "path": "/metadata/name", 
+        "value": "$KR_NAMESPACE"
+    },
+    {
+        "op": "replace",
         "path": "/spec/tls/0/hosts/0", 
         "value": "$KR_NAMESPACE.$KR_DOMAIN"
     },
