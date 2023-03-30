@@ -156,7 +156,7 @@ test_url() {
   then
     full_url=$url$test_connection_url_path
     echo "Running connection test against: $full_url"
-    output=$(curl --silent --fail --max-time 10 --retry 5 --retry-delay 5 --retry-connrefused --retry-all-errors "$full_url")
+    output=$(curl --silent --fail --max-time 10 --retry 10 --retry-delay 5 --retry-connrefused --retry-all-errors "$full_url")
     if [[ $? != 0 ]]; then
       echo "Connection test has failed with the following test output: $output";
       exit 1;
