@@ -1,16 +1,16 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: "PLACEHOLDER"
+  name: kube-review-ingress
   namespace: keda
   annotations:
     kubernetes.io/ingress.class: nginx
 spec:
   tls:
     - hosts:
-        - "PLACEHOLDER"
+        - '*.shared-stg.fih.io'
   rules:
-    - host: "PLACEHOLDER"
+    - host: '*.shared-stg.fih.io'
       http:
         paths:
           - path: /
