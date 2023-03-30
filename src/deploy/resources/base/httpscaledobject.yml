@@ -1,7 +1,7 @@
 apiVersion: http.keda.sh/v1alpha1
 kind: HTTPScaledObject
 metadata:
-  name: keda
+  name: keda-http
 spec:
   host: "PLACEHOLDER"
   targetPendingRequests: 100
