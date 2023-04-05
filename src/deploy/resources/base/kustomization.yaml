@@ -20,7 +20,7 @@ secretGenerator:
     disableNameSuffixHash: true
 
 patches:
-   - path: patches/httpscaledobject.patch.json
+  - path: patches/httpscaledobject.patch.json
     target:
       kind: HTTPScaledObject
   - path: patches/service.patch.json
