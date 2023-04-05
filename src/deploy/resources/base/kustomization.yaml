@@ -9,8 +9,6 @@ resources:
   - service.yml
   - deployment.yml
   - vpa.yml
-  - ingress-nginx/ingress.yml
-  - ingress-keda/httpscaledobject.yml
 
 secretGenerator:
 - name: secret
@@ -24,12 +22,6 @@ patches:
   - path: patches/service.patch.json
     target:
       kind: Service
-  - path: patches/ingress.patch.json
-    target:
-      kind: Ingress
-  - path: patches/httpscaledobject.patch.json
-    target:
-      kind: HTTPScaledObject
   - path: patches/deployment.patch.json
     target:
       kind: Deployment
