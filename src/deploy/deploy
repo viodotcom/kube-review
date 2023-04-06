@@ -36,7 +36,6 @@ test_connection_url_path=${KR_TEST_CONNECTION_URL_PATH:-"/"}
 shared_path=$KR_SHARED_PATH
 overlay_path=$KR_OVERLAY_PATH
 base_overlay_path=${KR_BASE_OVERLAY_PATH:-"src/deploy/resources/base"}
-overlay_target_dir=${KR_OVERLAY_TARGET_DIR:-"."}
 delete_before_apply=${KR_DELETE_BEFORE_APPLY:-false}
 
 updated_at=$(date +%s)
@@ -87,8 +86,8 @@ install_resources () {
 	done
 
   cd "$work_dir/base"
-  if [ "$overlay_target_dir" != "" ]; then
-    cd "$work_dir/overlay/$overlay_target_dir"
+  if [ "$overlay_path" != "" ]; then
+    cd "$work_dir/overlay"
   fi
 
   # Copy files to shared path if it is present
