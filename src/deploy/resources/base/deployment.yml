@@ -13,11 +13,11 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      name: kube-review
+      app.kubernetes.io/name: kube-review
   template:
     metadata:
       labels:
-        name: kube-review
+        app.kubernetes.io/name: kube-review
     spec:
       containers:
         - name: kube-review

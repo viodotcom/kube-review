@@ -5,7 +5,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    name: kube-review
+    app.kubernetes.io/name: kube-review
   ports:
     - name: web
       protocol: TCP
