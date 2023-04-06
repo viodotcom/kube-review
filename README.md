@@ -32,7 +32,7 @@ These are some of the features supported by *Kube-Review*:
 - Environment isolation through namespaces;
 - Connection test after deployment;
 - [Vertical Pod Autoscaling](https://cloud.google.com/kubernetes-engine/docs/concepts/verticalpodautoscaler);
-- [Scaling From/To zero with Keda HTTP Add-On](https://github.com/kedacore/charts/tree/main/http-add-on)
+- [Scaling From/To zero with Keda HTTP Add-On](https://github.com/kedacore/charts/tree/main/http-add-on);
 
 ## Documentation
 
