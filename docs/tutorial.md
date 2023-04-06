@@ -11,7 +11,7 @@
     + [Install](#install-1)
     + [Configure](#configure-2)
     + [Vertical Pod autoscaling - VPA](#vertical-pod-autoscaling---vpa)
-  * [Scaling From/To zero with Keda HTTP Add-On](#scaling-from-to-zero-with-keda-http-add-on)
+  * [Scaling From or To zero with Keda](#scaling-from-or-to-zero-with-keda)
   * [Deploying an environment](#deploying-an-environment)
   * [Kudos](#kudos)
 
@@ -207,7 +207,7 @@ For more information, you can also check this [guide](https://github.com/kuberne
 
 We are using the VPA service with `updateMode: "Off"` by default for all containers, including the `kube-review` and `sidecar`. To change these settings, we recommend that you use the [customization](customization.md) page. You can see the file created for this project [here](../src/deploy/resources/base/vpa.yml).
 
-## Scaling From/To zero with Keda HTTP Add-On
+## Scaling From or To zero with Keda
 
 **NOTE: KEDA requires Kubernetes cluster version 1.24 and higher**
 
