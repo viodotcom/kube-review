@@ -220,7 +220,7 @@ To install both components Keda and HTTP Add-On, you can follow their guides bel
 - [Keda](https://keda.sh/docs/2.10/deploy/)
 - [HTTP Add-on](https://github.com/kedacore/http-add-on/blob/main/docs/install.md)
 
-**TIP** Using the Keda project in the review environments, we don't need to take care of an ingress setting per each review environment (namespace). We should move it to the Keda namespace where we will have a `wildcard` covering all review environments URLs, then per each review environment (namespace), we just need to have an `HTTPScaledObject` created and used by Keda to collect metrics to scaling up/down the environment checking the HTTP requests.
+Using the Keda project in the review environments, we don't need to take care of an ingress setting per each review environment (namespace). We should move it to the Keda namespace where we will have a `wildcard` covering all review environments URLs, then per each review environment (namespace), we just need to have an `HTTPScaledObject` created and used by Keda to collect metrics to scaling up/down the environment checking the HTTP requests.
 
 ```yaml
 apiVersion: networking.k8s.io/v1
