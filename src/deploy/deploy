@@ -86,7 +86,12 @@ install_resources () {
     fi
 	done
 
-  cd "$work_dir"
+  # Accessing the folder with the kustomize files
+  if [ "$overlay_target_dir" != "" ]; then
+    cd "$work_dir/$overlay_target_dir"
+  else
+    cd "$work_dir"
+  fi
 
   # Copy files to shared path if it is present
   if [ "$shared_path" != "" ]; then
