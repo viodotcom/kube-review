@@ -261,6 +261,7 @@ KR_IMAGE=nginx:latest \
 KR_DOMAIN="${MY_DOMAIN}" \
 KR_CONTAINER_PORT="80" \
 KR_OVERLAY_PATH=src/deploy/resources/example \
+KR_OVERLAY_TARGET_DIR=example \
 LABEL=6.2.1 \
 src/deploy/deploy
 ```

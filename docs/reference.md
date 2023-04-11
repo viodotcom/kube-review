@@ -44,7 +44,8 @@ The `deploy` command contains many options which can be passed as environment va
 | KR_PRE_HOOK | A shell command to be executed before the deployment starts. | - | false |
 | KR_POST_HOOK | A shell command to be executed after the deployment is finished. | - | false |
 | KR_BASE_OVERLAY_PATH | The path containing the base kustomize overlay to be used. | src/deploy/resources/base | false |
-| KR_OVERLAY_PATH | The path containing a kustomize overlay to be used. | - | false |
+| KR_OVERLAY_PATH | The path containing a kustomize overlay files to be used. | - | false |
+| KR_OVERLAY_TARGET_DIR | The folder name inside of the `KR_OVERLAY_PATH` path containing a kustomize file to be applied, for example: `$KR_BASE_OVERLAY_PATH/example`. | - | false |
 | KR_VERBOSE | Prints verbose or debug messages. Should not be used in production. | false | false |
 | KR_SHARED_PATH | The path of a folder that will be copied to `__shared_path/` folder into the overlay path. Can be used to load files from the host as configMaps, for example. | - | false |
 
