@@ -88,10 +88,8 @@ install_resources () {
 
   # Accessing the folder with the kustomize files
   if [ "$overlay_target_dir" != "" ]; then
-    echo "Accessing the $overlay_target_dir folder";
     cd "$work_dir/$overlay_target_dir"
   else
-    echo "Accessing the base folder";
     cd "$work_dir"
   fi
 

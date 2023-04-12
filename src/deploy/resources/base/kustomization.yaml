@@ -7,9 +7,9 @@ resources:
   - namespace.yml
   - serviceaccount.yml
   - service.yml
+  - httpscaledobject.yml
   - deployment.yml
   - vpa.yml
-  - httpscaledobject.yml
 
 secretGenerator:
 - name: secret
@@ -20,12 +20,12 @@ secretGenerator:
     disableNameSuffixHash: true
 
 patches:
-  - path: patches/httpscaledobject.patch.json
-    target:
-      kind: HTTPScaledObject
   - path: patches/service.patch.json
     target:
       kind: Service
+  - path: patches/httpscaledobject.patch.json
+    target:
+      kind: HTTPScaledObject
   - path: patches/deployment.patch.json
     target:
       kind: Deployment
