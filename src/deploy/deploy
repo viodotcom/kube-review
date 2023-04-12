@@ -74,8 +74,6 @@ install_resources () {
   cp -R "$base_overlay_path" "$work_dir"
   if [ "$overlay_path" != "" ]; then
     cp -R "$overlay_path" "$work_dir"
-    echo "INFO - troubleshooting"
-    ls -la
   fi
 
   # Apply variable substituion on patches
@@ -91,14 +89,10 @@ install_resources () {
   # Accessing the folder with the kustomize files
   if [ "$overlay_target_dir" != "" ]; then
     echo "Accessing the $overlay_target_dir folder";
-    echo "INFO - troubleshooting";
     cd "$work_dir/$overlay_target_dir"
-    ls -la
   else
     echo "Accessing the base folder";
-    echo "INFO - troubleshooting";
     cd "$work_dir"
-    ls -la
   fi
 
   # Copy files to shared path if it is present
@@ -141,13 +135,9 @@ install_resources () {
   else
     if [ "$overlay_target_dir" != "" ]; then
       echo "Deploying the $overlay_target_dir folder";
-      echo "INFO - troubleshooting"
-      ls -la
       kustomize build $overlay_target_dir | kubectl apply -f - -n "$namespace" --wait=true
     else
       echo "Deploying the base folder";
-      echo "INFO - troubleshooting"
-      ls -la
       kustomize build base | kubectl apply -f - -n "$namespace" --wait=true
     fi
   fi
