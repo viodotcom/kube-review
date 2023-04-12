@@ -88,8 +88,10 @@ install_resources () {
 
   # Accessing the folder with the kustomize files
   if [ "$overlay_target_dir" != "" ]; then
+    echo "Accessing the $overlay_target_dir folder";
     cd "$work_dir/$overlay_target_dir"
   else
+    echo "Accessing the base folder";
     cd "$work_dir"
   fi
 
@@ -124,18 +126,18 @@ install_resources () {
   if [ "$verbose" = "true" ]; then
     if [ "$overlay_target_dir" != "" ]; then
       echo "[VERBOSE] Deploying the $overlay_target_dir folder";
-      kustomize build ./$overlay_target_dir | kubectl apply -f - -n "$namespace" --wait=true
+      kustomize build $overlay_target_dir | kubectl apply -f - -n "$namespace" --wait=true
     else
       echo "[VERBOSE] Deploying the base folder";
-      kustomize build ./base | kubectl apply -f - -n "$namespace" --wait=true
+      kustomize build base | kubectl apply -f - -n "$namespace" --wait=true
     fi
   else
     if [ "$overlay_target_dir" != "" ]; then
       echo "Deploying the $overlay_target_dir folder";
-      kustomize build ./$overlay_target_dir | kubectl apply -f - -n "$namespace" --wait=true
+      kustomize build $overlay_target_dir | kubectl apply -f - -n "$namespace" --wait=true
     else
       echo "Deploying the base folder";
-      kustomize build ./base | kubectl apply -f - -n "$namespace" --wait=true
+      kustomize build base | kubectl apply -f - -n "$namespace" --wait=true
     fi
   fi
 
