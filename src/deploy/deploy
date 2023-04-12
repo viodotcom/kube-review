@@ -35,7 +35,7 @@ test_connection=${KR_TEST_CONNECTION:-true}
 test_connection_url_path=${KR_TEST_CONNECTION_URL_PATH:-"/"}
 shared_path=$KR_SHARED_PATH
 base_overlay_path=${KR_BASE_OVERLAY_PATH:-"src/deploy/resources/base"}
-overlay_path=$KR_OVERLAY_PATH
+overlay_path="$KR_OVERLAY_PATH/."
 overlay_target_dir=$KR_OVERLAY_TARGET_DIR
 delete_before_apply=${KR_DELETE_BEFORE_APPLY:-false}
 
@@ -73,7 +73,7 @@ install_resources () {
   # If we don't have a overlay to apply, we just run from base overlay
   cp -R "$base_overlay_path" "$work_dir"
   if [ "$overlay_path" != "" ]; then
-    cp -R "$overlay_path" "$work_dir/"
+    cp -R "$overlay_path" "$work_dir"
   fi
 
   # Apply variable substituion on patches
@@ -124,18 +124,18 @@ install_resources () {
   if [ "$verbose" = "true" ]; then
     if [ "$overlay_target_dir" != "" ]; then
       echo "[VERBOSE] Deploying the $overlay_target_dir folder";
-      kustomize build $overlay_target_dir | kubectl apply -f - -n "$namespace" --wait=true
+      kustomize build ./$overlay_target_dir | kubectl apply -f - -n "$namespace" --wait=true
     else
       echo "[VERBOSE] Deploying the base folder";
-      kustomize build base | kubectl apply -f - -n "$namespace" --wait=true
+      kustomize build ./base | kubectl apply -f - -n "$namespace" --wait=true
     fi
   else
     if [ "$overlay_target_dir" != "" ]; then
       echo "Deploying the $overlay_target_dir folder";
-      kustomize build $overlay_target_dir | kubectl apply -f - -n "$namespace" --wait=true
+      kustomize build ./$overlay_target_dir | kubectl apply -f - -n "$namespace" --wait=true
     else
       echo "Deploying the base folder";
-      kustomize build base | kubectl apply -f - -n "$namespace" --wait=true
+      kustomize build ./base | kubectl apply -f - -n "$namespace" --wait=true
     fi
   fi
 
