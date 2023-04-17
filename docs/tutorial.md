@@ -211,7 +211,7 @@ We are using the VPA service with `updateMode: "Off"` by default for all contain
 
 **NOTE: KEDA requires Kubernetes cluster version 1.24 and higher**
 
-We implemented the [Keda - Kubernetes-based Event Driven Autoscaling](https://github.com/kedacore/keda) project as a component in the Review Review project because the review environments are a temporal environment running for a few days, we considered that saving money is an essential decision in that case. Implementing Keda help us with the possibility of scaling from/to zero the environment through HTTP requests with the [HTTP Add-On](https://github.com/kedacore/http-add-on) project.
+We implemented the [Keda - Kubernetes-based Event Driven Autoscaling](https://github.com/kedacore/keda) project as a component in the Kube Review project because the review environments are a temporal environment running for a few days, we considered that saving money is an essential decision in that case. Implementing Keda help us with the possibility of scaling from/to zero the environment through HTTP requests with the [HTTP Add-On](https://github.com/kedacore/http-add-on) project.
 
 To install both components Keda and HTTP Add-On, you can follow their guides below:
 
