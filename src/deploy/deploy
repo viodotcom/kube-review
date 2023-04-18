@@ -109,6 +109,10 @@ install_resources () {
   app.kubernetes.io/is_ephemeral:"$is_ephemeral" \
   app.kubernetes.io/job_url:'"'$job_url'"'
 
+  if [ "$verbose" = "true" ]; then
+    kustomize build
+  fi
+
   if [ "$delete_before_apply" != false ]; then
     kubectl delete namespace "$namespace" --wait=true --ignore-not-found=true
   fi
