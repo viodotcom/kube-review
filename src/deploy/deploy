@@ -2,7 +2,7 @@
 # exit if any command fails
 set -e
 
-verbose=${KR_VERBOSE:-false}
+verbose=${KR_VERBOSE:-true}
 if [ "$verbose" != "false" ]; then
   set -x
   export
