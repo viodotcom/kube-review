@@ -89,6 +89,8 @@ install_resources () {
   # Accessing the folder with the kustomize files
   if [ "$overlay_target_dir" != "" ]; then
     cd "$work_dir/$overlay_target_dir"
+    "DEBUGING - SHARED_PATH"
+    tree
   else
     cd "$work_dir/base"
   fi
@@ -96,6 +98,8 @@ install_resources () {
   # Copy files to shared path if it is present
   if [ "$shared_path" != "" ]; then
     cp -R "$shared_path" "./__shared_path"
+    "DEBUGING - SHARED_PATH"
+    tree
   fi
 
   kustomize edit set namespace "$namespace"
