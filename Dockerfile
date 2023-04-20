@@ -22,7 +22,7 @@ ENV KR_BASE_OVERLAY_PATH=/usr/local/kube-review/deploy/resources/base
 
 # Default packages #
 RUN apk --no-cache --quiet update \
-    && apk add --no-cache --quiet rhash gettext moreutils curl bash git jq python3 py3-pip
+    && apk add --no-cache --quiet rhash gettext moreutils curl bash git jq python3 py3-pip tree
 
 # AWS CLI
 RUN pip3 install --no-python-version-warning --upgrade --quiet pip \
