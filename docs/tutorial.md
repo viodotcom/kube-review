@@ -11,6 +11,7 @@
     + [Install](#install-1)
     + [Configure](#configure-2)
     + [Vertical Pod autoscaling - VPA](#vertical-pod-autoscaling---vpa)
+  * [Scaling From or To zero with Keda](#scaling-from-or-to-zero-with-keda)
   * [Deploying an environment](#deploying-an-environment)
   * [Kudos](#kudos)
 
@@ -46,7 +47,7 @@ The following command creates a EKS Cluster and node group named `tutorial`:
 ```shell
 eksctl create cluster \
 --name tutorial \
---version 1.19 \
+--version 1.24 \
 --with-oidc \
 --nodegroup-name tutorial \
 --node-type m5.large \
@@ -85,7 +86,7 @@ helm install \
   cert-manager jetstack/cert-manager \
   --create-namespace
   --namespace cert-manager \
-  --version v1.7.1 \
+  --version v1.9.1 \
   --set installCRDs=true \
   --set 'extraArgs={--dns01-recursive-nameservers-only}'
 ```
@@ -135,6 +136,7 @@ kubectl describe certificate --namespace cert-manager
 
 If everything went well, you should see something like:
 
+```shell
    ...
     Status:
     Conditions:
@@ -149,6 +151,7 @@ If everything went well, you should see something like:
     Renewal Time:            2021-08-06T14:00:55Z
     Events:                    <none>
     ...
+```
 
 For more info about this, check the certmanager's [official docs](https://cert-manager.io/docs/configuration/acme/).
 
@@ -168,7 +171,7 @@ helm install \
   --create-namespace
   --wait \
   --namespace nginx-ingress \
-  --version 4.1.3 \
+  --version 4.4.0 \
   --set rbac.create=true \
   --set controller.extraArgs.default-ssl-certificate=cert-manager/tutorial-prd
 ```
@@ -204,6 +207,46 @@ For more information, you can also check this [guide](https://github.com/kuberne
 
 We are using the VPA service with `updateMode: "Off"` by default for all containers, including the `kube-review` and `sidecar`. To change these settings, we recommend that you use the [customization](customization.md) page. You can see the file created for this project [here](../src/deploy/resources/base/vpa.yml).
 
+## Scaling From or To zero with Keda
+
+**NOTE: KEDA requires Kubernetes cluster version 1.24 and higher**
+
+We implemented the [Keda - Kubernetes-based Event Driven Autoscaling](https://github.com/kedacore/keda) project as a component in the Kube Review project because the review environments are a temporal environment running for a few days, we considered that saving money is an essential decision in that case. Implementing Keda help us with the possibility of scaling from/to zero the environment through HTTP requests with the [HTTP Add-On](https://github.com/kedacore/http-add-on) project.
+
+To install both components Keda and HTTP Add-On, you can follow their guides below:
+
+**NOTE: We tested the following versions: Keda 2.10.1 and HTTP Add-on 0.4.1**
+
+- [Keda](https://keda.sh/docs/2.10/deploy/)
+- [HTTP Add-on](https://github.com/kedacore/http-add-on/blob/main/docs/install.md)
+
+Using the Keda project in the review environments, we don't need to take care of an ingress setting per each review environment (namespace). We should move it to the Keda namespace where we will have a `wildcard` covering all review environments URLs, then per each review environment (namespace), we just need to have an `HTTPScaledObject` created and used by Keda to collect metrics to scaling up/down the environment checking the HTTP requests.
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kube-review-ingress
+  namespace: keda
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  tls:
+    - hosts:
+        - '*.example.com'
+  rules:
+    - host: '*.example.com'
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: keda-add-ons-http-interceptor-proxy
+                port:
+                  number: 8080
+```
+
 ## Deploying an environment
 
 Now that everything is installed and working, we just need to call the deploy script to actually deploy a review env.
@@ -218,6 +261,7 @@ KR_IMAGE=nginx:latest \
 KR_DOMAIN="${MY_DOMAIN}" \
 KR_CONTAINER_PORT="80" \
 KR_OVERLAY_PATH=src/deploy/resources/example \
+KR_OVERLAY_TARGET_DIR=example \
 LABEL=6.2.1 \
 src/deploy/deploy
 ```

@@ -69,7 +69,7 @@ If one needs to inject dynamic variables in the resources, that can be done by u
 ]
 ```
 
-Finally, in order to use the overlay one has to specify the `KR_OVERLAY_PATH` variable and the env vars to be injected in the resources:
+Finally, in order to use the overlay one has to specify the `KR_OVERLAY_PATH` and `KR_OVERLAY_TARGET_DIR` variables and the env vars to be injected in the resources:
 
 ```
 KR_ID=nginx \
@@ -77,6 +77,7 @@ KR_IMAGE=nginx:latest \
 KR_DOMAIN="my-domain.io" \
 KR_CONTAINER_PORT="80" \
 KR_OVERLAY_PATH=src/deploy/resources/example \
+KR_OVERLAY_TARGET_DIR=example \
 LABEL=6.2.1 \
 src/deploy/deploy
 ```

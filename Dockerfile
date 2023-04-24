@@ -16,8 +16,8 @@ FROM alpine
 
 ARG DEFAULT_HELM_REPO_URL
 
-ENV KUBECTL_VERSION=v1.22.5
-ENV KUSTOMIZE_VERSION=v4.5.5
+ENV KUBECTL_VERSION=v1.24.11
+ENV KUSTOMIZE_VERSION=v5.0.1
 ENV KR_BASE_OVERLAY_PATH=/usr/local/kube-review/deploy/resources/base
 
 # Default packages #
@@ -34,7 +34,7 @@ RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/
   && chmod +x /usr/local/bin/kubectl
 
 # Kustomize
-RUN curl -L --silent https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz -o kustomize.tar.gz \
+RUN curl --proto "=https" -L --silent https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz -o kustomize.tar.gz \
   && tar -zxf kustomize.tar.gz \
   && mv ./kustomize /usr/local/bin/kustomize \
   && rm -f kustomize.tar.gz

@@ -7,7 +7,7 @@ resources:
   - namespace.yml
   - serviceaccount.yml
   - service.yml
-  - ingress.yml
+  - httpscaledobject.yml
   - deployment.yml
   - vpa.yml
 
@@ -23,13 +23,12 @@ patches:
   - path: patches/service.patch.json
     target:
       kind: Service
-  - path: patches/ingress.patch.json
+  - path: patches/httpscaledobject.patch.json
     target:
-      kind: Ingress
+      kind: HTTPScaledObject
   - path: patches/deployment.patch.json
     target:
       kind: Deployment
-      name: deployment
   - path: patches/namespace.patch.json
     target:
       kind: Namespace
