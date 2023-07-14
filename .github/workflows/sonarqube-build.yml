@@ -3,7 +3,7 @@ on:
   # a pull request. 
   push:
     branches:
-      - master
+      - sc-87920-sonarqube_poc
   pull_request:
       types: [opened, synchronize, reopened]
 name: Main Workflow
