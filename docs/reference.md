@@ -6,6 +6,9 @@
       - [Options](#options-1)
   * [Prune Component](#prune-component)
     + [Options](#options-2)
+  * [Job Component](#job-component)
+    + [Job Command](#job-command)
+      - [Options](#options-3)
 
 # Reference
 
@@ -90,3 +93,34 @@ Although the component is not executed manually but through a `Cron Job` it's st
 | ghEndpoint | github api endpoint | https://api.github.com | false |
 | ghToken | github api token | - | true |
 | ghUserName | github username to use for auth | - | true |
+
+## Job Component
+
+The job component contains a set of commands that can be used to manage Kubernetes Job. There is a simple script that will do all the necessary magic to manage a job. 
+
+### Job Command
+
+This command is reponsible to create a new job.
+
+The basic flow of the components is, configure the correct kube context and create the resources. Depending on the use case, some other features might be used, like running pre/post scripts.
+
+#### Options
+
+The `job` command contains many options which can be passed as environment variables. This is the list of all options:
+
+| Name | Description | Default Value | Required |
+| - | - | - | - |
+| JOB_ID | A unique identifier for the job. It's recommended this to be the branch name. | - | true |
+| JOB_IMAGE | The full url of the container image, including the tag that the app should run. e.g: `JOB_IMAGE=nginx:stable` | - | true |
+| JOB_KUBE_CONTEXT | The kube context from the kube config file that should be used. | Default to current context. | false |
+| JOB_PREFIX | A prefix to be added to the name of the job. | job | false |
+| JOB_KUBE_CONFIG_FILE | The kube config file used for connecting to Kuberneres. The file has to be accessible on the local file system during execution of the script. | $HOME/.kube/config | false |
+| JOB_PULL_REQUEST_NUMBER | The pull request number that is being used to create the job. | - | false |
+| JOB_BRANCH_NAME | The branch that is being used to create the job. | - | false |
+| JOB_REPO_NAME | The repo name source code in question. | - | false |
+| JOB_REPO_OWNER | The repository owner of the source code in question. | - | false |
+| JOB_PRE_HOOK | A shell command to be executed before the deployment starts. | - | false |
+| JOB_POST_HOOK | A shell command to be executed after the deployment is finished. | - | false |
+| JOB_BASE_OVERLAY_PATH | The path containing the base kustomize overlay to be used. | src/job/resources/base | false |
+| JOB_OVERLAY_PATH | The path containing a kustomize overlay files to be used. | - | false |
+| JOB_VERBOSE | Prints verbose or debug messages. Should not be used in production. | false | false |
