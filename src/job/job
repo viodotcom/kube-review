@@ -30,6 +30,7 @@ namespace=$short_name-$hash
 kube_context=$JOB_KUBE_CONTEXT
 base_overlay_path=${JOB_BASE_OVERLAY_PATH:-"src/job/resources/base"}
 overlay_path="$JOB_OVERLAY_PATH/."
+overlay_target_dir=$JOB_OVERLAY_TARGET_DIR
 updated_at=$(date +%s)
 
 print_preinstall_message() {
@@ -71,7 +72,11 @@ install_resources () {
   done
 
   # Accessing the folder with the kustomize files
-  cd "$work_dir"
+  if [ "$overlay_target_dir" != "" ]; then
+    cd "$work_dir/$overlay_target_dir"
+  else
+    cd "$work_dir/base"
+  fi
 
   kustomize edit set namespace "$namespace"
   kustomize edit set nameSuffix "-$updated_at"
