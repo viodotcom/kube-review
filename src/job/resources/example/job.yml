@@ -7,3 +7,10 @@ spec:
     spec:
       containers:
       - name: kube-review-job
+        volumeMounts:
+        - name: config
+          mountPath: /config
+      volumes:
+      - name: config
+        configMap:
+          name: configmap

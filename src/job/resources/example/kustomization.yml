@@ -4,6 +4,12 @@ kind: Kustomization
 resources:
   - ../base
 
+configMapGenerator:
+- name: configmap
+  files:
+  - script.sh
+  behavior: merge
+
 secretGenerator:
 - name: secret
   envs:

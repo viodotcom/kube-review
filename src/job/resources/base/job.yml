@@ -6,22 +6,22 @@ spec:
   backoffLimit: 2
   selector:
     matchLabels:
-      app.kubernetes.io/name: kube-review-job
+      app.kubernetes.io/name: kube-review
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: kube-review-job
+        app.kubernetes.io/name: kube-review
     spec:
       ttlSecondsAfterFinished: 300
       restartPolicy: Never
       containers:
-      - name: kube-review-job
+      - name: job
         image: "PLACEHOLDER"
         command: ["PLACEHOLDER"]
         imagePullPolicy: IfNotPresent
         envFrom:
           - secretRef:
-              name: kube-review-secret-job
+              name: kube-review-job-secret
         resources:
           limits:
             cpu: "1"
