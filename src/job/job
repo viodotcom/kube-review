@@ -34,7 +34,7 @@ updated_at=$(date +%s)
 
 print_preinstall_message() {
   if [ "$JOB_MESSAGE" != "" ]; then
-    printf "%s\n" "$JOB_MESSAGE" "$JOB_LOG_URL$namespace"
+    printf "%s\n" "$JOB_MESSAGE" "$namespace"
   fi
 }
 
