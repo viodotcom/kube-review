@@ -3,10 +3,5 @@
         "op": "replace",
         "path": "/spec/template/spec/containers/0/image",
         "value": "mcr.microsoft.com/playwright:bionic"
-    },
-    {
-        "op": "replace",
-        "path": "/spec/template/spec/containers/0/command",
-        "value": ["/bin/bash", "-c", "apt-get -qq update && apt-get -qq install -y --no-install-recommends make"]
     }
 ]

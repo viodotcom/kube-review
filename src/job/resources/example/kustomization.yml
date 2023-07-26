@@ -5,13 +5,13 @@ resources:
   - ../base
 
 configMapGenerator:
-- name: configmap
+- name: job-configmap
   files:
   - script.sh
   behavior: merge
 
 secretGenerator:
-- name: secret
+- name: job-secret
   envs:
   - secrets.txt
   type: Opaque

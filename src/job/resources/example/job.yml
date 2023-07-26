@@ -6,11 +6,11 @@ spec:
   template:
     spec:
       containers:
-      - name: kube-review-job
-        volumeMounts:
-        - name: config
-          mountPath: /config
-      volumes:
-      - name: config
-        configMap:
-          name: configmap
+      - name: job
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2048Mi
+          requests:
+            cpu: "2"
+            memory: 1024Mi

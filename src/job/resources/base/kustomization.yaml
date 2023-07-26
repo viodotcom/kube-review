@@ -1,18 +1,18 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-nameprefix: job-
+nameprefix: kube-review-
 commonLabels:
   app.kubernetes.io/name: kube-review
 resources:
   - job.yml
 
 configMapGenerator:
-- name: configmap
+- name: job-configmap
   files:
   - script.sh
 
 secretGenerator:
-- name: secret
+- name: job-secret
   envs:
   - secrets.txt
   type: Opaque

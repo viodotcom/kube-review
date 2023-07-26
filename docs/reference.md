@@ -119,8 +119,11 @@ The `job` command contains many options which can be passed as environment varia
 | JOB_BRANCH_NAME | The branch that is being used to create the job. | - | false |
 | JOB_REPO_NAME | The repo name source code in question. | - | false |
 | JOB_REPO_OWNER | The repository owner of the source code in question. | - | false |
+| JOB_URL | The url responsible for running the job, for example, the url of your CI/CD execution. | - | false |
 | JOB_PRE_HOOK | A shell command to be executed before the deployment starts. | - | false |
 | JOB_POST_HOOK | A shell command to be executed after the deployment is finished. | - | false |
 | JOB_BASE_OVERLAY_PATH | The path containing the base kustomize overlay to be used. | src/job/resources/base | false |
 | JOB_OVERLAY_PATH | The path containing a kustomize overlay files to be used. | - | false |
+| JOB_OVERLAY_TARGET_DIR | The folder name inside of the `JOB_OVERLAY_PATH` path containing a kustomize file to be applied, for example: `$JOB_BASE_OVERLAY_PATH/example`. | - | false |
 | JOB_VERBOSE | Prints verbose or debug messages. Should not be used in production. | false | false |
+| JOB_MESSAGE | A message to be shown before executing the job. | - | false |

@@ -17,8 +17,10 @@ spec:
       containers:
       - name: job
         image: "PLACEHOLDER"
-        command: ["PLACEHOLDER"]
         imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: config
+          mountPath: /config
         envFrom:
           - secretRef:
               name: kube-review-job-secret
@@ -29,3 +31,7 @@ spec:
           requests:
             cpu: 100m
             memory: 600Mi
+      volumes:
+      - name: config
+        configMap:
+          name: configmap
