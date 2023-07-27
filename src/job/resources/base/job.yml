@@ -3,6 +3,7 @@ kind: Job
 metadata:
   name: job
 spec:
+  ttlSecondsAfterFinished: 300
   backoffLimit: 2
   selector:
     matchLabels:
@@ -12,7 +13,6 @@ spec:
       labels:
         app.kubernetes.io/name: kube-review
     spec:
-      ttlSecondsAfterFinished: 300
       restartPolicy: Never
       containers:
       - name: job
