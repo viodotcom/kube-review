@@ -15,6 +15,7 @@ spec:
       - name: job
         image: "PLACEHOLDER"
         imagePullPolicy: IfNotPresent
+        command: ["/config/script.sh"]
         volumeMounts:
         - name: config
           mountPath: /config
@@ -32,3 +33,4 @@ spec:
       - name: config
         configMap:
           name: job-configmap
+          defaultMode: 0500
