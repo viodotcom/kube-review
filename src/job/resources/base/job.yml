@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  generateName: job-
+  name: job
 spec:
   ttlSecondsAfterFinished: 300
   backoffLimit: 2
