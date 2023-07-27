@@ -113,7 +113,7 @@ The `job` command contains many options which can be passed as environment varia
 | JOB_ID | A unique identifier for the job. It's recommended this to be the branch name. | - | true |
 | JOB_IMAGE | The full url of the container image, including the tag that the app should run. e.g: `JOB_IMAGE=nginx:stable` | - | true |
 | JOB_KUBE_CONTEXT | The kube context from the kube config file that should be used. | Default to current context. | false |
-| JOB_PREFIX | A prefix to be added to the name of the job. | job | false |
+| JOB_PREFIX | A prefix to be added to the name of the job. | rev | false |
 | JOB_KUBE_CONFIG_FILE | The kube config file used for connecting to Kuberneres. The file has to be accessible on the local file system during execution of the script. | $HOME/.kube/config | false |
 | JOB_PULL_REQUEST_NUMBER | The pull request number that is being used to create the job. | - | false |
 | JOB_BRANCH_NAME | The branch that is being used to create the job. | - | false |
