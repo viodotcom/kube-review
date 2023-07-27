@@ -80,7 +80,7 @@ install_resources () {
   fi
 
   kustomize edit set namespace "$namespace"
-  kustomize edit set nameSuffix "$updated_at"
+  kustomize edit set nameSuffix '-"'$updated_at'"'
   kustomize edit add annotation --force \
   app.kubernetes.io/instance:"$namespace" \
   app.kubernetes.io/pull_request_number:"$pull_request_number" \
