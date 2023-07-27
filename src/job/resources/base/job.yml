@@ -5,9 +5,6 @@ metadata:
 spec:
   ttlSecondsAfterFinished: 300
   backoffLimit: 2
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: kube-review
   template:
     metadata:
       labels:
