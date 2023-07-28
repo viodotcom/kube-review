@@ -12,7 +12,7 @@ spec:
     spec:
       restartPolicy: Never
       containers:
-      - name: job
+      - name: kube-review-job
         image: "PLACEHOLDER"
         imagePullPolicy: IfNotPresent
         command: ["/config/script.sh"]
