@@ -34,10 +34,10 @@ overlay_target_dir=$JOB_OVERLAY_TARGET_DIR
 
 updated_at=$(date +%s)
 
-export_variables() {
+#export_variables() {
   # Export normally here so they are available to the post hook
   # export VARIABLE_NAME=$variable_name
-}
+#}
 
 print_preinstall_message() {
   if [ "$JOB_MESSAGE" != "" ]; then
@@ -112,7 +112,7 @@ install_resources () {
   kustomize build | kubectl apply -f - -n "$namespace" --wait=true
 }
 
-export_variables
+#export_variables
 print_preinstall_message
 config_context
 install_resources
