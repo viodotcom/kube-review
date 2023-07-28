@@ -44,6 +44,7 @@ updated_at=$(date +%s)
 export_variables() {
   # Export normally here so they are available to the post hook
   export URL=$url
+  export NAMESPACE=$namespace
 }
 
 print_preinstall_message() {
