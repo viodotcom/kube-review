@@ -1,6 +1,6 @@
 FROM golang:1.18.2-alpine3.15 as base
 
-LABEL maintainer="EEQ Team"
+LABEL maintainer="Eng Platform Team"
 LABEL service="Kube Review"
 
 RUN apk --no-cache --quiet update
@@ -19,6 +19,7 @@ ARG DEFAULT_HELM_REPO_URL
 ENV KUBECTL_VERSION=v1.24.11
 ENV KUSTOMIZE_VERSION=v5.0.1
 ENV KR_BASE_OVERLAY_PATH=/usr/local/kube-review/deploy/resources/base
+ENV JOB_BASE_OVERLAY_PATH=/usr/local/kube-review/job/resources/base
 
 # Default packages #
 RUN apk --no-cache --quiet update \
@@ -48,6 +49,11 @@ RUN mkdir -p kube-review/deploy
 COPY src/deploy kube-review/deploy/
 RUN chmod +x kube-review/deploy/deploy
 RUN ln -s /usr/local/kube-review/deploy/deploy /deploy
+
+RUN mkdir -p kube-review/job
+COPY src/job kube-review/job/
+RUN chmod +x kube-review/job/job
+RUN ln -s /usr/local/kube-review/job/job /job
 
 RUN mkdir -p kube-review/restart
 COPY src/restart kube-review/restart/

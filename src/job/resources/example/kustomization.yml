@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../base
+
+configMapGenerator:
+- name: job-configmap
+  files:
+  - script.sh
+  behavior: merge
+
+secretGenerator:
+- name: job-secret
+  envs:
+  - secrets.txt
+  type: Opaque
+  options:
+    disableNameSuffixHash: true
+  behavior: merge
+
+patches:
+  - path: patches/job.patch.json
+    target:
+      kind: Job
+      name: job
