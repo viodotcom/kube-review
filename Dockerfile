@@ -7,7 +7,7 @@ RUN apk --no-cache --quiet update
 
 WORKDIR /
 
-# Prune
+# Prune.
 COPY src/prune/* ./
 RUN go build -o ./prune .
 RUN chmod +x prune
