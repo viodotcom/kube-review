@@ -9,6 +9,7 @@ spec:
     deployment: kube-review-deployment
     service: kube-review-service
     port: 80
+  scaledownPeriod: 900
   replicas:
     min: 0
     max: 1
