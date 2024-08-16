@@ -25,8 +25,8 @@ RUN apk --no-cache --quiet update \
     && apk add --no-cache --quiet rhash gettext moreutils curl bash git jq python3 py3-pip
 
 # AWS CLI
-RUN pip3 install --no-python-version-warning --upgrade --quiet pip \
-  && pip3 install --no-python-version-warning --quiet awscli
+RUN pip3 install --no-python-version-warning --upgrade pip \
+  && pip3 install --no-python-version-warning awscli
 
 # Kubectl #
 RUN curl -LO --silent https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
