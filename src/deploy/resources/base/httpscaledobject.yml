@@ -3,7 +3,7 @@ kind: HTTPScaledObject
 metadata:
   name: keda-http
 spec:
-  host: "PLACEHOLDER"
+  hosts: "PLACEHOLDER"
   targetPendingRequests: 100
   scaleTargetRef:
     deployment: kube-review-deployment
