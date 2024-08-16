@@ -1,16 +1,16 @@
-apiVersion: http.keda.sh/v1alpha1
 kind: HTTPScaledObject
-metadata:
-  name: keda-http
+apiVersion: http.keda.sh/v1alpha1
 spec:
-  hosts: 
-    - "PLACEHOLDER"
-  targetPendingRequests: 100
-  scaleTargetRef:
-    deployment: kube-review-deployment
-    service: kube-review-service
-    port: 80
-  scaledownPeriod: 900
-  replicas:
-    min: 0
-    max: 1
+    hosts:
+        - "PLACEHOLDER"
+    pathPrefixes:
+        - /test
+    scaleTargetRef:
+        name: kube-review-deployment
+        kind: Deployment
+        apiVersion: apps/v1
+        service: kube-review-service
+        port: 80
+    replicas:
+        min: 0
+        max: 1
