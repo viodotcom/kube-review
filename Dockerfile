@@ -25,7 +25,7 @@ RUN apk --no-cache --quiet update \
     && apk add --no-cache --quiet rhash gettext moreutils curl bash git jq python3 py3-pip
 
 # AWS CLI
-RUN pip3 install --no-python-version-warning --upgrade pip \
+RUN pip3 install --no-python-version-warning  --break-system-packages --upgrade pip \
   && pip3 install --no-python-version-warning awscli
 
 # Kubectl #
