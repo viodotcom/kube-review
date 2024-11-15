@@ -1,7 +1,7 @@
 kind: HTTPScaledObject
 apiVersion: http.keda.sh/v1alpha1
 metadata:
-    name: xkcd
+    name: keda-http
 spec:
     hosts:
         - "PLACEHOLDER"
