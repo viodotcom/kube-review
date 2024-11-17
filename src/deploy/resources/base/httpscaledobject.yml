@@ -6,7 +6,7 @@ spec:
     hosts:
         - "PLACEHOLDER"
     pathPrefixes:
-        - /test
+        - /
     scaleTargetRef:
         name: kube-review-deployment
         kind: Deployment
