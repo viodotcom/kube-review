@@ -1,7 +1,7 @@
 [
     {
         "op": "replace",
-        "path": "/spec/hosts", 
+        "path": "/spec/0/hosts", 
         "value": "$KR_NAMESPACE.$KR_DOMAIN"
     }
 ]
