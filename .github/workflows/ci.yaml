@@ -51,7 +51,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
         with:
