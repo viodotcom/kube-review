@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kube-review
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: kube-review-job
+        image: "PLACEHOLDER"
+        imagePullPolicy: IfNotPresent
+        command: ["/config/script.sh"]
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        envFrom:
+          - secretRef:
+              name: job-secret
+        resources:
+          limits:
+            cpu: "1"
+            memory: 600Mi
+          requests:
+            cpu: 100m
+            memory: 600Mi
+      volumes:
+      - name: config
+        configMap:
+          name: job-configmap
+          defaultMode: 0500
