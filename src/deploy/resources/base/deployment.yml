@@ -26,6 +26,10 @@ spec:
           env:
             - name: KR_HOST
               value: "PLACEHOLDER"
+            - name: DD_SERVICE
+              value: "PLACEHOLDER"
+            - name: DD_ENV
+              value: "development"
           envFrom:
             - secretRef:
                 name: kube-review-secret
